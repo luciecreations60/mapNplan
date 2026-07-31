@@ -1,0 +1,226 @@
+[
+  {
+    "path": ".env.example",
+    "bytes": 86
+  },
+  {
+    "path": ".github/workflows/deploy.yml",
+    "bytes": 988
+  },
+  {
+    "path": ".gitignore",
+    "bytes": 95
+  },
+  {
+    "path": "ARCHITECTURE.md",
+    "bytes": 2466
+  },
+  {
+    "path": "CHANGELOG.md",
+    "bytes": 623
+  },
+  {
+    "path": "README.md",
+    "bytes": 2639
+  },
+  {
+    "path": "ROADMAP.md",
+    "bytes": 1259
+  },
+  {
+    "path": "UPLOAD_TO_GITHUB.md",
+    "bytes": 656
+  },
+  {
+    "path": "index.html",
+    "bytes": 773
+  },
+  {
+    "path": "package.json",
+    "bytes": 552
+  },
+  {
+    "path": "project.config.js",
+    "bytes": 440
+  },
+  {
+    "path": "public/favicon.svg",
+    "bytes": 495
+  },
+  {
+    "path": "public/service-worker.js",
+    "bytes": 1418
+  },
+  {
+    "path": "public/site.webmanifest",
+    "bytes": 356
+  },
+  {
+    "path": "src/App.jsx",
+    "bytes": 1250
+  },
+  {
+    "path": "src/components/common/Badge.jsx",
+    "bytes": 185
+  },
+  {
+    "path": "src/components/common/Brand.jsx",
+    "bytes": 496
+  },
+  {
+    "path": "src/components/common/Button.jsx",
+    "bytes": 586
+  },
+  {
+    "path": "src/components/common/Card.jsx",
+    "bytes": 202
+  },
+  {
+    "path": "src/components/common/Icon.jsx",
+    "bytes": 1287
+  },
+  {
+    "path": "src/components/common/Modal.jsx",
+    "bytes": 1448
+  },
+  {
+    "path": "src/components/common/ProgressBar.jsx",
+    "bytes": 501
+  },
+  {
+    "path": "src/components/common/TextField.jsx",
+    "bytes": 673
+  },
+  {
+    "path": "src/components/dashboard/StatCard.jsx",
+    "bytes": 460
+  },
+  {
+    "path": "src/components/dashboard/UpcomingTripCard.jsx",
+    "bytes": 2395
+  },
+  {
+    "path": "src/components/feedback/ErrorBoundary.jsx",
+    "bytes": 897
+  },
+  {
+    "path": "src/components/navigation/Sidebar.jsx",
+    "bytes": 1980
+  },
+  {
+    "path": "src/components/navigation/TopBar.jsx",
+    "bytes": 1844
+  },
+  {
+    "path": "src/components/trips/CreateTripDialog.jsx",
+    "bytes": 4649
+  },
+  {
+    "path": "src/components/trips/TripCard.jsx",
+    "bytes": 2366
+  },
+  {
+    "path": "src/config/app.config.js",
+    "bytes": 601
+  },
+  {
+    "path": "src/config/navigation.config.js",
+    "bytes": 474
+  },
+  {
+    "path": "src/contexts/ThemeContext.jsx",
+    "bytes": 1803
+  },
+  {
+    "path": "src/contexts/TripContext.jsx",
+    "bytes": 1194
+  },
+  {
+    "path": "src/data/demoTrips.js",
+    "bytes": 1483
+  },
+  {
+    "path": "src/hooks/useTheme.js",
+    "bytes": 271
+  },
+  {
+    "path": "src/hooks/useTrips.js",
+    "bytes": 267
+  },
+  {
+    "path": "src/layouts/AppLayout.jsx",
+    "bytes": 625
+  },
+  {
+    "path": "src/main.jsx",
+    "bytes": 680
+  },
+  {
+    "path": "src/pages/DashboardPage.jsx",
+    "bytes": 5071
+  },
+  {
+    "path": "src/pages/ExplorePage.jsx",
+    "bytes": 2574
+  },
+  {
+    "path": "src/pages/NotFoundPage.jsx",
+    "bytes": 512
+  },
+  {
+    "path": "src/pages/SettingsPage.jsx",
+    "bytes": 3067
+  },
+  {
+    "path": "src/pages/TripsPage.jsx",
+    "bytes": 2755
+  },
+  {
+    "path": "src/services/pwa/registerServiceWorker.js",
+    "bytes": 488
+  },
+  {
+    "path": "src/services/storage/LocalStorageService.js",
+    "bytes": 1216
+  },
+  {
+    "path": "src/services/trips/TripService.js",
+    "bytes": 2766
+  },
+  {
+    "path": "src/styles/components.css",
+    "bytes": 7579
+  },
+  {
+    "path": "src/styles/global.css",
+    "bytes": 1596
+  },
+  {
+    "path": "src/styles/layout.css",
+    "bytes": 5284
+  },
+  {
+    "path": "src/styles/pages.css",
+    "bytes": 14877
+  },
+  {
+    "path": "src/styles/tokens.css",
+    "bytes": 1890
+  },
+  {
+    "path": "src/utils/currency.js",
+    "bytes": 219
+  },
+  {
+    "path": "src/utils/date.js",
+    "bytes": 1348
+  },
+  {
+    "path": "src/utils/id.js",
+    "bytes": 302
+  },
+  {
+    "path": "vite.config.js",
+    "bytes": 483
+  }
+]
