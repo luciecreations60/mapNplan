@@ -7,6 +7,7 @@ import { DiscussionThread } from '../collaboration/DiscussionThread.jsx';
 import { Button } from '../common/Button.jsx';
 import { Card } from '../common/Card.jsx';
 import { Icon } from '../common/Icon.jsx';
+import { LocationAutocomplete } from '../common/LocationAutocomplete.jsx';
 
 const EMPTY_FORM = Object.freeze({
   date: '', time: '09:00', type: 'map', title: '', location: '', latitude: '', longitude: '',
@@ -157,7 +158,28 @@ export function ItineraryPanel({ trip, onUpdate }) {
                 </select>
               </Field>
               <Field label={t('itinerary.titleLabel')} className="workspace-form__wide"><input name="title" value={form.title} onChange={updateField} placeholder={t('itinerary.titlePlaceholder')} required /></Field>
-              <Field label={t('itinerary.location')} className="workspace-form__wide"><input name="location" value={form.location} onChange={updateField} placeholder={t('itinerary.locationPlaceholder')} /></Field>
+              <LocationAutocomplete
+                id="itinerary-location"
+                variant="workspace"
+                className="workspace-form__wide"
+                label={t('itinerary.location')}
+                value={form.location}
+                placeholder={t('itinerary.locationPlaceholder')}
+                bias={{ latitude: trip.destinationLatitude, longitude: trip.destinationLongitude }}
+                hint={t('placeSearch.locationHint')}
+                onValueChange={(value) => setForm((current) => ({
+                  ...current, location: value, latitude: '', longitude: '',
+                }))}
+                onPlaceSelect={(place) => {
+                  if (!place) return;
+                  setForm((current) => ({
+                    ...current,
+                    location: place.label,
+                    latitude: place.latitude,
+                    longitude: place.longitude,
+                  }));
+                }}
+              />
               <Field label={t('common.latitude')}><input name="latitude" type="number" min="-90" max="90" step="any" value={form.latitude} onChange={updateField} placeholder="35.6762" title={t('itinerary.latitudeHelp')} /></Field>
               <Field label={t('common.longitude')}><input name="longitude" type="number" min="-180" max="180" step="any" value={form.longitude} onChange={updateField} placeholder="139.6503" title={t('itinerary.longitudeHelp')} /></Field>
               <Field label={t('itinerary.duration')}><input name="durationMinutes" type="number" min="0" step="15" value={form.durationMinutes} onChange={updateField} /></Field>

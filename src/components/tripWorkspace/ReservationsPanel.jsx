@@ -10,6 +10,7 @@ import { Badge } from '../common/Badge.jsx';
 import { Button } from '../common/Button.jsx';
 import { Card } from '../common/Card.jsx';
 import { Icon } from '../common/Icon.jsx';
+import { LocationAutocomplete } from '../common/LocationAutocomplete.jsx';
 
 const EMPTY_FORM = Object.freeze({
   type: 'flight', title: '', provider: '', confirmationNumber: '', startDate: '', startTime: '',
@@ -158,7 +159,28 @@ export function ReservationsPanel({ trip, onUpdate }) {
               <Field label={t('reservations.startTime')}><input name="startTime" type="time" value={form.startTime} onChange={updateField} /></Field>
               <Field label={t('reservations.endDate')}><input name="endDate" type="date" value={form.endDate} onChange={updateField} /></Field>
               <Field label={t('reservations.endTime')}><input name="endTime" type="time" value={form.endTime} onChange={updateField} /></Field>
-              <Field label={t('common.location')} className="workspace-form__wide"><input name="location" value={form.location} onChange={updateField} placeholder={t('reservations.locationPlaceholder')} /></Field>
+              <LocationAutocomplete
+                id="reservation-location"
+                variant="workspace"
+                className="workspace-form__wide"
+                label={t('common.location')}
+                value={form.location}
+                placeholder={t('reservations.locationPlaceholder')}
+                bias={{ latitude: trip.destinationLatitude, longitude: trip.destinationLongitude }}
+                hint={t('placeSearch.locationHint')}
+                onValueChange={(value) => setForm((current) => ({
+                  ...current, location: value, latitude: '', longitude: '',
+                }))}
+                onPlaceSelect={(place) => {
+                  if (!place) return;
+                  setForm((current) => ({
+                    ...current,
+                    location: place.label,
+                    latitude: place.latitude,
+                    longitude: place.longitude,
+                  }));
+                }}
+              />
               <Field label={`${t('tools.amount')} (${trip.currency})`}><input name="amount" type="number" min="0" step="0.01" value={form.amount} onChange={updateField} /></Field>
               <Field label={t('reservations.bookingLink')}><input name="url" type="url" value={form.url} onChange={updateField} placeholder={t('reservations.linkPlaceholder')} /></Field>
               <Field label={t('common.latitude')}><input name="latitude" type="number" min="-90" max="90" step="any" value={form.latitude} onChange={updateField} placeholder="35.6762" /></Field>

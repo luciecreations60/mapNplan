@@ -196,8 +196,8 @@ export const TRANSLATIONS = Object.freeze({
     },
     map: {
       eyebrow: 'Visual planning', title: 'Trip map', intro: 'See itinerary stops and geolocated reservations in one place.',
-      emptyTitle: 'No mapped places yet', emptyText: 'Add latitude and longitude to itinerary activities or reservations.',
-      addCoordinates: 'Add itinerary coordinates', mappedPlaces: 'Mapped places', mappedEmpty: 'Mapped locations will appear here.', location: '{{count}} location', locations: '{{count}} locations', reservation: 'Reservation', itinerary: 'Itinerary', savedCoordinates: 'Saved coordinates',
+      emptyTitle: 'No mapped places yet', emptyText: 'Select a suggested destination or add a geolocated activity or reservation.',
+      addCoordinates: 'Add itinerary coordinates', mappedPlaces: 'Mapped places', mappedEmpty: 'Mapped locations will appear here.', location: '{{count}} location', locations: '{{count}} locations', reservation: 'Reservation', itinerary: 'Itinerary', destination: 'Destination', savedCoordinates: 'Saved coordinates',
       aria: 'Interactive trip map',
     },
     notes: {
@@ -210,9 +210,9 @@ export const TRANSLATIONS = Object.freeze({
     },
     tools: {
       title: 'Travel tools', emptyTitle: 'Add one mapped place first',
-      emptyText: 'Weather and local time need coordinates. Add latitude and longitude to an itinerary activity or reservation.',
+      emptyText: 'Weather and local time need coordinates. Select a destination suggestion or add a geolocated activity or reservation.',
       openItinerary: 'Open itinerary', openReservations: 'Open reservations', eyebrow: 'Travel companion',
-      heading: 'Useful information at a glance', liveFrom: 'Live conditions use the first mapped itinerary location:',
+      heading: 'Useful information at a glance', liveFrom: 'Live conditions use the selected destination or first mapped place:',
       noKey: 'No account or API key required', forecastLoadError: 'The forecast could not be loaded.', disclaimer: 'Weather forecasts and exchange rates are informational. Confirm critical travel decisions with official providers and your bank.',
       rateEyebrow: 'Reference rate', converter: 'Currency converter', fees: 'Bank and card fees may differ.',
       amount: 'Amount', from: 'From', to: 'To', updatingRate: 'Updating reference rate…', swap: 'Swap currencies',
@@ -232,6 +232,14 @@ export const TRANSLATIONS = Object.freeze({
       other: 'Other', documents: 'Documents', bookings: 'Bookings', packing: 'Packing', technology: 'Technology', money: 'Money',
       place: 'Place', hotel: 'Hotel', flight: 'Flight', activity: 'Activity', confirmed: 'Confirmed', pending: 'Pending',
       cancelled: 'Cancelled', passport: 'Passport', identity: 'Identity', ticket: 'Ticket', booking: 'Booking', insurance: 'Insurance',
+    },
+    placeSearch: {
+      loading: 'Searching places…', clear: 'Clear place', noResults: 'No matching place found.',
+      error: 'Place search is temporarily unavailable. You can still enter the location manually.',
+      minimumCharacters: 'Type at least {{count}} characters to search.',
+      destinationHint: 'Start typing and select a result to save the destination coordinates automatically.',
+      locationHint: 'Select a suggestion to fill latitude and longitude automatically.',
+      poweredBy: 'Search powered by',
     },
     search: {
       title: 'Search your travel workspace', placeholder: 'Search trips, activities, bookings or documents…',
@@ -508,8 +516,8 @@ export const TRANSLATIONS = Object.freeze({
     },
     map: {
       eyebrow: 'Planification visuelle', title: 'Carte du voyage', intro: 'Visualisez les étapes et réservations géolocalisées au même endroit.',
-      emptyTitle: 'Aucun lieu cartographié', emptyText: 'Ajoutez latitude et longitude aux activités ou réservations.',
-      addCoordinates: 'Ajouter des coordonnées à l’itinéraire', mappedPlaces: 'Lieux cartographiés', mappedEmpty: 'Les lieux cartographiés apparaîtront ici.', location: '{{count}} lieu', locations: '{{count}} lieux', reservation: 'Réservation', itinerary: 'Itinéraire', savedCoordinates: 'Coordonnées enregistrées',
+      emptyTitle: 'Aucun lieu cartographié', emptyText: 'Sélectionnez une destination proposée ou ajoutez une activité ou réservation géolocalisée.',
+      addCoordinates: 'Ajouter des coordonnées à l’itinéraire', mappedPlaces: 'Lieux cartographiés', mappedEmpty: 'Les lieux cartographiés apparaîtront ici.', location: '{{count}} lieu', locations: '{{count}} lieux', reservation: 'Réservation', itinerary: 'Itinéraire', destination: 'Destination', savedCoordinates: 'Coordonnées enregistrées',
       aria: 'Carte interactive du voyage',
     },
     notes: {
@@ -522,9 +530,9 @@ export const TRANSLATIONS = Object.freeze({
     },
     tools: {
       title: 'Outils de voyage', emptyTitle: 'Ajoutez d’abord un lieu cartographié',
-      emptyText: 'La météo et l’heure locale nécessitent des coordonnées. Ajoutez latitude et longitude à une activité ou une réservation.',
+      emptyText: 'La météo et l’heure locale nécessitent des coordonnées. Sélectionnez une destination proposée ou ajoutez une activité ou réservation géolocalisée.',
       openItinerary: 'Ouvrir l’itinéraire', openReservations: 'Ouvrir les réservations', eyebrow: 'Compagnon de voyage',
-      heading: 'Informations utiles en un coup d’œil', liveFrom: 'Les conditions utilisent le premier lieu cartographié de l’itinéraire :',
+      heading: 'Informations utiles en un coup d’œil', liveFrom: 'Les conditions utilisent la destination sélectionnée ou le premier lieu cartographié :',
       noKey: 'Aucun compte ni clé API nécessaire', forecastLoadError: 'Les prévisions n’ont pas pu être chargées.', disclaimer: 'Les prévisions météo et taux de change sont indicatifs. Confirmez les décisions importantes auprès des services officiels et de votre banque.',
       rateEyebrow: 'Taux de référence', converter: 'Convertisseur de devises', fees: 'Les frais bancaires et de carte peuvent différer.',
       amount: 'Montant', from: 'De', to: 'Vers', updatingRate: 'Mise à jour du taux de référence…', swap: 'Inverser les devises',
@@ -544,6 +552,14 @@ export const TRANSLATIONS = Object.freeze({
       other: 'Autre', documents: 'Documents', bookings: 'Réservations', packing: 'Bagages', technology: 'Technologie', money: 'Argent',
       place: 'Lieu', hotel: 'Hôtel', flight: 'Vol', activity: 'Activité', confirmed: 'Confirmée', pending: 'En attente',
       cancelled: 'Annulée', passport: 'Passeport', identity: 'Identité', ticket: 'Billet', booking: 'Réservation', insurance: 'Assurance',
+    },
+    placeSearch: {
+      loading: 'Recherche de lieux…', clear: 'Effacer le lieu', noResults: 'Aucun lieu correspondant trouvé.',
+      error: 'La recherche de lieux est temporairement indisponible. Vous pouvez toujours saisir le lieu manuellement.',
+      minimumCharacters: 'Saisissez au moins {{count}} caractères pour lancer la recherche.',
+      destinationHint: 'Commencez à saisir puis sélectionnez un résultat pour enregistrer automatiquement les coordonnées.',
+      locationHint: 'Sélectionnez une suggestion pour renseigner automatiquement la latitude et la longitude.',
+      poweredBy: 'Recherche fournie par',
     },
     search: {
       title: 'Rechercher dans votre espace voyage', placeholder: 'Rechercher un voyage, une activité, une réservation ou un document…',

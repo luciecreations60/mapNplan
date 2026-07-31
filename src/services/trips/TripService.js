@@ -6,7 +6,7 @@ import { normalizeExternalUrl } from '../../utils/url.js';
 import { localStorageService } from '../storage/LocalStorageService.js';
 
 const STORAGE_KEY = 'trips';
-const CURRENT_TRIP_SCHEMA_VERSION = 7;
+const CURRENT_TRIP_SCHEMA_VERSION = 8;
 
 /**
  * Trip repository façade.
@@ -186,6 +186,12 @@ class TripService {
       archivedAt: Object.hasOwn(trip, 'archivedAt') ? trip.archivedAt : null,
       isFavorite: Object.hasOwn(trip, 'isFavorite') ? Boolean(trip.isFavorite) : false,
       pinnedAt: Object.hasOwn(trip, 'pinnedAt') ? trip.pinnedAt : null,
+      destinationLatitude: Object.hasOwn(trip, 'destinationLatitude')
+        ? trip.destinationLatitude
+        : this.#findLegacyDestinationCoordinate(trip, 'latitude'),
+      destinationLongitude: Object.hasOwn(trip, 'destinationLongitude')
+        ? trip.destinationLongitude
+        : this.#findLegacyDestinationCoordinate(trip, 'longitude'),
     };
 
     if (!demoTrip) return migratedTrip;
@@ -221,6 +227,8 @@ class TripService {
       id: trip.id,
       name: String(trip.name || 'Untitled trip').trim(),
       destination: String(trip.destination || '').trim(),
+      destinationLatitude: this.#normalizeLatitude(trip.destinationLatitude),
+      destinationLongitude: this.#normalizeLongitude(trip.destinationLongitude),
       country: String(trip.country || '').trim(),
       countryCode: String(trip.countryCode || '').trim().toUpperCase(),
       startDate: trip.startDate || '',
@@ -410,6 +418,25 @@ class TripService {
         lastCreatedAt: collaboration?.share?.lastCreatedAt || null,
       },
     };
+  }
+
+
+  #findLegacyDestinationCoordinate(trip, key) {
+    const firstActivity = Array.isArray(trip.itinerary)
+      ? trip.itinerary
+          .flatMap((day) => day.items || [])
+          .find((item) => hasValidCoordinates(item.latitude, item.longitude))
+      : null;
+
+    if (firstActivity) return firstActivity[key];
+
+    const firstReservation = Array.isArray(trip.reservations)
+      ? trip.reservations.find((reservation) => (
+          hasValidCoordinates(reservation.latitude, reservation.longitude)
+        ))
+      : null;
+
+    return firstReservation?.[key] ?? null;
   }
 
   #normalizeLatitude(value) {

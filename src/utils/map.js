@@ -17,6 +17,22 @@ export function hasValidCoordinates(latitude, longitude) {
  * Builds a stable, presentation-neutral list of map points from trip data.
  */
 export function getTripMapPoints(trip) {
+  const destinationPoints = hasValidCoordinates(
+    trip.destinationLatitude,
+    trip.destinationLongitude,
+  ) ? [{
+    id: `destination-${trip.id}`,
+    source: 'destination',
+    order: -1,
+    title: trip.destination || trip.name,
+    subtitle: trip.country || '',
+    latitude: Number(trip.destinationLatitude),
+    longitude: Number(trip.destinationLongitude),
+    type: 'pin',
+    date: trip.startDate,
+    time: '',
+  }] : [];
+
   const itineraryPoints = (trip.itinerary || []).flatMap((day, dayIndex) => (
     (day.items || [])
       .filter((item) => hasValidCoordinates(item.latitude, item.longitude))
@@ -49,5 +65,6 @@ export function getTripMapPoints(trip) {
       time: reservation.startTime,
     }));
 
-  return [...itineraryPoints, ...reservationPoints].sort((left, right) => left.order - right.order);
+  return [...destinationPoints, ...itineraryPoints, ...reservationPoints]
+    .sort((left, right) => left.order - right.order);
 }

@@ -45,7 +45,7 @@ export function MapPanel({ trip, onOpenTab }) {
                 <article key={point.id} className="map-place-row">
                   <span className="map-place-row__number">{index + 1}</span>
                   <div>
-                    <small>{point.source === 'reservation' ? t('map.reservation') : t('map.itinerary')}</small>
+                    <small>{point.source === 'reservation' ? t('map.reservation') : point.source === 'destination' ? t('map.destination') : t('map.itinerary')}</small>
                     <strong>{point.title}</strong>
                     <p><Icon name="pin" size={13} /> {point.subtitle || t('map.savedCoordinates')}</p>
                   </div>

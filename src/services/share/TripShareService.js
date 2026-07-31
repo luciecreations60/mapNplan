@@ -25,6 +25,8 @@ class TripShareService {
         id: trip.id,
         name: trip.name,
         destination: trip.destination,
+        destinationLatitude: trip.destinationLatitude,
+        destinationLongitude: trip.destinationLongitude,
         country: trip.country,
         countryCode: trip.countryCode,
         startDate: trip.startDate,

@@ -16,6 +16,15 @@ export const EXTERNAL_SERVICES_CONFIG = Object.freeze({
     timeoutMs: 10000,
     cacheTtlMs: 6 * 60 * 60 * 1000,
   }),
+  geocoding: Object.freeze({
+    provider: 'photon',
+    baseUrl: 'https://photon.komoot.io/api',
+    timeoutMs: 9000,
+    cacheTtlMs: 24 * 60 * 60 * 1000,
+    debounceMs: 500,
+    minimumQueryLength: 3,
+    resultLimit: 6,
+  }),
 });
 
 export const SUPPORTED_CURRENCIES = Object.freeze([

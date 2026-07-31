@@ -2,12 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { SUPPORTED_CURRENCIES } from '../../config/external-services.config.js';
 import { useI18n } from '../../hooks/useI18n.js';
 import { Button } from '../common/Button.jsx';
+import { LocationAutocomplete } from '../common/LocationAutocomplete.jsx';
 import { Modal } from '../common/Modal.jsx';
 import { TextField } from '../common/TextField.jsx';
 
 const EMPTY_FORM = Object.freeze({
   name: '',
   destination: '',
+  destinationLatitude: '',
+  destinationLongitude: '',
   country: '',
   countryCode: '',
   startDate: '',
@@ -74,6 +77,8 @@ export function TripFormDialog({ isOpen, mode = 'create', trip = null, onSubmit,
       ...form,
       name: form.name.trim(),
       destination: form.destination.trim(),
+      destinationLatitude: form.destinationLatitude === '' ? null : Number(form.destinationLatitude),
+      destinationLongitude: form.destinationLongitude === '' ? null : Number(form.destinationLongitude),
       country: form.country.trim(),
       countryCode: form.countryCode.trim().toUpperCase(),
       travelers: Math.max(1, Number(form.travelers) || 1),
@@ -93,7 +98,32 @@ export function TripFormDialog({ isOpen, mode = 'create', trip = null, onSubmit,
       <form className="trip-form" onSubmit={handleSubmit} noValidate>
         <div className="trip-form__grid">
           <TextField id="trip-name" label={t('createTrip.name')} name="name" placeholder={t('createTrip.namePlaceholder')} value={form.name} error={submitted ? errors.name : ''} onChange={updateField} />
-          <TextField id="trip-destination" label={t('createTrip.destination')} name="destination" placeholder={t('createTrip.destinationPlaceholder')} value={form.destination} error={submitted ? errors.destination : ''} onChange={updateField} />
+          <LocationAutocomplete
+            id="trip-destination"
+            label={t('createTrip.destination')}
+            value={form.destination}
+            placeholder={t('createTrip.destinationPlaceholder')}
+            error={submitted ? errors.destination : ''}
+            required
+            hint={t('placeSearch.destinationHint')}
+            onValueChange={(value) => setForm((current) => ({
+              ...current,
+              destination: value,
+              destinationLatitude: '',
+              destinationLongitude: '',
+            }))}
+            onPlaceSelect={(place) => {
+              if (!place) return;
+              setForm((current) => ({
+                ...current,
+                destination: place.label,
+                destinationLatitude: place.latitude,
+                destinationLongitude: place.longitude,
+                country: place.country || current.country,
+                countryCode: place.countryCode || current.countryCode,
+              }));
+            }}
+          />
           <TextField id="trip-country" label={t('createTrip.country')} name="country" placeholder={t('createTrip.countryPlaceholder')} value={form.country} onChange={updateField} />
           <TextField id="trip-country-code" label={t('editTrip.countryCode')} name="countryCode" placeholder="FR, JP, US…" maxLength="3" value={form.countryCode} onChange={updateField} />
           <TextField id="trip-travelers" label={t('createTrip.travellers')} name="travelers" type="number" min="1" max="30" value={form.travelers} onChange={updateField} />
@@ -154,6 +184,8 @@ function buildForm(trip) {
   return {
     name: trip.name || '',
     destination: trip.destination || '',
+    destinationLatitude: trip.destinationLatitude ?? '',
+    destinationLongitude: trip.destinationLongitude ?? '',
     country: trip.country || '',
     countryCode: trip.countryCode || '',
     startDate: trip.startDate || '',

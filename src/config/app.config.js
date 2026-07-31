@@ -30,6 +30,7 @@ export const APP_CONFIG = Object.freeze({
     readOnlySharing: true,
     discussions: true,
     localNotifications: true,
+    placeAutocomplete: true,
     affiliateLinks: false,
     aiAssistant: false,
   }),

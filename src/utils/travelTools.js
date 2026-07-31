@@ -1,11 +1,18 @@
-import { getTripMapPoints } from './map.js';
+import { getTripMapPoints, hasValidCoordinates } from './map.js';
 
 /**
- * Selects the first meaningful map point as the location for live travel tools.
- * The selection logic is isolated so a dedicated destination entity can replace
- * it later without changing weather or time components.
+ * Selects the explicit trip destination first, then the first meaningful
+ * itinerary/reservation point for weather and local-time tools.
  */
 export function getPrimaryTripLocation(trip) {
+  if (hasValidCoordinates(trip.destinationLatitude, trip.destinationLongitude)) {
+    return {
+      label: trip.destination || trip.country || trip.name,
+      latitude: Number(trip.destinationLatitude),
+      longitude: Number(trip.destinationLongitude),
+    };
+  }
+
   const points = getTripMapPoints(trip);
   const preferredPoint = points.find((point) => point.source === 'itinerary') || points[0];
 
