@@ -1,19 +1,16 @@
-# Upload V0.1 Part 7 to GitHub
+# Upload V0.1 Part 8 to GitHub
 
-1. Extract `travel-planner-v0.1-part7.zip`.
-2. Open the `luciecreations60/travel-planner` repository.
-3. Select **Add file → Upload files**.
-4. Upload every file and folder contained inside the extracted directory.
-5. Allow GitHub to replace files with identical paths.
-6. Commit directly to `main` with:
+1. Extract `travel-planner-v0.1-part8.zip`.
+2. Open the `travel-planner` repository on GitHub.
+3. Choose **Add file → Upload files**.
+4. Upload the contents of the extracted folder and replace existing files.
+5. Commit directly to `main` with:
 
 ```text
-feat: add v0.1.6 search calendar and reporting
+feat: add v0.1.7 sharing and local collaboration
 ```
 
-7. Open **Actions** and wait for the deployment workflow to show a green check.
-8. Refresh Chrome with `Ctrl + F5` after deployment so the new service-worker cache is loaded immediately.
+6. Open **Actions** and wait for the deployment workflow to become green.
+7. Refresh Chrome with `Ctrl + F5` after deployment.
 
-No change is required in **Settings → Pages**.
-
-Existing local trips are preserved and migrated automatically to schema 6.
+Existing local trips are preserved and migrated automatically to schema 7.

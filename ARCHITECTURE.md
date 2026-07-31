@@ -1,4 +1,4 @@
-# Architecture — V0.1.6
+# Architecture — V0.1.7
 
 ## Goals
 
@@ -91,7 +91,7 @@ Every nested record owns a stable identifier. `TripService` normalises the compl
 
 ## Schema migration
 
-The current trip schema version is `6`.
+The current trip schema version is `7`.
 
 - Schema 1: trip summary fields.
 - Schema 2: itinerary, expenses, checklist and notes.
@@ -99,8 +99,9 @@ The current trip schema version is `6`.
 - Schema 4: destination currency and travel-tool defaults.
 - Schema 5: reversible archive lifecycle through `archivedAt`.
 - Schema 6: local-library preferences through `isFavorite` and `pinnedAt`.
+- Schema 7: participants, role metadata, comments, activity history and privacy-aware sharing.
 
-Migration is non-destructive. Existing records receive `isFavorite: false` and `pinnedAt: null`; all nested identifiers remain unchanged.
+Migration is non-destructive. Existing records receive a local owner, empty discussion arrays and collaboration metadata; all existing identifiers and user content remain unchanged.
 
 
 ## Editing and lifecycle boundary
@@ -179,3 +180,14 @@ Provider URLs and limits live in `external-services.config.js`. Replacing Open-M
 ## Routing
 
 `HashRouter` remains in use for GitHub Pages because the host does not provide project-level SPA rewrite rules. Workspace tab deep links use `?tab=` query parameters. The printable report uses `/trips/:tripId/print` inside the hash route. A custom host can later replace the router at the application boundary.
+
+
+## V0.1.7 collaboration boundary
+
+The collaboration domain is embedded in each trip under `trip.collaboration`:
+
+- `members`: future account identities and roles;
+- `activityLog`: language-neutral audit entries;
+- `share`: local share metadata.
+
+Comments belong to their domain entities (`itinerary.items[].comments` and `reservations[].comments`). Read-only sharing is isolated in `TripShareService`; it emits a privacy-filtered snapshot instead of exposing the persisted trip object. This boundary allows a future API/Supabase adapter to replace local persistence without rewriting workspace components.

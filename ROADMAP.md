@@ -107,3 +107,19 @@
 - Premium plans
 - Group expense settlement
 - Travel journal and shareable recap
+
+
+## Completed in V0.1.7
+
+- [x] Read-only trip sharing
+- [x] Privacy-filtered share snapshots
+- [x] Participant and role model
+- [x] Activity and reservation discussions
+- [x] Local activity log and notifications
+
+## Next recommended milestone
+
+- Account/authentication abstraction
+- Remote persistence adapter
+- Real-time collaboration
+- Invitation delivery and revocation

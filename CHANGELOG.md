@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.7 — Sharing and local collaboration
+
+### Added
+
+- Read-only share links and share file export.
+- Shared trip page.
+- Participants and roles.
+- Activity/reservation discussions.
+- Collaboration audit log.
+- Local notification centre.
+
+### Changed
+
+- Trip schema upgraded from 6 to 7.
+- Service worker cache upgraded to `tripflow-v0.1.7`.
+
 All notable changes to this project are documented here.
 
 ## [0.1.6] — 2026-07-31

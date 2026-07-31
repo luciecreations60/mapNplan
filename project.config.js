@@ -10,5 +10,5 @@ export const PROJECT_CONFIG = Object.freeze({
   codeName: 'TripFlow',
   brandName: 'TripFlow',
   tagline: 'Every journey starts here.',
-  version: '0.1.6',
+  version: '0.1.7',
 });

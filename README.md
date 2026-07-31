@@ -2,7 +2,7 @@
 
 > Every journey starts here.
 
-TripFlow is the temporary code name for a modern travel-planning application. Version `0.1.6` provides a complete local workspace with itinerary, map, reservations, budget, checklist, documents, notes and practical travel tools. The interface is responsive and available in French and English.
+TripFlow is the temporary code name for a modern travel-planning application. Version `0.1.7` provides a complete local workspace with itinerary, map, reservations, budget, checklist, documents, notes and practical travel tools. The interface is responsive and available in French and English.
 
 ## Included
 
@@ -91,7 +91,7 @@ A manual selection in **Settings → Language** is stored locally and takes prio
 6. Commit directly to `main`.
 7. Open **Actions** and wait for the Pages deployment to complete.
 
-Existing browser data is migrated automatically from schema 5 to schema 6. No saved trip is reset; the migration only adds favorite and pinned-trip metadata.
+Existing browser data is migrated automatically from earlier schemas to schema 7. No saved trip is reset; the migration adds collaboration, comments and sharing metadata without deleting existing content.
 
 ## Local development
 
@@ -114,3 +114,11 @@ Edit `project.config.js`. Application branding and the browser title derive from
 ## Data storage
 
 React components never access LocalStorage directly. They use services and contexts. A later migration to Supabase or another backend therefore does not require rewriting the workspace interface.
+
+
+## V0.1.7 highlights
+
+- Read-only sharing links with privacy controls
+- Participants and local roles
+- Comments on activities and reservations
+- Collaboration history and local notifications

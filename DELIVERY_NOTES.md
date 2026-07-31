@@ -1,70 +1,33 @@
-# Delivery notes — V0.1 Part 7
+# V0.1 — Part 8 delivery notes
 
 ## Version
 
-- Application: `0.1.6`
-- Trip schema: `6`
-- Service-worker cache: `tripflow-v0.1.6`
+- Application: `0.1.7`
+- Trip schema: `7`
 
 ## Added
 
-### Global search
+- Privacy-aware read-only sharing links.
+- Standalone shared trip page that does not require local trip data.
+- Downloadable `.tripflow-share.json` fallback.
+- Participants with owner, editor and viewer roles.
+- Local discussions attached to itinerary activities and reservations.
+- Language-neutral collaboration activity log.
+- Local notification centre in the top navigation.
+- Automatic migration of existing trips and nested entities.
 
-- Search button in the desktop and mobile top bar.
-- `Ctrl/Cmd + K` shortcut.
-- Accent-insensitive matching.
-- Results from trips, activities, reservations, documents and notes.
-- Direct navigation to the relevant workspace tab.
-- Search remains local to the browser.
+## Privacy model
 
-### Trip library
+Shared snapshots never contain:
 
-- Search inside all trip content.
-- Smart, departure, recently updated and alphabetical sorting.
-- Favorite-only filter.
-- Favorite and pin actions on trip cards.
-- Smart sorting prioritises pinned trips and favorites.
+- booking confirmation numbers;
+- document references or URLs;
+- private booking links;
+- internal discussion comments;
+- participant email addresses.
 
-### Calendar
+Budget, notes and checklist inclusion are explicitly configurable when generating a link.
 
-- Monthly grid using itinerary activities and reservation dates.
-- Daily agenda.
-- Month navigation.
-- Direct links back to itinerary and reservation panels.
-- Responsive compact event indicators on mobile.
+## Current limitation
 
-### Statistics
-
-- Trip length and planned-day count.
-- Activity count and daily average.
-- Mapped-place count.
-- Reservation and document totals.
-- Expense breakdown and budget allocation.
-- Checklist completion and reservation statuses.
-- Total planned activity duration.
-
-### Printing and PDF
-
-- Dedicated full-trip report route.
-- Itinerary, reservations, budget, checklist, documents and notes.
-- A4 print stylesheet.
-- Browser-native “Save as PDF” support.
-
-## Migration
-
-Schema 6 adds:
-
-```text
-isFavorite: boolean
-pinnedAt: ISO timestamp | null
-```
-
-Existing trips are migrated without deleting or replacing user data.
-
-## Important test paths
-
-1. Top bar → search or press `Ctrl/Cmd + K`.
-2. My trips → use search, sort, favorites and pin controls.
-3. Open a trip → Calendar.
-4. Open a trip → Statistics.
-5. Open a trip → Print / PDF.
+Collaboration is local in this version. Members and roles prepare the future data model, but real-time multi-device editing requires authentication and a backend planned for a later milestone.
