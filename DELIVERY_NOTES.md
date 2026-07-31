@@ -1,60 +1,70 @@
-# Delivery notes — V0.1 Part 6
+# Delivery notes — V0.1 Part 7
 
-## Release
+## Version
 
-- Application version: `0.1.5`
-- Trip schema: `5`
-- Service-worker cache: `tripflow-v0.1.5`
+- Application: `0.1.6`
+- Trip schema: `6`
+- Service-worker cache: `tripflow-v0.1.6`
 
-## Delivered features
+## Added
 
-### Trip management
+### Global search
 
-- Edit the trip name, destination, country, country code, dates, travellers, budget, currencies, card colour and summary.
-- Open the editor from **My trips** or from the trip workspace hero.
-- Duplicate a complete trip.
-- Regenerate trip, day, activity, expense, checklist, reservation and document identifiers during duplication.
-- Archive a trip without deleting its data.
-- Restore archived trips from the **Archived** filter.
-- Permanently delete a trip only after explicit confirmation.
+- Search button in the desktop and mobile top bar.
+- `Ctrl/Cmd + K` shortcut.
+- Accent-insensitive matching.
+- Results from trips, activities, reservations, documents and notes.
+- Direct navigation to the relevant workspace tab.
+- Search remains local to the browser.
 
-### Detailed editing
+### Trip library
 
-- Edit an existing itinerary activity.
-- Move an edited activity to another date.
-- Edit reservations while retaining their original creation date.
-- Edit documents while retaining their original creation date.
-- Confirm deletion of activities, reservations and documents.
+- Search inside all trip content.
+- Smart, departure, recently updated and alphabetical sorting.
+- Favorite-only filter.
+- Favorite and pin actions on trip cards.
+- Smart sorting prioritises pinned trips and favorites.
 
-### Interface
+### Calendar
 
-- French and English labels for all new controls and messages.
-- Responsive management controls on trip cards.
-- Responsive edit controls in itinerary, reservation and document cards.
-- Success notices after trip-level actions.
+- Monthly grid using itinerary activities and reservation dates.
+- Daily agenda.
+- Month navigation.
+- Direct links back to itinerary and reservation panels.
+- Responsive compact event indicators on mobile.
 
-## Data migration
+### Statistics
 
-Schema 5 adds:
+- Trip length and planned-day count.
+- Activity count and daily average.
+- Mapped-place count.
+- Reservation and document totals.
+- Expense breakdown and budget allocation.
+- Checklist completion and reservation statuses.
+- Total planned activity duration.
 
-```json
-{
-  "archivedAt": null
-}
+### Printing and PDF
+
+- Dedicated full-trip report route.
+- Itinerary, reservations, budget, checklist, documents and notes.
+- A4 print stylesheet.
+- Browser-native “Save as PDF” support.
+
+## Migration
+
+Schema 6 adds:
+
+```text
+isFavorite: boolean
+pinnedAt: ISO timestamp | null
 ```
 
-Existing trips are migrated automatically. No collection is reset or removed.
+Existing trips are migrated without deleting or replacing user data.
 
-## Verification performed
+## Important test paths
 
-- JavaScript and JSX parsed with TypeScript `--noCheck`.
-- Relative imports resolved.
-- 524 translation keys compared between French and English.
-- Static translation references checked.
-- TripService create, update, duplicate, archive and restore flows executed with a mocked browser store.
-- JSON files parsed.
-- ZIP archive integrity checked.
-
-## Environment limitation
-
-The complete Vite build could not run in the generation environment because its internal npm mirror does not expose `@vitejs/plugin-react`. GitHub Actions will install packages from its configured npm registry and perform the production build.
+1. Top bar → search or press `Ctrl/Cmd + K`.
+2. My trips → use search, sort, favorites and pin controls.
+3. Open a trip → Calendar.
+4. Open a trip → Statistics.
+5. Open a trip → Print / PDF.

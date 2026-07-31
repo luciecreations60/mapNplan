@@ -24,10 +24,16 @@ export function TripHero({ trip, onEdit }) {
       <div className="trip-workspace-hero__grid" aria-hidden="true" />
 
       <div className="trip-workspace-hero__content">
-        <button className="trip-workspace-hero__edit" type="button" onClick={onEdit}>
-          <Icon name="edit" size={16} />
-          {t('editTrip.action')}
-        </button>
+        <div className="trip-workspace-hero__actions no-print">
+          <Link className="trip-workspace-hero__action" to={`/trips/${trip.id}/print`} target="_blank" rel="noreferrer">
+            <Icon name="print" size={16} />
+            {t('print.actionShort')}
+          </Link>
+          <button className="trip-workspace-hero__action" type="button" onClick={onEdit}>
+            <Icon name="edit" size={16} />
+            {t('editTrip.action')}
+          </button>
+        </div>
         <Link className="trip-back-link" to="/trips">
           <Icon name="arrowLeft" size={17} />
           {t('workspace.allTrips')}

@@ -26,6 +26,8 @@ export function TripCard({
   trip,
   onEdit,
   onDuplicate,
+  onToggleFavorite,
+  onTogglePinned,
   onArchive,
   onRestore,
   onDelete,
@@ -35,7 +37,7 @@ export function TripCard({
   const budgetProgress = trip.budget > 0 ? (trip.spent / trip.budget) * 100 : 0;
 
   return (
-    <article className={`trip-card trip-card--${trip.accent}${trip.archivedAt ? ' trip-card--archived' : ''}`}>
+    <article className={`trip-card trip-card--${trip.accent}${trip.archivedAt ? ' trip-card--archived' : ''}${trip.pinnedAt ? ' trip-card--pinned' : ''}`}>
       <div className="trip-card__visual">
         <div className="trip-card__visual-grid" />
         <span className="trip-card__country">{trip.countryCode || '✦'}</span>
@@ -48,7 +50,31 @@ export function TripCard({
             <p className="trip-card__destination"><Icon name="pin" size={15} /> {trip.destination}</p>
             <h3>{trip.name}</h3>
           </div>
-          {(onEdit || onDuplicate) && <div className="trip-card__quick-actions">
+          {(onEdit || onDuplicate || onToggleFavorite || onTogglePinned) && <div className="trip-card__quick-actions">
+            {!trip.archivedAt && onToggleFavorite && (
+              <button
+                className={trip.isFavorite ? 'icon-button icon-button--small icon-button--active' : 'icon-button icon-button--small'}
+                type="button"
+                aria-pressed={trip.isFavorite}
+                aria-label={t(trip.isFavorite ? 'tripLibrary.removeFavoriteAria' : 'tripLibrary.addFavoriteAria', { name: trip.name })}
+                title={t(trip.isFavorite ? 'tripLibrary.removeFavorite' : 'tripLibrary.addFavorite')}
+                onClick={() => onToggleFavorite(trip)}
+              >
+                <Icon name="star" size={16} />
+              </button>
+            )}
+            {!trip.archivedAt && onTogglePinned && (
+              <button
+                className={trip.pinnedAt ? 'icon-button icon-button--small icon-button--active' : 'icon-button icon-button--small'}
+                type="button"
+                aria-pressed={Boolean(trip.pinnedAt)}
+                aria-label={t(trip.pinnedAt ? 'tripLibrary.unpinAria' : 'tripLibrary.pinAria', { name: trip.name })}
+                title={t(trip.pinnedAt ? 'tripLibrary.unpin' : 'tripLibrary.pin')}
+                onClick={() => onTogglePinned(trip)}
+              >
+                <Icon name={trip.pinnedAt ? 'pinOff' : 'pinTrip'} size={16} />
+              </button>
+            )}
             {!trip.archivedAt && onEdit && (
               <button
                 className="icon-button icon-button--small"

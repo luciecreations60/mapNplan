@@ -4,10 +4,12 @@ import { Icon } from '../common/Icon.jsx';
 export const TRIP_TABS = Object.freeze([
   { id: 'overview', labelKey: 'workspace.overview', icon: 'dashboard' },
   { id: 'itinerary', labelKey: 'workspace.itinerary', icon: 'calendarDays' },
+  { id: 'calendar', labelKey: 'workspace.calendar', icon: 'calendarRange' },
   { id: 'map', labelKey: 'workspace.map', icon: 'map' },
   { id: 'tools', labelKey: 'workspace.tools', icon: 'globe' },
   { id: 'reservations', labelKey: 'workspace.reservations', icon: 'ticket' },
   { id: 'budget', labelKey: 'workspace.budget', icon: 'wallet' },
+  { id: 'statistics', labelKey: 'workspace.statistics', icon: 'chart' },
   { id: 'checklist', labelKey: 'workspace.checklistTab', icon: 'checklist' },
   { id: 'documents', labelKey: 'workspace.documents', icon: 'folder' },
   { id: 'notes', labelKey: 'workspace.notes', icon: 'notebook' },

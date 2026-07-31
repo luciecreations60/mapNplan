@@ -42,6 +42,18 @@ export function TripProvider({ children }) {
     return duplicatedTrip;
   }, []);
 
+  const toggleTripFavorite = useCallback((id) => {
+    const updatedTrip = tripService.toggleFavorite(id);
+    if (updatedTrip) setTrips(tripService.getAll());
+    return updatedTrip;
+  }, []);
+
+  const toggleTripPinned = useCallback((id) => {
+    const updatedTrip = tripService.togglePinned(id);
+    if (updatedTrip) setTrips(tripService.getAll());
+    return updatedTrip;
+  }, []);
+
   const archiveTrip = useCallback((id) => {
     const archivedTrip = tripService.archive(id);
     if (archivedTrip) setTrips(tripService.getAll());
@@ -83,6 +95,8 @@ export function TripProvider({ children }) {
       createTrip,
       updateTrip,
       duplicateTrip,
+      toggleTripFavorite,
+      toggleTripPinned,
       archiveTrip,
       restoreTrip,
       deleteTrip,
@@ -97,6 +111,8 @@ export function TripProvider({ children }) {
       createTrip,
       updateTrip,
       duplicateTrip,
+      toggleTripFavorite,
+      toggleTripPinned,
       archiveTrip,
       restoreTrip,
       deleteTrip,

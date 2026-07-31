@@ -2,7 +2,7 @@
 
 > Every journey starts here.
 
-TripFlow is the temporary code name for a modern travel-planning application. Version `0.1.5` provides a complete local workspace with itinerary, map, reservations, budget, checklist, documents, notes and practical travel tools. The interface is responsive and available in French and English.
+TripFlow is the temporary code name for a modern travel-planning application. Version `0.1.6` provides a complete local workspace with itinerary, map, reservations, budget, checklist, documents, notes and practical travel tools. The interface is responsive and available in French and English.
 
 ## Included
 
@@ -20,7 +20,9 @@ TripFlow is the temporary code name for a modern travel-planning application. Ve
 
 ### Trip management
 
-- Dashboard and trip library
+- Dashboard and searchable trip library
+- Global search across trips, activities, reservations, documents and notes
+- Favorites, pinned trips, advanced filters and sorting
 - Trip creation, edition, duplication, archiving, restoration and deletion
 - Browser persistence hidden behind repository services
 - Stable, versioned trip data schema with migrations
@@ -30,6 +32,9 @@ TripFlow is the temporary code name for a modern travel-planning application. Ve
 ### Planning workspace
 
 - Trip overview and countdown
+- Combined monthly calendar for activities and reservations
+- Planning, budget and readiness statistics
+- Printable full-trip report with browser PDF export
 - Day-by-day itinerary with activity edition
 - Interactive Leaflet/OpenStreetMap map
 - Editable flight, accommodation, transport and activity reservations
@@ -86,7 +91,7 @@ A manual selection in **Settings → Language** is stored locally and takes prio
 6. Commit directly to `main`.
 7. Open **Actions** and wait for the Pages deployment to complete.
 
-Existing browser data is migrated automatically from schema 4 to schema 5. No saved trip is reset; the migration only adds the archive lifecycle field.
+Existing browser data is migrated automatically from schema 5 to schema 6. No saved trip is reset; the migration only adds favorite and pinned-trip metadata.
 
 ## Local development
 

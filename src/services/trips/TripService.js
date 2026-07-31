@@ -6,7 +6,7 @@ import { normalizeExternalUrl } from '../../utils/url.js';
 import { localStorageService } from '../storage/LocalStorageService.js';
 
 const STORAGE_KEY = 'trips';
-const CURRENT_TRIP_SCHEMA_VERSION = 5;
+const CURRENT_TRIP_SCHEMA_VERSION = 6;
 
 /**
  * Trip repository façade.
@@ -48,6 +48,8 @@ class TripService {
       createdAt: now,
       updatedAt: now,
       archivedAt: null,
+      isFavorite: false,
+      pinnedAt: null,
       itinerary: [],
       expenses: [],
       checklist: [],
@@ -91,6 +93,8 @@ class TripService {
       createdAt: now,
       updatedAt: now,
       archivedAt: null,
+      isFavorite: false,
+      pinnedAt: null,
       itinerary: sourceTrip.itinerary.map((day) => ({
         ...day,
         id: createId('day'),
@@ -112,6 +116,19 @@ class TripService {
 
     localStorageService.set(STORAGE_KEY, [...this.getAll(), duplicateTrip]);
     return duplicateTrip;
+  }
+
+
+  toggleFavorite(id) {
+    const trip = this.getById(id);
+    if (!trip) return null;
+    return this.update(id, { isFavorite: !trip.isFavorite });
+  }
+
+  togglePinned(id) {
+    const trip = this.getById(id);
+    if (!trip) return null;
+    return this.update(id, { pinnedAt: trip.pinnedAt ? null : new Date().toISOString() });
   }
 
   archive(id) {
@@ -153,6 +170,8 @@ class TripService {
     const migratedTrip = {
       ...trip,
       archivedAt: Object.hasOwn(trip, 'archivedAt') ? trip.archivedAt : null,
+      isFavorite: Object.hasOwn(trip, 'isFavorite') ? Boolean(trip.isFavorite) : false,
+      pinnedAt: Object.hasOwn(trip, 'pinnedAt') ? trip.pinnedAt : null,
     };
 
     if (!demoTrip) return migratedTrip;
@@ -215,6 +234,8 @@ class TripService {
       reservations,
       documents,
       archivedAt: trip.archivedAt || null,
+      isFavorite: Boolean(trip.isFavorite),
+      pinnedAt: trip.pinnedAt || null,
       createdAt: trip.createdAt || new Date().toISOString(),
       updatedAt: trip.updatedAt || new Date().toISOString(),
     };

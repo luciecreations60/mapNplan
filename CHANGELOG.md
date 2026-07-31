@@ -2,6 +2,30 @@
 
 All notable changes to this project are documented here.
 
+## [0.1.6] — 2026-07-31
+
+### Added
+
+- Global search across trips, activities, reservations, documents and notes.
+- `Ctrl/Cmd + K` keyboard shortcut and direct navigation to matching workspace tabs.
+- Trip-library search, favorite-only filter and five sort modes.
+- Favorite and pinned-trip controls with persisted metadata.
+- Combined monthly calendar for itinerary activities and reservations.
+- Trip statistics for duration, planning density, mapped places, budget and readiness.
+- Dedicated printable trip report and browser PDF export.
+- Schema 6 migration for `isFavorite` and `pinnedAt`.
+
+### Changed
+
+- Workspace tabs now support URL query parameters for deep navigation.
+- Smart trip ordering prioritizes pinned trips, then favorites, then departure date.
+- Service-worker cache version updated to `tripflow-v0.1.6`.
+
+### Fixed
+
+- Mobile access to global search now uses a compact top-bar search button.
+- Print layouts avoid application navigation and interactive controls.
+
 ## [0.1.5] — 2026-07-31
 
 ### Added

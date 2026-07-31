@@ -4,6 +4,7 @@ import { useI18n } from '../../hooks/useI18n.js';
 import { useTheme } from '../../hooks/useTheme.js';
 import { Brand } from '../common/Brand.jsx';
 import { Icon } from '../common/Icon.jsx';
+import { GlobalSearch } from './GlobalSearch.jsx';
 
 const ALL_NAVIGATION = [...PRIMARY_NAVIGATION, ...SECONDARY_NAVIGATION];
 
@@ -27,11 +28,7 @@ export function TopBar({ onOpenMenu }) {
       </div>
 
       <div className="topbar__actions">
-        <button className="topbar__search" type="button" aria-label={t('nav.search')}>
-          <Icon name="search" size={18} />
-          <span>{t('nav.search')}</span>
-          <kbd>⌘ K</kbd>
-        </button>
+        <GlobalSearch />
         <button className="icon-button" type="button" aria-label={t('nav.notifications')}>
           <Icon name="bell" />
           <span className="notification-dot" />

@@ -1,24 +1,33 @@
 import { useMemo, useState } from 'react';
 import { Button } from '../components/common/Button.jsx';
 import { ConfirmDialog } from '../components/common/ConfirmDialog.jsx';
+import { Icon } from '../components/common/Icon.jsx';
 import { InlineNotice } from '../components/feedback/InlineNotice.jsx';
 import { CreateTripDialog } from '../components/trips/CreateTripDialog.jsx';
 import { EditTripDialog } from '../components/trips/EditTripDialog.jsx';
 import { TripCard } from '../components/trips/TripCard.jsx';
 import { useI18n } from '../hooks/useI18n.js';
 import { useTrips } from '../hooks/useTrips.js';
-import { getTripStatus, sortTripsByStartDate } from '../utils/date.js';
+import { getTripStatus, parseLocalDate } from '../utils/date.js';
+import { tripMatchesQuery } from '../utils/tripSearch.js';
+
+const SORT_OPTIONS = ['smart', 'startAsc', 'startDesc', 'updatedDesc', 'nameAsc'];
 
 export function TripsPage() {
   const [activeFilter, setActiveFilter] = useState('all');
+  const [query, setQuery] = useState('');
+  const [sortBy, setSortBy] = useState('smart');
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [isCreateOpen, setCreateOpen] = useState(false);
   const [editingTrip, setEditingTrip] = useState(null);
   const [pendingAction, setPendingAction] = useState(null);
   const [notice, setNotice] = useState(null);
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
   const {
     trips,
     duplicateTrip,
+    toggleTripFavorite,
+    toggleTripPinned,
     archiveTrip,
     restoreTrip,
     deleteTrip,
@@ -32,16 +41,21 @@ export function TripsPage() {
   ];
 
   const filteredTrips = useMemo(() => {
-    const sortedTrips = sortTripsByStartDate(trips);
-    if (activeFilter === 'archived') return sortedTrips.filter((trip) => trip.archivedAt);
+    let nextTrips = trips.filter((trip) => (
+      activeFilter === 'archived' ? Boolean(trip.archivedAt) : !trip.archivedAt
+    ));
 
-    const activeTrips = sortedTrips.filter((trip) => !trip.archivedAt);
-    if (activeFilter === 'all') return activeTrips;
     if (activeFilter === 'upcoming') {
-      return activeTrips.filter((trip) => ['upcoming', 'ongoing'].includes(getTripStatus(trip)));
+      nextTrips = nextTrips.filter((trip) => ['upcoming', 'ongoing'].includes(getTripStatus(trip)));
     }
-    return activeTrips.filter((trip) => getTripStatus(trip) === 'past');
-  }, [activeFilter, trips]);
+    if (activeFilter === 'past') {
+      nextTrips = nextTrips.filter((trip) => getTripStatus(trip) === 'past');
+    }
+    if (favoritesOnly) nextTrips = nextTrips.filter((trip) => trip.isFavorite);
+    if (query.trim()) nextTrips = nextTrips.filter((trip) => tripMatchesQuery(trip, query));
+
+    return sortTrips(nextTrips, sortBy, locale);
+  }, [activeFilter, favoritesOnly, locale, query, sortBy, trips]);
 
   function requestAction(type, trip) {
     setPendingAction({ type, trip });
@@ -74,7 +88,32 @@ export function TripsPage() {
     setPendingAction(null);
   }
 
+  function handleFavorite(trip) {
+    const updated = toggleTripFavorite(trip.id);
+    if (!updated) return;
+    setNotice({
+      title: t(updated.isFavorite ? 'tripLibrary.favoriteAddedTitle' : 'tripLibrary.favoriteRemovedTitle'),
+      message: t(updated.isFavorite ? 'tripLibrary.favoriteAddedText' : 'tripLibrary.favoriteRemovedText', { name: trip.name }),
+    });
+  }
+
+  function handlePinned(trip) {
+    const updated = toggleTripPinned(trip.id);
+    if (!updated) return;
+    setNotice({
+      title: t(updated.pinnedAt ? 'tripLibrary.pinnedTitle' : 'tripLibrary.unpinnedTitle'),
+      message: t(updated.pinnedAt ? 'tripLibrary.pinnedText' : 'tripLibrary.unpinnedText', { name: trip.name }),
+    });
+  }
+
+  function resetFilters() {
+    setQuery('');
+    setSortBy('smart');
+    setFavoritesOnly(false);
+  }
+
   const actionCopy = getActionCopy(pendingAction, t);
+  const hasActiveControls = Boolean(query.trim()) || sortBy !== 'smart' || favoritesOnly;
 
   return (
     <div className="page-stack">
@@ -93,19 +132,67 @@ export function TripsPage() {
         </InlineNotice>
       )}
 
-      <div className="filter-tabs" role="tablist" aria-label={t('trips.filtersAria')}>
-        {filters.map((filter) => (
-          <button
-            key={filter.id}
-            className={activeFilter === filter.id ? 'filter-tabs__button filter-tabs__button--active' : 'filter-tabs__button'}
-            type="button"
-            role="tab"
-            aria-selected={activeFilter === filter.id}
-            onClick={() => setActiveFilter(filter.id)}
-          >
-            {filter.label}
+      <section className="trip-library-controls" aria-label={t('tripLibrary.controlsAria')}>
+        <label className="trip-library-search">
+          <Icon name="search" size={18} />
+          <input
+            type="search"
+            value={query}
+            placeholder={t('tripLibrary.searchPlaceholder')}
+            aria-label={t('tripLibrary.searchPlaceholder')}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+          {query && (
+            <button type="button" aria-label={t('search.clear')} onClick={() => setQuery('')}>
+              <Icon name="close" size={16} />
+            </button>
+          )}
+        </label>
+
+        <label className="trip-library-select">
+          <span>{t('tripLibrary.sortLabel')}</span>
+          <select value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
+            {SORT_OPTIONS.map((option) => (
+              <option key={option} value={option}>{t(`tripLibrary.sort.${option}`)}</option>
+            ))}
+          </select>
+        </label>
+
+        <button
+          className={favoritesOnly ? 'trip-library-favorite trip-library-favorite--active' : 'trip-library-favorite'}
+          type="button"
+          aria-pressed={favoritesOnly}
+          onClick={() => setFavoritesOnly((value) => !value)}
+        >
+          <Icon name="star" size={17} />
+          {t('tripLibrary.favoritesOnly')}
+        </button>
+
+        {hasActiveControls && (
+          <button className="trip-library-reset" type="button" onClick={resetFilters}>
+            {t('tripLibrary.resetFilters')}
           </button>
-        ))}
+        )}
+      </section>
+
+      <div className="trip-library-view-row">
+        <div className="filter-tabs" role="tablist" aria-label={t('trips.filtersAria')}>
+          {filters.map((filter) => (
+            <button
+              key={filter.id}
+              className={activeFilter === filter.id ? 'filter-tabs__button filter-tabs__button--active' : 'filter-tabs__button'}
+              type="button"
+              role="tab"
+              aria-selected={activeFilter === filter.id}
+              onClick={() => setActiveFilter(filter.id)}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+        <span className="trip-library-count">
+          {t(filteredTrips.length === 1 ? 'tripLibrary.resultOne' : 'tripLibrary.resultMany', { count: filteredTrips.length })}
+        </span>
       </div>
 
       {filteredTrips.length > 0 ? (
@@ -116,6 +203,8 @@ export function TripsPage() {
               trip={trip}
               onEdit={setEditingTrip}
               onDuplicate={(item) => requestAction('duplicate', item)}
+              onToggleFavorite={handleFavorite}
+              onTogglePinned={handlePinned}
               onArchive={(item) => requestAction('archive', item)}
               onRestore={(item) => requestAction('restore', item)}
               onDelete={(item) => requestAction('delete', item)}
@@ -125,9 +214,13 @@ export function TripsPage() {
       ) : (
         <section className="empty-state">
           <span>{activeFilter === 'archived' ? '▣' : '✈'}</span>
-          <h2>{t(activeFilter === 'archived' ? 'trips.archivedEmptyTitle' : 'trips.emptyTitle')}</h2>
-          <p>{t(activeFilter === 'archived' ? 'trips.archivedEmptyText' : 'trips.emptyText')}</p>
-          {activeFilter !== 'archived' && <Button icon="plus" onClick={() => setCreateOpen(true)}>{t('trips.create')}</Button>}
+          <h2>{t(hasActiveControls ? 'tripLibrary.noMatchTitle' : activeFilter === 'archived' ? 'trips.archivedEmptyTitle' : 'trips.emptyTitle')}</h2>
+          <p>{t(hasActiveControls ? 'tripLibrary.noMatchText' : activeFilter === 'archived' ? 'trips.archivedEmptyText' : 'trips.emptyText')}</p>
+          {hasActiveControls ? (
+            <Button variant="secondary" onClick={resetFilters}>{t('tripLibrary.resetFilters')}</Button>
+          ) : activeFilter !== 'archived' && (
+            <Button icon="plus" onClick={() => setCreateOpen(true)}>{t('trips.create')}</Button>
+          )}
         </section>
       )}
 
@@ -152,6 +245,30 @@ export function TripsPage() {
       />
     </div>
   );
+}
+
+function sortTrips(trips, sortBy, locale) {
+  return [...trips].sort((left, right) => {
+    if (sortBy === 'smart') {
+      const pinnedDifference = Number(Boolean(right.pinnedAt)) - Number(Boolean(left.pinnedAt));
+      if (pinnedDifference) return pinnedDifference;
+      if (left.pinnedAt && right.pinnedAt) {
+        const pinDateDifference = new Date(right.pinnedAt) - new Date(left.pinnedAt);
+        if (pinDateDifference) return pinDateDifference;
+      }
+      const favoriteDifference = Number(right.isFavorite) - Number(left.isFavorite);
+      if (favoriteDifference) return favoriteDifference;
+      return getStartTime(left) - getStartTime(right);
+    }
+    if (sortBy === 'startDesc') return getStartTime(right) - getStartTime(left);
+    if (sortBy === 'updatedDesc') return new Date(right.updatedAt || 0) - new Date(left.updatedAt || 0);
+    if (sortBy === 'nameAsc') return left.name.localeCompare(right.name, locale, { sensitivity: 'base' });
+    return getStartTime(left) - getStartTime(right);
+  });
+}
+
+function getStartTime(trip) {
+  return parseLocalDate(trip.startDate)?.getTime() ?? Number.MAX_SAFE_INTEGER;
 }
 
 function getActionCopy(pendingAction, t) {

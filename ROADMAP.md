@@ -57,8 +57,19 @@
 - [x] Archive and restore trips
 - [x] Reusable confirmation dialog
 - [x] Bilingual success and confirmation messages
+
+### Part 7 — Search, calendar and reporting
+
+- [x] Global search across all locally stored travel content
+- [x] Keyboard shortcut for global search
+- [x] Trip-library search, favorites filter and advanced sorting
+- [x] Favorite and pinned-trip metadata
+- [x] Combined itinerary and reservation calendar
+- [x] Trip statistics and readiness indicators
+- [x] Complete printable travel plan
+- [x] Browser PDF export workflow
+- [x] Schema 6 migration
 - [ ] Drag-and-drop itinerary ordering
-- [ ] Search and filter within a trip
 - [ ] Accessibility and keyboard-navigation audit
 
 ## V0.2 — Place discovery and intelligent routing
@@ -92,7 +103,6 @@
 ## Later opportunities
 
 - AI itinerary assistant
-- Calendar and PDF export
 - Offline travel mode
 - Premium plans
 - Group expense settlement

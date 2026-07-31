@@ -381,3 +381,178 @@
     display: none;
   }
 }
+
+/* ========================================================================== */
+/* V0.1.6 — Global search                                                     */
+/* ========================================================================== */
+
+.global-search {
+  position: relative;
+  min-width: 0;
+}
+
+.global-search__panel {
+  position: absolute;
+  z-index: 90;
+  top: calc(100% + 12px);
+  right: 0;
+  width: min(620px, calc(100vw - 32px));
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.global-search__field {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.global-search__field > svg {
+  color: var(--color-text-soft);
+}
+
+.global-search__field input {
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  color: var(--color-text);
+  background: transparent;
+  font: inherit;
+}
+
+.global-search__field button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 0;
+  border-radius: 9px;
+  color: var(--color-text-soft);
+  background: var(--color-surface-muted);
+}
+
+.global-search__results {
+  max-height: min(460px, 65vh);
+  padding: 8px;
+  overflow-y: auto;
+}
+
+.global-search__result {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: 40px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 11px;
+  padding: 10px;
+  border: 0;
+  border-radius: 12px;
+  color: var(--color-text);
+  text-align: left;
+  background: transparent;
+}
+
+.global-search__result:hover,
+.global-search__result:focus-visible {
+  outline: 0;
+  background: var(--color-surface-muted);
+}
+
+.global-search__result-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 11px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.global-search__result-copy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.global-search__result-copy strong,
+.global-search__result-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.global-search__result-copy strong { font-size: .82rem; }
+.global-search__result-copy small { color: var(--color-text-soft); font-size: .69rem; }
+.global-search__result-type { color: var(--color-text-soft); font-size: .67rem; font-weight: 750; }
+.global-search__result > svg { color: var(--color-text-soft); }
+
+.global-search__empty {
+  display: grid;
+  min-height: 180px;
+  place-content: center;
+  justify-items: center;
+  padding: 28px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.global-search__empty svg { margin-bottom: 10px; color: var(--color-primary); }
+.global-search__empty strong { margin-bottom: 4px; color: var(--color-text); }
+.global-search__empty p { max-width: 360px; margin: 0; font-size: .78rem; }
+
+.global-search__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-soft);
+  background: var(--color-surface-muted);
+  font-size: .66rem;
+}
+
+.global-search__footer kbd {
+  padding: 2px 7px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+}
+
+@media (max-width: 760px) {
+  .global-search__panel {
+    position: fixed;
+    top: calc(var(--topbar-height) + 8px);
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+
+  .global-search__result {
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+  }
+
+  .global-search__result-type { display: none; }
+}
+
+@media (max-width: 960px) {
+  .global-search .topbar__search {
+    display: grid;
+    width: 42px;
+    min-width: 42px;
+    grid-template-columns: 1fr;
+    place-items: center;
+    padding: 0;
+  }
+
+  .global-search .topbar__search span,
+  .global-search .topbar__search kbd {
+    display: none;
+  }
+}

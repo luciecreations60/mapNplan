@@ -1,4 +1,4 @@
-# Architecture — V0.1.5
+# Architecture — V0.1.6
 
 ## Goals
 
@@ -82,6 +82,8 @@ Trip
 ├── currency
 ├── destinationCurrency
 ├── archivedAt
+├── isFavorite
+├── pinnedAt
 └── notes
 ```
 
@@ -89,15 +91,16 @@ Every nested record owns a stable identifier. `TripService` normalises the compl
 
 ## Schema migration
 
-The current trip schema version is `5`.
+The current trip schema version is `6`.
 
 - Schema 1: trip summary fields.
 - Schema 2: itinerary, expenses, checklist and notes.
 - Schema 3: reservations, documents and coordinates.
 - Schema 4: destination currency and travel-tool defaults.
 - Schema 5: reversible archive lifecycle through `archivedAt`.
+- Schema 6: local-library preferences through `isFavorite` and `pinnedAt`.
 
-Migration is non-destructive. Existing records receive `archivedAt: null` and all nested identifiers remain unchanged.
+Migration is non-destructive. Existing records receive `isFavorite: false` and `pinnedAt: null`; all nested identifiers remain unchanged.
 
 
 ## Editing and lifecycle boundary
@@ -110,12 +113,39 @@ Trip lifecycle operations are repository methods:
 TripService
 ├── update(id, patch)
 ├── duplicate(id, name)
+├── toggleFavorite(id)
+├── togglePinned(id)
 ├── archive(id)
 ├── restore(id)
 └── remove(id)
 ```
 
 Duplication regenerates every nested identifier. Archiving is reversible and does not remove data. Permanent deletion remains a separate confirmed action.
+
+
+## Search boundary
+
+`tripSearch.js` creates a normalized, accent-insensitive index from user-owned content. The global search component receives only domain results and navigates to the relevant workspace tab through query parameters. Search data never leaves the browser.
+
+```text
+GlobalSearch
+    ↓
+searchTripContent(trips, query)
+    ↓
+Trip / activity / reservation / document / notes result
+```
+
+The trip library reuses `tripMatchesQuery()` so global and local search follow the same normalization rules.
+
+## Calendar and statistics boundaries
+
+`tripCalendar.js` maps itinerary items and reservations to provider-neutral calendar events. `CalendarPanel` only renders those events and does not change persistence rules.
+
+`tripStatistics.js` contains deterministic aggregations for trip duration, mapped places, budget allocation, reservation states and checklist readiness. The statistics component remains display-only.
+
+## Printable report
+
+`PrintTripPage` is a dedicated route outside the application shell. It composes the complete trip aggregate into an A4-oriented document and delegates PDF creation to the browser print dialog. No PDF library or paid service is required.
 
 ## External provider boundary
 
@@ -148,4 +178,4 @@ Provider URLs and limits live in `external-services.config.js`. Replacing Open-M
 
 ## Routing
 
-`HashRouter` remains in use for GitHub Pages because the host does not provide project-level SPA rewrite rules. A custom host can later replace it at the application boundary.
+`HashRouter` remains in use for GitHub Pages because the host does not provide project-level SPA rewrite rules. Workspace tab deep links use `?tab=` query parameters. The printable report uses `/trips/:tripId/print` inside the hash route. A custom host can later replace the router at the application boundary.
