@@ -2,137 +2,65 @@
 
 ## V0.1 — Complete local travel workspace
 
-### Part 1 — Foundation
+### Parts 1–9
 
-- [x] React and Vite foundation
-- [x] Application shell and design tokens
-- [x] Dashboard and trip library
-- [x] Trip creation and local persistence
-- [x] GitHub Pages and PWA foundation
+- [x] React/Vite foundation and GitHub Pages deployment
+- [x] Responsive application shell and design system
+- [x] Trip creation, editing, lifecycle and local persistence
+- [x] Itinerary, calendar, map, reservations and documents
+- [x] Budget, checklist, notes and statistics
+- [x] Weather, local time and currency conversion
+- [x] French/English localization
+- [x] Search, favorites, PDF reporting and backups
+- [x] Local collaboration and privacy-aware sharing
+- [x] Smart place search and automatic coordinates
 
-### Part 2 — Planning workspace
+### Part 10 — Route optimization
 
-- [x] Trip overview
-- [x] Day-by-day itinerary
-- [x] Budget and expenses
-- [x] Preparation checklist
-- [x] Persistent notes
-- [x] Versioned trip schema
+- [x] Replaceable route-planning service boundary
+- [x] Walking, cycling, driving and transit estimates
+- [x] Distance and travel-time calculation
+- [x] Nearest-neighbour day optimization
+- [x] Automatic schedule recalculation
+- [x] Reversible optimization
+- [x] Manual activity ordering
+- [x] Route map and segment preview
+- [x] Workload and missing-coordinate warnings
+- [x] Schema 9 migration
 
-### Part 3 — Map, reservations and documents
+### V0.1 finishing work
 
-- [x] Leaflet/OpenStreetMap adapter
-- [x] Itinerary markers and route line
-- [x] Coordinates on activities
-- [x] Reservation management
-- [x] Document references and safe links
+- [ ] Full accessibility and keyboard-navigation audit
+- [ ] Automated unit-test suite in GitHub Actions
+- [ ] Empty/loading/error-state consistency pass
+- [ ] Performance and Lighthouse audit
+- [ ] Final temporary-brand visual review
 
-### Part 4 — Travel companion and data portability
+## V0.2 — Discovery and advanced routing
 
-- [x] Weather and seven-day forecast
-- [x] Destination local time
-- [x] Currency converter
-- [x] Provider-response cache
-- [x] JSON backup export and import
-- [x] Demonstration-data reset action
-
-### Part 5 — Responsive stability and localisation
-
-- [x] Chromium desktop-shell correction
-- [x] Sticky desktop sidebar
-- [x] Tablet/mobile navigation drawer
-- [x] Fluid page and card layouts
-- [x] French and English interface
-- [x] Browser-language detection
-- [x] Persisted language selector
-- [x] Locale-aware formatting
-- [x] Translation-key integrity check
-
-### Part 6 — Editing and trip lifecycle
-
-- [x] Edit trip identity, dates, travellers, currencies, colour and summary
-- [x] Edit existing activities, including moving them to another day
-- [x] Edit existing reservations and documents
-- [x] Duplicate a complete trip with regenerated identifiers
-- [x] Archive and restore trips
-- [x] Reusable confirmation dialog
-- [x] Bilingual success and confirmation messages
-
-### Part 7 — Search, calendar and reporting
-
-- [x] Global search across all locally stored travel content
-- [x] Keyboard shortcut for global search
-- [x] Trip-library search, favorites filter and advanced sorting
-- [x] Favorite and pinned-trip metadata
-- [x] Combined itinerary and reservation calendar
-- [x] Trip statistics and readiness indicators
-- [x] Complete printable travel plan
-- [x] Browser PDF export workflow
-- [x] Schema 6 migration
+- [ ] Place-result preview on the map
+- [ ] Real routing-provider adapter
+- [ ] Live traffic and public-transport provider study
 - [ ] Drag-and-drop itinerary ordering
-- [ ] Accessibility and keyboard-navigation audit
-
-
-### Part 8 — Sharing and local collaboration
-
-- [x] Privacy-aware read-only trip sharing
-- [x] Downloadable share snapshot
-- [x] Participants and local roles
-- [x] Activity and reservation discussions
-- [x] Collaboration activity log
-- [x] Local notifications
-
-### Part 9 — Smart place search
-
-- [x] Place-search service abstraction
-- [x] Search-as-you-type geocoding provider
-- [x] Destination autocomplete
-- [x] Activity and reservation place autocomplete
-- [x] Automatic coordinate capture
-- [x] Search debounce, cancellation and cache
-- [x] Keyboard-accessible result list
-- [x] Destination map and travel-tool integration
-- [x] Schema 8 migration
-
-## V0.2 — Place discovery and intelligent routing
-
-- [ ] Search result preview on map
-- [ ] Route duration estimates
-- [ ] Map and timeline synchronisation
+- [ ] Map/timeline synchronization
+- [ ] Opening hours and visit-duration suggestions
 - [ ] Destination content model
 - [ ] Offline map strategy study
 
-## V0.3 — Accounts and synchronisation
+## V0.3 — Accounts and synchronization
 
-- [ ] Authentication provider
+- [ ] Authentication
 - [ ] Cloud trip repository
 - [ ] Secure document storage
 - [ ] Sharing permissions
-- [ ] Collaborative editing
+- [ ] Real-time collaborative editing
 - [ ] Reservation email-import preparation
 
-## V0.4 — Monetisation foundation
+## V0.4 — Monetization foundation
 
 - [ ] Affiliate provider configuration
-- [ ] Hotel, flight and activity calls to action
+- [ ] Hotel, flight, activity, insurance and eSIM calls to action
 - [ ] Conversion event tracking
 - [ ] SEO destination and itinerary pages
 - [ ] Consent and analytics controls
-- [ ] Commercial-provider terms review
-
-## Later opportunities
-
-- AI itinerary assistant
-- Offline travel mode
-- Premium plans
-- Group expense settlement
-- Travel journal and shareable recap
-
-
-## Next recommended milestone
-
-- Drag-and-drop itinerary ordering
-- Search-result preview directly on the map
-- Route duration and distance estimates
-- Accessibility and keyboard-navigation audit
-- Production geocoder-provider strategy
+- [ ] Premium-plan feature model

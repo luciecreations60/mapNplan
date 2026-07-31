@@ -1,24 +1,26 @@
 # Changelog
 
-## 0.1.8 — Smart place search and geocoding
+## [0.1.9] — 2026-07-31
 
 ### Added
 
-- Search-as-you-type place autocomplete for trip destinations.
-- Place autocomplete for itinerary activities and reservations.
-- Automatic latitude and longitude capture after selecting a result.
-- Automatic country and country-code capture for trip destinations.
-- Accessible keyboard navigation, loading, empty and error states.
-- Debounced, cancellable and locally cached geocoding requests.
-- Visible Photon and OpenStreetMap attribution.
-- Destination coordinates reused by map, weather and local-time tools.
+- Dedicated route-planning workspace tab.
+- Walking, cycling, driving and public-transport estimates.
+- Local distance and travel-time calculations.
+- Automatic nearest-neighbour activity ordering.
+- Recalculated activity start times.
+- Reversible optimization with saved previous order and times.
+- Manual up/down itinerary ordering.
+- Route map, segment list and workload alerts.
+- Central routing configuration and provider-neutral service boundary.
+- Schema 9 route-plan migration.
 
 ### Changed
 
-- Trip schema upgraded from 7 to 8.
-- `HttpService` now supports caller-driven request cancellation.
-- Map points now include the explicit trip destination.
-- Service worker cache upgraded to `tripflow-v0.1.8`.
+- Itinerary normalization now preserves explicit manual order.
+- Activity changes invalidate stale route calculations.
+- Coordinate validation no longer treats null values as coordinates at 0,0.
+- Service-worker cache updated to `tripflow-v0.1.9`.
 
 ## 0.1.7 — Sharing and local collaboration
 

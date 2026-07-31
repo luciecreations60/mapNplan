@@ -1,8 +1,8 @@
 {
-  "version": "0.1.8",
-  "schemaVersion": 8,
-  "generatedFor": "V0.1 Part 9",
-  "fileCount": 110,
+  "version": "0.1.9",
+  "schemaVersion": 9,
+  "generatedFor": "V0.1 Part 10",
+  "fileCount": 114,
   "files": [
     {
       "path": ".env.example",
@@ -21,33 +21,33 @@
     },
     {
       "path": "ARCHITECTURE.md",
-      "size": 8736,
-      "sha256": "9b4d54eb33c1845c5c0043fe91d5a23d01ca34bff85009382f819f2590fc54f3"
+      "size": 3784,
+      "sha256": "94d2342250aca9b3cc1181dbe5b2ce9dcba93c93205832fd2742c24c3cd6325c"
     },
     {
       "path": "CHANGELOG.md",
-      "size": 5109,
-      "sha256": "2d26a961dc68c785e2c2af1a3acf95fbfeaf8f1f215f234adc3d8b800d4bf6ee"
+      "size": 5098,
+      "sha256": "5d3f7253ae958ce1b2a9d4a217377aceb2647d287e4d078bfee277d321d05309"
     },
     {
       "path": "DELIVERY_NOTES.md",
-      "size": 1396,
-      "sha256": "1867979401f539c7fc3438575c919050b60c6caff187a5116c7de5e2650d5a6a"
+      "size": 1643,
+      "sha256": "6e972193b96ddee1c6eafca2a82d062236d444077d8da027e80715f0aa319be0"
     },
     {
       "path": "README.md",
-      "size": 4203,
-      "sha256": "6c60ec3441b4423611a6ebdb49775707ae5a41a5ebbf20e25991e6bfa1bdbe43"
+      "size": 2160,
+      "sha256": "d344813c23d937714be955994889feaf8d1ed1cc8f06c0d4b992b78f9b21eff3"
     },
     {
       "path": "ROADMAP.md",
-      "size": 4036,
-      "sha256": "4aa0396641c26ae15035bcb53edd6f611b1e1f7e52770e2bff3801afaaf41667"
+      "size": 2169,
+      "sha256": "d8cca8943fa9346299ad5adc2aa3b10a2e1a70f08facccb78fbbba89e80fa4dd"
     },
     {
       "path": "UPLOAD_TO_GITHUB.md",
-      "size": 531,
-      "sha256": "0243a60b75324668ddb6299bcdb3bf2e36dffbc9664308397549450fac1e1acd"
+      "size": 695,
+      "sha256": "3640c7dbcb8c12450615bc78ebb990193c02c6db70fc9d509a3635f1649bb57c"
     },
     {
       "path": "index.html",
@@ -57,12 +57,12 @@
     {
       "path": "package.json",
       "size": 576,
-      "sha256": "4d212f122d55ffa1282e2e4ee209f3c0dba8bc122ba3f3fdcdd5578d05c1df55"
+      "sha256": "4f4408fb9ceeead2f30e3c3941fe5b66a14b7a0196dd651bfb96b6d6129d238a"
     },
     {
       "path": "project.config.js",
       "size": 440,
-      "sha256": "efa0b3f303a4a63c725a8747e9ed770c8e27a8096196bfc489a5b2c1a5a04c11"
+      "sha256": "c627ee0b6e8652075807e78e5cbd6962a7dd4c65931f6622a34afeda2422b213"
     },
     {
       "path": "public/favicon.svg",
@@ -72,7 +72,7 @@
     {
       "path": "public/service-worker.js",
       "size": 1418,
-      "sha256": "062c3731a7bb15c472640085329604f09876b5bf3d68b961ebe053dee0c1595a"
+      "sha256": "387e0716b29c3757160c32b80873e54157b5b7116f0e463bfec99f9a9b169d5e"
     },
     {
       "path": "public/site.webmanifest",
@@ -116,8 +116,8 @@
     },
     {
       "path": "src/components/common/Icon.jsx",
-      "size": 2808,
-      "sha256": "7c41e7ea877396827d4098bc3fe292f1f1d9866bc81a61feae0ad8574ed94ad7"
+      "size": 2932,
+      "sha256": "4321c440af21def72ed6d62fe289818bb4a6c536b02a29265becdae5aaf532e4"
     },
     {
       "path": "src/components/common/LocationAutocomplete.jsx",
@@ -206,8 +206,8 @@
     },
     {
       "path": "src/components/tripWorkspace/ItineraryPanel.jsx",
-      "size": 13728,
-      "sha256": "f987d21e62f6f7529db9cebadf1ef127b7812540c14553f0bf1c847e7c715200"
+      "size": 15170,
+      "sha256": "71725c8650c3f0b52050f9afdf9c32313be659d47f06f458d82dc7894b20109a"
     },
     {
       "path": "src/components/tripWorkspace/MapPanel.jsx",
@@ -228,6 +228,11 @@
       "path": "src/components/tripWorkspace/ReservationsPanel.jsx",
       "size": 15244,
       "sha256": "8b8188db54bb2629a026707ff9f54bdd364cb61c635d42757f1d4cae01cdb55b"
+    },
+    {
+      "path": "src/components/tripWorkspace/RouteOptimizerPanel.jsx",
+      "size": 11107,
+      "sha256": "3249ee6ff2164eff0fa76f07c3c15ff4abdea4d73744193c14ebf00d0be72876"
     },
     {
       "path": "src/components/tripWorkspace/StatisticsPanel.jsx",
@@ -251,8 +256,8 @@
     },
     {
       "path": "src/components/tripWorkspace/TripTabs.jsx",
-      "size": 1616,
-      "sha256": "a10d46e3ff136619f5298f5b953909e85df3c0209e0cb8a33f7e9d2dcaaac8d5"
+      "size": 1679,
+      "sha256": "3662831f3342890866719785e0b589877d48744208a22dcd8e55248507402a48"
     },
     {
       "path": "src/components/tripWorkspace/tools/CurrencyConverter.jsx",
@@ -291,8 +296,8 @@
     },
     {
       "path": "src/config/app.config.js",
-      "size": 977,
-      "sha256": "8a6b06f6e42ab7614c2812b7ad28df1bf8c8eabf9a8bdb2c37560e1dd7eed9d2"
+      "size": 1010,
+      "sha256": "35dad204e8eb005ede8a838485d0cca1fbc8f28e8f9acd3736f1d5e1b4b89463"
     },
     {
       "path": "src/config/external-services.config.js",
@@ -313,6 +318,11 @@
       "path": "src/config/navigation.config.js",
       "size": 487,
       "sha256": "2bc0d86b598c0837d46359ceadc3ce22966c1389fc20d7ade0743567eaee08ae"
+    },
+    {
+      "path": "src/config/routing.config.js",
+      "size": 591,
+      "sha256": "453b87b4bdcc93230a85e93a686a50aa6b045a82730fde3248edcd31fa0cb1fe"
     },
     {
       "path": "src/contexts/LocalizationContext.jsx",
@@ -351,8 +361,8 @@
     },
     {
       "path": "src/i18n/translations.js",
-      "size": 62959,
-      "sha256": "4c47b132f06813a7d284b313e84af16af98af2ee950cc030f570b8179d4de8e8"
+      "size": 69008,
+      "sha256": "cd4f7c0c0c3290f2c213a6adf538bab73f34c8c4375afd413a3da730085bfe54"
     },
     {
       "path": "src/layouts/AppLayout.jsx",
@@ -396,8 +406,8 @@
     },
     {
       "path": "src/pages/TripWorkspacePage.jsx",
-      "size": 4900,
-      "sha256": "6b566b3be653fffdbf7f5196338df30fd5480369da7ecc48272968112714ce3a"
+      "size": 5114,
+      "sha256": "dbd99d579e1ae7da1d9b205b17825da1d6a1c15ce79917807b4ba5dec92f773d"
     },
     {
       "path": "src/pages/TripsPage.jsx",
@@ -430,6 +440,11 @@
       "sha256": "972650aac33dd563e90f566d59a5ac800add135c00f142dd5906a56c5db27ad6"
     },
     {
+      "path": "src/services/routing/RoutePlanningService.js",
+      "size": 1224,
+      "sha256": "3744ca044eb516994ee4cbfc5ccbc760c13f1803a3f5f899ec7001decb4481a1"
+    },
+    {
       "path": "src/services/share/TripShareService.js",
       "size": 6487,
       "sha256": "f0175d891976c7fe53c5cae5b20779d2e3acc0c4836a30d116b46d5550822bdc"
@@ -446,8 +461,8 @@
     },
     {
       "path": "src/services/trips/TripService.js",
-      "size": 16376,
-      "sha256": "38bf14053d35f82f120301f9c8f135131017ed440423a0f54f8460eeb27f2a71"
+      "size": 17771,
+      "sha256": "685fba42839e24f40225fdb40f6ad2bf9fb54b99fdc4dc83e021a703704abfdd"
     },
     {
       "path": "src/services/weather/WeatherService.js",
@@ -456,8 +471,8 @@
     },
     {
       "path": "src/styles/components.css",
-      "size": 13381,
-      "sha256": "e92b8fe8db2c7988829e1918f497054016bd08f5d05dcf4b8eb94fd665b51c32"
+      "size": 19415,
+      "sha256": "4a0d1541c795c2b6a3703d1a2837c249eeccfbfcf3efa329eb7044a94e234858"
     },
     {
       "path": "src/styles/global.css",
@@ -506,8 +521,13 @@
     },
     {
       "path": "src/utils/map.js",
-      "size": 2207,
-      "sha256": "65c9b136d4df491c24d0f378c18ee22a61eaa9169ca6d110ed9b2aeea27c5e71"
+      "size": 2365,
+      "sha256": "4ef769738c54b09e8ff7be54cc06c18de8064a959c88ed420365a6b87c82a160"
+    },
+    {
+      "path": "src/utils/routeOptimization.js",
+      "size": 10634,
+      "sha256": "39aa3438f52bfbbbb1f0fa820ab8efee45b86e95fa7eeaa940ac9a7d05ac469c"
     },
     {
       "path": "src/utils/travelTools.js",

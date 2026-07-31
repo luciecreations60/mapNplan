@@ -1,127 +1,61 @@
-# TripFlow — V0.1 Local Travel Workspace
+# TripFlow — V0.1.9
 
 > Every journey starts here.
 
-TripFlow is the temporary code name for a modern travel-planning application. Version `0.1.8` provides a complete local workspace with itinerary, map, reservations, budget, checklist, documents, notes and practical travel tools. The interface is responsive and available in French and English.
+TripFlow is a responsive travel-planning web application built with React and Vite. The current version runs entirely in the browser, stores trips locally and deploys for free through GitHub Pages.
 
-## Included
+## Current capabilities
 
-### Application foundation
+- Dashboard and trip library
+- Trip creation, editing, duplication, archive and favorites
+- Day-by-day itinerary with mapped locations
+- Local route optimization with transport-mode estimates
+- Calendar, map, reservations, budget, checklist, notes and documents
+- Weather, local time and currency conversion
+- Global search and printable/PDF travel report
+- Read-only sharing snapshots and local collaboration metadata
+- French and English interface with browser-language detection
+- JSON backup and restore
+- PWA foundation and automated GitHub Pages deployment
 
-- React 19 and Vite 8
-- GitHub Pages deployment workflow
-- Responsive desktop, tablet and mobile shell
-- Light, dark and system themes
-- French and English interface
-- Browser-language detection on first visit
-- Persisted manual language preference
-- Centralised project and branding configuration
-- PWA manifest and lightweight service worker
-
-### Trip management
-
-- Dashboard and searchable trip library
-- Global search across trips, activities, reservations, documents and notes
-- Favorites, pinned trips, advanced filters and sorting
-- Trip creation, edition, duplication, archiving, restoration and deletion
-- Browser persistence hidden behind repository services
-- Stable, versioned trip data schema with migrations
-- Dedicated workspace for each trip
-- JSON backup export and import
-
-### Planning workspace
-
-- Trip overview and countdown
-- Combined monthly calendar for activities and reservations
-- Planning, budget and readiness statistics
-- Printable full-trip report with browser PDF export
-- Day-by-day itinerary with activity edition
-- Search-as-you-type place selection for destinations, activities and reservations
-- Automatic coordinate capture from selected places
-- Interactive Leaflet/OpenStreetMap map
-- Editable flight, accommodation, transport and activity reservations
-- Paid and planned expense tracking
-- Preparation checklist
-- Editable document references and safe external links
-- Persistent travel notes
-- Destination weather, local time and currency converter
-
-## Repository structure
-
-```text
-travel-planner/
-├── .github/workflows/deploy.yml
-├── public/
-├── src/
-│   ├── components/
-│   ├── config/
-│   ├── contexts/
-│   ├── data/
-│   ├── hooks/
-│   ├── i18n/
-│   ├── layouts/
-│   ├── pages/
-│   ├── services/
-│   ├── styles/
-│   └── utils/
-├── ARCHITECTURE.md
-├── CHANGELOG.md
-├── DELIVERY_NOTES.md
-├── ROADMAP.md
-├── index.html
-├── package.json
-├── project.config.js
-└── vite.config.js
-```
-
-## Language behaviour
-
-On the first visit, the interface follows `navigator.languages`:
-
-- French browser language → French interface.
-- Any unsupported browser language → English interface.
-
-A manual selection in **Settings → Language** is stored locally and takes priority on later visits. User-created trip content is never translated automatically.
-
-## Updating the GitHub repository
-
-1. Download and extract the latest archive.
-2. Open the `travel-planner` repository on GitHub.
-3. Select **Add file → Upload files**.
-4. Drag every item inside the extracted folder into the upload area.
-5. Let GitHub replace files with identical paths.
-6. Commit directly to `main`.
-7. Open **Actions** and wait for the Pages deployment to complete.
-
-Existing browser data is migrated automatically from earlier schemas to schema 8. No saved trip is reset; the migration adds collaboration, comments and sharing metadata without deleting existing content.
-
-## Local development
+## Development
 
 ```bash
 npm install
 npm run dev
 ```
 
-Production verification:
+Production build:
 
 ```bash
 npm run build
-npm run preview
 ```
 
-## Changing the temporary name
+## Repository structure
 
-Edit `project.config.js`. Application branding and the browser title derive from this central file.
+```text
+src/
+├── components/       Reusable UI and feature components
+├── config/           Central application and provider configuration
+├── contexts/         React application state boundaries
+├── data/             Demonstration data
+├── hooks/            Component-facing APIs
+├── i18n/             French and English interface copy
+├── layouts/          Application shell
+├── pages/            Route-level composition
+├── services/         Persistence and provider adapters
+├── styles/           Design tokens, layouts and feature styles
+└── utils/            Pure domain and formatting helpers
+```
 
-## Data storage
+## Data and privacy
 
-React components never access LocalStorage directly. They use services and contexts. A later migration to Supabase or another backend therefore does not require rewriting the workspace interface.
+V0.1 stores data in the browser through LocalStorage. No account or backend is required. Clearing browser storage removes local trips unless a JSON backup has been exported.
 
+## Deployment
 
-## V0.1.8 highlights
+The workflow in `.github/workflows/deploy.yml` builds and publishes the application to GitHub Pages after every push to `main`.
 
-- Search-as-you-type place autocomplete
-- Destination, activity and reservation geocoding
-- Automatic latitude and longitude capture
-- Destination coordinates reused by map, weather and local time
-- Provider abstraction ready for a private or commercial geocoder
+## Project status
+
+This is a product-development foundation. The temporary brand name can be replaced centrally through `project.config.js` when the final commercial name is selected.

@@ -1,37 +1,39 @@
-# V0.1 — Part 9 delivery notes
+# V0.1 — Part 10 delivery notes
 
 ## Version
 
-- Application: `0.1.8`
-- Trip schema: `8`
+- Application: `0.1.9`
+- Trip schema: `9`
 
 ## Added
 
-- Reusable search-as-you-type location combobox.
-- Destination search in the trip creation and edition dialog.
-- Location search in activity and reservation forms.
-- Automatic latitude and longitude capture.
-- Automatic country and country-code capture for trip destinations.
-- Keyboard navigation with Arrow Up, Arrow Down, Enter and Escape.
-- Debounced requests, cancellation of obsolete requests and a 24-hour cache.
-- Photon/OpenStreetMap attribution in the suggestion panel.
-- Destination marker on the map and direct reuse by weather/local-time tools.
+- Dedicated route-planning tab for every trip.
+- Local distance and travel-time estimates between mapped activities.
+- Walking, cycling, driving and public-transport planning modes.
+- Nearest-neighbour day optimization.
+- Automatic activity start-time recalculation.
+- Start from the first activity or from the trip destination.
+- Undo action restoring the order and times saved before optimization.
+- Manual up/down ordering controls inside the itinerary.
+- Day workload warnings for long duration, walking distance, missing coordinates and excessive activity count.
+- Route map preview and segment-by-segment summary.
+- Central routing configuration and replaceable routing service boundary.
 
-## Behaviour
+## Important behaviour
 
-Typing at least three characters starts a search after 500 ms. Selecting a
-result stores its formatted label and coordinates. The input remains editable,
-and users can ignore suggestions or enter a location manually when the provider
-is unavailable.
+The V0.1 route engine is an offline planning estimate. It uses geographic distance, configurable road factors and average speeds. It does not provide turn-by-turn navigation or live traffic.
 
-## Architecture
-
-The provider is isolated behind `GeocodingService`. The public Photon endpoint
-is appropriate for prototype traffic only. A private Photon instance or another
-provider can later be configured without changing React forms.
+Activities without coordinates remain in the itinerary but are excluded from distance calculations. They are placed after mapped activities when a day is optimized.
 
 ## Migration
 
-Schema 8 adds `destinationLatitude` and `destinationLongitude`. Older trips are
-migrated non-destructively; when possible, the first existing mapped activity or
-reservation supplies the initial destination coordinates.
+Schema 9 adds a `routePlan` object to every itinerary day. Existing trips are migrated without changing their activities or manual order.
+
+## Quality checks
+
+- JavaScript and JSX syntax checked with the TypeScript parser.
+- All relative imports resolved.
+- French and English dictionaries synchronized.
+- Route analysis, optimization, restoration and manual ordering tested.
+- Schema 8 to 9 migration tested.
+- JSON, CSS and archive integrity checked.

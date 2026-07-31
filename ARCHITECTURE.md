@@ -1,8 +1,8 @@
-# Architecture — V0.1.8
+# Architecture — V0.1.9
 
 ## Goals
 
-The architecture separates interface composition, domain behaviour, persistence, localisation and external providers. The current implementation remains static and free to host while preparing for authentication, cloud synchronisation, secure files, affiliations and artificial intelligence.
+TripFlow separates interface composition, domain behaviour, persistence, localization and external providers. The current application remains static and free to host while preparing for accounts, cloud synchronization, commercial providers, affiliations and artificial intelligence.
 
 ## Dependency direction
 
@@ -13,211 +13,106 @@ Contexts and hooks
         ↓
 Domain / provider services
         ↓
-Storage and remote HTTP adapters
+Storage, HTTP and future backend adapters
 ```
 
-Components do not access LocalStorage or provider endpoints directly.
+React components never access LocalStorage or remote provider endpoints directly.
 
 ## Main boundaries
 
 - `components/`: reusable interface and feature components.
-- `config/`: branding, features, navigation, languages and provider settings.
+- `config/`: branding, features, languages and provider parameters.
 - `contexts/`: React state backed by application services.
 - `hooks/`: stable component-facing APIs.
 - `i18n/`: central interface translations.
-- `pages/`: route-level composition only.
+- `pages/`: route-level composition.
 - `services/`: persistence, data portability and provider adapters.
 - `styles/`: tokens, global rules, layouts and feature styling.
-- `utils/`: deterministic validation, formatting and aggregation helpers.
-
-## Responsive application shell
-
-Desktop layout:
-
-```text
-.app-shell (CSS grid)
-├── Sidebar (sticky grid item)
-└── Main column
-    ├── Top bar (sticky)
-    └── Fluid page container
-```
-
-The desktop sidebar participates in the grid and is no longer `position: fixed`. This prevents Chromium from placing the main content in the sidebar column. At `960px` and below, the shell becomes a single-column layout and the sidebar becomes an off-canvas drawer with an overlay.
-
-All grid and flex children use `min-width: 0` where required, preventing long content from forcing horizontal overflow. Page padding and card grids use fluid breakpoints for desktop, tablet and mobile widths.
-
-## Localisation boundary
-
-```text
-LocalizationProvider
-├── browser-language resolver
-├── persisted language preference
-├── translation dictionary
-└── locale-aware formatters
-```
-
-- `localization.config.js` owns supported language metadata.
-- `translations.js` owns application copy only.
-- `LocalizationContext.jsx` exposes `language`, `locale`, `setLanguage()` and `t()`.
-- `useI18n()` is the component-facing API.
-- The first visit follows `navigator.languages`.
-- A manual setting is persisted through `LocalStorageService`.
-- Unsupported browser languages fall back to English.
-- User-created content remains unchanged.
-
-Adding a language requires one configuration entry and a complete translation branch; pages and components do not require structural changes.
+- `utils/`: deterministic validation, routing, formatting and aggregation helpers.
 
 ## Trip aggregate
 
 ```text
 Trip
 ├── itinerary[]
+│   ├── day.routePlan
 │   └── day.items[]
-│       ├── latitude
-│       └── longitude
+│       ├── latitude / longitude
+│       ├── durationMinutes
+│       └── comments[]
 ├── expenses[]
 ├── checklist[]
 ├── reservations[]
 ├── documents[]
-├── currency
-├── destinationCurrency
-├── archivedAt
-├── isFavorite
-├── pinnedAt
-└── notes
+├── collaboration
+├── destination coordinates
+├── currencies
+└── lifecycle metadata
 ```
 
-Every nested record owns a stable identifier. `TripService` normalises the complete aggregate, calculates derived totals and stores a `schemaVersion`.
+Every nested record owns a stable identifier. `TripService` normalizes the complete aggregate and stores a `schemaVersion`.
+
+## Route-planning boundary
+
+```text
+RouteOptimizerPanel
+        ↓
+RoutePlanningService
+        ↓
+Local route-estimation engine
+```
+
+`RoutePlanningService` exposes a stable contract:
+
+- `analyse(day, mode)`
+- `optimize(day, options)`
+- `restore(day)`
+- `move(day, activityId, direction)`
+- `getMapPoints(day)`
+
+The current engine uses the Haversine distance, configurable distance multipliers and average speeds. This keeps V0.1 free and deterministic. A future routing provider such as OSRM, GraphHopper or Mapbox can replace the service implementation without rewriting the workspace.
+
+Configuration lives in `src/config/routing.config.js`. UI components contain no provider URL, speed or warning threshold.
+
+## Route-plan persistence
+
+Each itinerary day contains:
+
+```text
+routePlan
+├── mode
+├── startStrategy
+├── startTime
+├── optimizedAt
+├── previousOrder[]
+├── previousTimes{}
+├── manuallyOrderedAt
+├── estimatedDistanceKm
+└── estimatedTravelMinutes
+```
+
+Before optimization, the current activity order and times are saved. Undo restores those values. Editing, deleting or manually moving an activity invalidates stale route estimates.
 
 ## Schema migration
 
-The current trip schema version is `8`.
+Current trip schema: `9`.
 
-- Schema 1: trip summary fields.
-- Schema 2: itinerary, expenses, checklist and notes.
-- Schema 3: reservations, documents and coordinates.
-- Schema 4: destination currency and travel-tool defaults.
-- Schema 5: reversible archive lifecycle through `archivedAt`.
-- Schema 6: local-library preferences through `isFavorite` and `pinnedAt`.
-- Schema 7: participants, role metadata, comments, activity history and privacy-aware sharing.
-- Schema 8: explicit destination latitude and longitude for geocoding and travel tools.
+1. Summary fields
+2. Itinerary, expenses, checklist and notes
+3. Reservations, documents and coordinates
+4. Destination currency and travel tools
+5. Archive lifecycle
+6. Favorites and pinned trips
+7. Collaboration, comments and privacy-aware sharing
+8. Explicit destination coordinates
+9. Route planning, reversible optimization and manual ordering
 
-Migration is non-destructive. Existing records receive destination coordinates from the first already mapped activity or reservation when available; all identifiers and user content remain unchanged.
+Migration is non-destructive. Existing activity order is preserved.
 
+## Responsive architecture
 
-## Editing and lifecycle boundary
+Desktop uses a grid shell with a sticky sidebar. Tablet and mobile use a single-column layout with an off-canvas navigation drawer. Route controls collapse from five columns to two and then one; map and segment panels stack below 960 px.
 
-`TripFormDialog` is shared by creation and edition so field definitions and validation rules cannot diverge. Nested itinerary, reservation and document editors reuse the same normalised trip aggregate through `TripContext`.
+## Localization
 
-Trip lifecycle operations are repository methods:
-
-```text
-TripService
-├── update(id, patch)
-├── duplicate(id, name)
-├── toggleFavorite(id)
-├── togglePinned(id)
-├── archive(id)
-├── restore(id)
-└── remove(id)
-```
-
-Duplication regenerates every nested identifier. Archiving is reversible and does not remove data. Permanent deletion remains a separate confirmed action.
-
-
-## Search boundary
-
-`tripSearch.js` creates a normalized, accent-insensitive index from user-owned content. The global search component receives only domain results and navigates to the relevant workspace tab through query parameters. Search data never leaves the browser.
-
-```text
-GlobalSearch
-    ↓
-searchTripContent(trips, query)
-    ↓
-Trip / activity / reservation / document / notes result
-```
-
-The trip library reuses `tripMatchesQuery()` so global and local search follow the same normalization rules.
-
-## Calendar and statistics boundaries
-
-`tripCalendar.js` maps itinerary items and reservations to provider-neutral calendar events. `CalendarPanel` only renders those events and does not change persistence rules.
-
-`tripStatistics.js` contains deterministic aggregations for trip duration, mapped places, budget allocation, reservation states and checklist readiness. The statistics component remains display-only.
-
-## Printable report
-
-`PrintTripPage` is a dedicated route outside the application shell. It composes the complete trip aggregate into an A4-oriented document and delegates PDF creation to the browser print dialog. No PDF library or paid service is required.
-
-## External provider boundary
-
-```text
-TravelToolsPanel
-├── WeatherService
-│   ├── HttpService
-│   └── ResponseCacheService
-└── CurrencyService
-    ├── HttpService
-    └── ResponseCacheService
-```
-
-Provider URLs and limits live in `external-services.config.js`. Replacing Open-Meteo or Frankfurter does not require changes to workspace components.
-
-
-
-## Place-search boundary
-
-```text
-LocationAutocomplete
-        ↓
-GeocodingService
-        ↓
-HttpService + ResponseCacheService
-        ↓
-Configurable Photon endpoint
-```
-
-`LocationAutocomplete` is an accessible controlled combobox shared by trip,
-itinerary and reservation forms. It applies a debounce, cancels stale requests,
-supports keyboard selection and preserves manual text entry.
-
-`GeocodingService` converts provider-specific GeoJSON into a stable application
-place model. Components only receive labels, country metadata and coordinates.
-The current public Photon demo endpoint is isolated in
-`external-services.config.js`; a self-hosted Photon instance or another provider
-can replace it without changing forms.
-
-Selected destination coordinates are stored on the trip aggregate. Activity and
-reservation selections fill their existing latitude/longitude fields. The map,
-weather and local-time tools therefore reuse one consistent coordinate model.
-
-
-## Data portability
-
-`DataPortabilityService` creates and validates a versioned JSON envelope before replacing locally stored trips through `TripService`.
-
-## Map integration
-
-`TripMap` is the only component coupled to Leaflet. It receives provider-neutral points from `getTripMapPoints()` and knows nothing about persistence or editing.
-
-## Security boundaries
-
-- External document and reservation links accept only HTTP and HTTPS.
-- Imported backups are size-limited, parsed as JSON and normalised before storage.
-- No API secret is committed to the browser bundle.
-- Binary document uploads remain deferred until authentication and secure object storage exist.
-
-## Routing
-
-`HashRouter` remains in use for GitHub Pages because the host does not provide project-level SPA rewrite rules. Workspace tab deep links use `?tab=` query parameters. The printable report uses `/trips/:tripId/print` inside the hash route. A custom host can later replace the router at the application boundary.
-
-
-## V0.1.7 collaboration boundary
-
-The collaboration domain is embedded in each trip under `trip.collaboration`:
-
-- `members`: future account identities and roles;
-- `activityLog`: language-neutral audit entries;
-- `share`: local share metadata.
-
-Comments belong to their domain entities (`itinerary.items[].comments` and `reservations[].comments`). Read-only sharing is isolated in `TripShareService`; it emits a privacy-filtered snapshot instead of exposing the persisted trip object. This boundary allows a future API/Supabase adapter to replace local persistence without rewriting workspace components.
+Interface copy is stored in `src/i18n/translations.js`. French and English share identical keys. User-created content is never translated automatically.
