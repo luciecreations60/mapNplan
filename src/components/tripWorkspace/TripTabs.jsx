@@ -4,6 +4,7 @@ export const TRIP_TABS = Object.freeze([
   { id: 'overview', label: 'Overview', icon: 'dashboard' },
   { id: 'itinerary', label: 'Itinerary', icon: 'calendarDays' },
   { id: 'map', label: 'Map', icon: 'map' },
+  { id: 'tools', label: 'Travel tools', icon: 'globe' },
   { id: 'reservations', label: 'Reservations', icon: 'ticket' },
   { id: 'budget', label: 'Budget', icon: 'wallet' },
   { id: 'checklist', label: 'Checklist', icon: 'checklist' },

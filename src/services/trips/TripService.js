@@ -6,7 +6,7 @@ import { normalizeExternalUrl } from '../../utils/url.js';
 import { localStorageService } from '../storage/LocalStorageService.js';
 
 const STORAGE_KEY = 'trips';
-const CURRENT_TRIP_SCHEMA_VERSION = 3;
+const CURRENT_TRIP_SCHEMA_VERSION = 4;
 
 /**
  * Trip repository façade.
@@ -52,6 +52,7 @@ class TripService {
       reservations: [],
       documents: [],
       notes: '',
+      destinationCurrency: payload.destinationCurrency || payload.currency || APP_CONFIG.defaultCurrency,
     });
 
     localStorageService.set(STORAGE_KEY, [...trips, newTrip]);
@@ -74,6 +75,17 @@ class TripService {
 
     localStorageService.set(STORAGE_KEY, trips);
     return updatedTrip;
+  }
+
+
+  replaceAll(trips) {
+    if (!Array.isArray(trips)) {
+      throw new Error('A trips array is required.');
+    }
+
+    const normalizedTrips = trips.map((trip) => this.#normalize(this.#migrateLegacyTrip(trip)));
+    localStorageService.set(STORAGE_KEY, normalizedTrips);
+    return normalizedTrips;
   }
 
   remove(id) {
@@ -104,6 +116,9 @@ class TripService {
       reservations: Object.hasOwn(trip, 'reservations') ? trip.reservations : demoTrip.reservations,
       documents: Object.hasOwn(trip, 'documents') ? trip.documents : demoTrip.documents,
       notes: Object.hasOwn(trip, 'notes') ? trip.notes : demoTrip.notes,
+      destinationCurrency: Object.hasOwn(trip, 'destinationCurrency')
+        ? trip.destinationCurrency
+        : demoTrip.destinationCurrency,
     };
   }
 
@@ -128,7 +143,10 @@ class TripService {
       startDate: trip.startDate || '',
       endDate: trip.endDate || '',
       travelers: Math.max(1, Number(trip.travelers) || 1),
-      currency: trip.currency || APP_CONFIG.defaultCurrency,
+      currency: String(trip.currency || APP_CONFIG.defaultCurrency).trim().toUpperCase(),
+      destinationCurrency: String(
+        trip.destinationCurrency || trip.currency || APP_CONFIG.defaultCurrency,
+      ).trim().toUpperCase(),
       budget: Math.max(0, Number(trip.budget) || 0),
       spent: expenses.length > 0
         ? calculatedSpent

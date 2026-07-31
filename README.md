@@ -1,42 +1,37 @@
-# TripFlow — V0.1.2 Travel Workspace
+# Travel Planner — V0.1.3
 
-> Every journey starts here.
+> Temporary product code name: **TripFlow** — Every journey starts here.
 
-TripFlow is the temporary code name for a modern travel-planning application. Version `0.1.2` extends the usable planner with reservations, document references and an interactive trip map while preserving the service boundaries required for future accounts, synchronisation and affiliation.
+This repository contains a zero-budget, static-first travel-planning application built with React and Vite. V0.1.3 adds live travel utilities and local data portability while preserving the service boundaries needed for a future backend, user accounts and affiliate providers.
 
 ## Included
 
 ### Application foundation
 
-- React and Vite
-- Automated GitHub Pages deployment
+- React 19 and Vite 8
+- GitHub Pages deployment workflow
 - Responsive desktop, tablet and mobile shell
 - Light, dark and system themes
-- Centralised branding and runtime configuration
+- Centralised project and feature configuration
 - PWA manifest and lightweight service worker
 
-### Trip workspace
+### Travel workspace
 
-- Overview dashboard
-- Day-by-day itinerary
-- Activity creation and deletion
-- Optional coordinates for each activity
-- Interactive Leaflet map with OpenStreetMap tiles
-- Itinerary route line and numbered map points
-- Structured flight, accommodation, transport and activity reservations
-- Reservation statuses, references, links and map coordinates
-- Budget tracking and spending categories
-- Preparation checklist
-- Travel document references and secure HTTP(S) links
-- Persistent notes
+- Dashboard and trip library
+- Trip creation and deletion
+- Overview, itinerary, map, reservations, budget, checklist, documents and notes
+- Leaflet and OpenStreetMap integration
+- Versioned LocalStorage schema with automatic migrations
 
-### Data architecture
+### V0.1.3 travel companion
 
-- LocalStorage hidden behind repository services
-- Stable identifiers for nested entities
-- Trip schema version `3`
-- Automatic migration from V0.1 Parts 1 and 2
-- Central URL and coordinate validation
+- Seven-day destination weather forecast
+- Destination local time
+- Reference currency converter
+- Response caching for external services
+- JSON backup export and import
+- Clearly labelled **Reset demo data** action
+- Visible success and error feedback
 
 ## Repository structure
 
@@ -46,11 +41,6 @@ travel-planner/
 ├── public/
 ├── src/
 │   ├── components/
-│   │   ├── common/
-│   │   ├── dashboard/
-│   │   ├── navigation/
-│   │   ├── trips/
-│   │   └── tripWorkspace/
 │   ├── config/
 │   ├── contexts/
 │   ├── data/
@@ -58,11 +48,17 @@ travel-planner/
 │   ├── layouts/
 │   ├── pages/
 │   ├── services/
+│   │   ├── currency/
+│   │   ├── data/
+│   │   ├── http/
+│   │   ├── pwa/
+│   │   ├── storage/
+│   │   ├── trips/
+│   │   └── weather/
 │   ├── styles/
 │   └── utils/
 ├── ARCHITECTURE.md
 ├── CHANGELOG.md
-├── DELIVERY_NOTES.md
 ├── ROADMAP.md
 ├── index.html
 ├── package.json
@@ -70,22 +66,23 @@ travel-planner/
 └── vite.config.js
 ```
 
-## Uploading to GitHub
+## Using the travel tools
 
-1. Download and unzip this delivery.
-2. Open the `travel-planner` repository on GitHub.
-3. Select **Add file → Upload files**.
-4. Drag every item inside the unzipped folder into the upload area.
-5. Let GitHub replace files with identical paths.
-6. Commit directly to `main` with:
+Open a trip containing at least one itinerary activity or reservation with valid latitude and longitude. Select **Travel tools** in the trip workspace.
+
+The first mapped itinerary location is used for weather and local time. The exchange converter defaults to the trip budget currency and destination currency.
+
+## Resetting the demonstration data
+
+Open **Settings**, scroll to the final card named **Reset demo data**, then select the red **Reset demo data** button.
+
+## Updating GitHub
+
+See `UPLOAD_TO_GITHUB.md` for the exact steps. The recommended commit message is:
 
 ```text
-feat: add v0.1.2 maps reservations and documents
+feat: add v0.1.3 travel tools and backups
 ```
-
-7. Open **Actions** and wait for the Pages deployment to complete.
-
-Existing browser data is migrated automatically. Use **Settings → Reset demo data** only when you want to load the complete new demonstration data.
 
 ## Local development
 
@@ -101,10 +98,15 @@ npm run build
 npm run preview
 ```
 
-## Changing the temporary brand
+## Temporary branding
 
-Edit `project.config.js`. The name, slogan, repository base path and displayed version are centralised there.
+Edit `project.config.js` when the final commercial name is selected. Application branding and the browser title derive from this central file.
 
-## Current document-storage limitation
+## External services
 
-The static zero-budget version stores document metadata and safe external links only. It does not persist binary files in LocalStorage. Actual PDF and image storage will be added with authenticated cloud accounts.
+Provider URLs, timeouts and cache durations are centralised in `src/config/external-services.config.js`.
+
+- Weather: Open-Meteo
+- Exchange rates: Frankfurter
+
+The public APIs are suitable for development without embedding credentials. Provider terms and commercial usage requirements must be reviewed again before monetised production launch.

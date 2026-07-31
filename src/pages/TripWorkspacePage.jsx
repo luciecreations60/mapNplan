@@ -8,6 +8,7 @@ import { MapPanel } from '../components/tripWorkspace/MapPanel.jsx';
 import { NotesPanel } from '../components/tripWorkspace/NotesPanel.jsx';
 import { OverviewPanel } from '../components/tripWorkspace/OverviewPanel.jsx';
 import { ReservationsPanel } from '../components/tripWorkspace/ReservationsPanel.jsx';
+import { TravelToolsPanel } from '../components/tripWorkspace/TravelToolsPanel.jsx';
 import { TripHero } from '../components/tripWorkspace/TripHero.jsx';
 import { TripTabs } from '../components/tripWorkspace/TripTabs.jsx';
 import { useTrips } from '../hooks/useTrips.js';
@@ -56,6 +57,7 @@ export function TripWorkspacePage() {
         {activeTab === 'overview' && <OverviewPanel trip={trip} onOpenTab={setActiveTab} />}
         {activeTab === 'itinerary' && <ItineraryPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'map' && <MapPanel trip={trip} onOpenTab={setActiveTab} />}
+        {activeTab === 'tools' && <TravelToolsPanel trip={trip} onOpenTab={setActiveTab} />}
         {activeTab === 'reservations' && <ReservationsPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'budget' && <BudgetPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'checklist' && <ChecklistPanel trip={trip} onUpdate={handleUpdate} />}

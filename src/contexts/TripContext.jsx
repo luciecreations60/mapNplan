@@ -1,4 +1,5 @@
 import { createContext, useCallback, useMemo, useState } from 'react';
+import { dataPortabilityService } from '../services/data/DataPortabilityService.js';
 import { tripService } from '../services/trips/TripService.js';
 
 export const TripContext = createContext(null);
@@ -41,6 +42,18 @@ export function TripProvider({ children }) {
     return deleted;
   }, []);
 
+
+  const exportBackup = useCallback(() => {
+    dataPortabilityService.downloadBackup(tripService.getAll());
+  }, []);
+
+  const importBackup = useCallback(async (file) => {
+    const importedTrips = await dataPortabilityService.readBackup(file);
+    const normalizedTrips = tripService.replaceAll(importedTrips);
+    setTrips(normalizedTrips);
+    return normalizedTrips;
+  }, []);
+
   const resetDemoData = useCallback(() => {
     const demoTrips = tripService.resetDemoData();
     setTrips(demoTrips);
@@ -54,6 +67,8 @@ export function TripProvider({ children }) {
       updateTrip,
       deleteTrip,
       resetDemoData,
+      exportBackup,
+      importBackup,
       refreshTrips,
     }),
     [
@@ -63,6 +78,8 @@ export function TripProvider({ children }) {
       updateTrip,
       deleteTrip,
       resetDemoData,
+      exportBackup,
+      importBackup,
       refreshTrips,
     ],
   );

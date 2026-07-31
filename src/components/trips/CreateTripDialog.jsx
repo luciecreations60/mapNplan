@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { SUPPORTED_CURRENCIES } from '../../config/external-services.config.js';
 import { useTrips } from '../../hooks/useTrips.js';
 import { Button } from '../common/Button.jsx';
 import { Modal } from '../common/Modal.jsx';
@@ -13,6 +14,7 @@ const INITIAL_FORM = {
   travelers: 2,
   budget: 0,
   currency: 'EUR',
+  destinationCurrency: 'EUR',
   accent: 'violet',
 };
 
@@ -136,12 +138,25 @@ export function CreateTripDialog({ isOpen, onClose }) {
             onChange={updateField}
           />
           <div className="field">
-            <label className="field__label" htmlFor="trip-currency">Currency</label>
+            <label className="field__label" htmlFor="trip-currency">Budget currency</label>
             <select id="trip-currency" className="field__input" name="currency" value={form.currency} onChange={updateField}>
-              <option value="EUR">EUR — Euro</option>
-              <option value="USD">USD — US dollar</option>
-              <option value="GBP">GBP — Pound sterling</option>
-              <option value="JPY">JPY — Japanese yen</option>
+              {SUPPORTED_CURRENCIES.map((currency) => (
+                <option key={currency.code} value={currency.code}>{currency.code} — {currency.label}</option>
+              ))}
+            </select>
+          </div>
+          <div className="field">
+            <label className="field__label" htmlFor="trip-destination-currency">Destination currency</label>
+            <select
+              id="trip-destination-currency"
+              className="field__input"
+              name="destinationCurrency"
+              value={form.destinationCurrency}
+              onChange={updateField}
+            >
+              {SUPPORTED_CURRENCIES.map((currency) => (
+                <option key={currency.code} value={currency.code}>{currency.code} — {currency.label}</option>
+              ))}
             </select>
           </div>
         </div>

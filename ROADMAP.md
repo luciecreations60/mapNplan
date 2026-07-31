@@ -26,24 +26,35 @@
 
 - [x] Leaflet map adapter
 - [x] OpenStreetMap tile configuration
-- [x] Itinerary map markers and route line
-- [x] Coordinates on itinerary activities
-- [x] Reservation domain model
-- [x] Flights, accommodation, transport and activities
-- [x] Reservation status management
+- [x] Itinerary markers and route line
+- [x] Coordinates on activities
+- [x] Reservation management
 - [x] Document references and safe links
 - [x] Schema 3 migration
-- [x] Responsive map and reservation layouts
 
-### Part 4 — Editing and usability completion
+### Part 4 — Travel companion and data portability
+
+- [x] Weather provider abstraction
+- [x] Seven-day destination forecast
+- [x] Destination local time
+- [x] Currency provider abstraction
+- [x] Reference currency converter
+- [x] External-response cache
+- [x] Export trips to JSON
+- [x] Import and validate JSON backups
+- [x] Explicit Reset demo data action
+- [x] Schema 4 migration
+
+### Part 5 — Editing and usability completion
 
 - [ ] Edit existing activities
 - [ ] Edit existing reservations and documents
-- [ ] Drag-and-drop itinerary ordering
 - [ ] Trip settings and trip editing
-- [ ] Confirmation dialogs and toast notifications
-- [ ] Import/export trip JSON
+- [ ] Reusable toast notification system
+- [ ] Confirmation dialog component
+- [ ] Drag-and-drop itinerary ordering
 - [ ] Accessibility audit
+- [ ] Production build audit after GitHub deployment
 
 ## V0.2 — Place discovery and intelligent routing
 
@@ -71,6 +82,7 @@
 - [ ] Conversion event tracking
 - [ ] SEO destination and itinerary pages
 - [ ] Consent and analytics controls
+- [ ] Commercial-provider terms review
 
 ## Later opportunities
 

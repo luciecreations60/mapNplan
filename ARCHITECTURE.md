@@ -1,8 +1,8 @@
-# Architecture — V0.1.2
+# Architecture — V0.1.3
 
 ## Goals
 
-The architecture separates interface composition, domain behaviour, persistence and external providers. The current implementation remains static and free to host while preparing for authentication, cloud synchronisation, secure file storage, affiliations and artificial intelligence.
+The architecture separates interface composition, domain behaviour, persistence and external providers. The current implementation remains static and free to host while preparing for authentication, cloud synchronisation, secure files, affiliations and artificial intelligence.
 
 ## Dependency direction
 
@@ -11,12 +11,12 @@ Pages and components
         ↓
 Contexts and hooks
         ↓
-Domain services
+Domain / provider services
         ↓
-Storage / future API adapters
+Storage and remote HTTP adapters
 ```
 
-Components must not access LocalStorage or external APIs directly.
+Components do not access LocalStorage or provider endpoints directly.
 
 ## Main boundaries
 
@@ -25,7 +25,7 @@ Components must not access LocalStorage or external APIs directly.
 - `contexts/`: React state backed by domain services.
 - `hooks/`: stable component-facing APIs.
 - `pages/`: route-level composition only.
-- `services/`: persistence and future provider integrations.
+- `services/`: persistence, data portability and provider adapters.
 - `styles/`: tokens, global rules, layouts and feature styling.
 - `utils/`: deterministic validation, formatting and aggregation helpers.
 
@@ -41,6 +41,8 @@ Trip
 ├── checklist[]
 ├── reservations[]
 ├── documents[]
+├── currency
+├── destinationCurrency
 └── notes
 ```
 
@@ -48,44 +50,60 @@ Every nested record owns a stable identifier. `TripService` normalises the compl
 
 ## Schema migration
 
-The current schema version is `3`.
+The current schema version is `4`.
 
 - Schema 1: trip summary fields.
 - Schema 2: itinerary, expenses, checklist and notes.
 - Schema 3: reservations, documents and coordinates.
+- Schema 4: destination currency and travel-tool defaults.
 
-Existing trips are normalised non-destructively. Demonstration collections are added only when the property did not previously exist.
+Existing trips are normalised non-destructively. Demonstration properties are added only when the property did not previously exist.
+
+## External provider boundary
+
+```text
+TravelToolsPanel
+├── WeatherService
+│   ├── HttpService
+│   └── ResponseCacheService
+└── CurrencyService
+    ├── HttpService
+    └── ResponseCacheService
+```
+
+`HttpService` centralises timeout and JSON error handling. Provider services translate raw responses into application-owned models. `ResponseCacheService` stores short-lived results under the application LocalStorage namespace.
+
+Provider URLs and limits live in `external-services.config.js`. Replacing Open-Meteo or Frankfurter does not require changes to workspace components.
+
+## Location selection
+
+`getPrimaryTripLocation()` currently selects the first itinerary map point, then falls back to a mapped reservation. This rule is isolated so a future dedicated destination entity or place-search provider can replace it without changing travel-tool components.
+
+## Data portability
+
+`DataPortabilityService` creates a versioned JSON envelope:
+
+```text
+Backup
+├── format
+├── version
+├── exportedAt
+└── trips[]
+```
+
+Imported trips are validated, then passed through `TripService.replaceAll()` so current normalisation and schema rules are always applied.
 
 ## Map integration
 
-`TripMap` is the only component coupled to Leaflet. It receives provider-neutral map points from `getTripMapPoints()` and knows nothing about LocalStorage or trip editing.
+`TripMap` is the only component coupled to Leaflet. It receives provider-neutral map points from `getTripMapPoints()` and knows nothing about persistence or editing.
 
-`map.config.js` centralises:
+## Security boundaries
 
-- default centre and zoom;
-- tile URL;
-- attribution;
-- provider limits.
-
-A future move to MapLibre or a commercial tile service is therefore isolated to the adapter and configuration layer.
-
-## Reservation and document security
-
-External links are passed through `normalizeExternalUrl()`. Only HTTP and HTTPS protocols are exposed in clickable links.
-
-The current document module stores metadata and links, not binary files. Secure uploads require authentication, access policies and cloud object storage and are intentionally deferred.
+- External document and reservation links accept only HTTP and HTTPS.
+- Imported backups are size-limited, parsed as JSON and normalised before storage.
+- No API secret is committed to the browser bundle.
+- Binary document uploads remain deferred until authentication and secure object storage exist.
 
 ## Routing
 
 `HashRouter` remains in use for GitHub Pages because the host does not provide project-level SPA rewrite rules. A custom host can later replace it at the application boundary.
-
-## Future adapters
-
-- `PlaceSearchService` → geocoding and place discovery.
-- `RouteService` → travel-time and route calculations.
-- `WeatherService` → forecast provider.
-- `AffiliateService` → Booking, Skyscanner and activity partners.
-- `AuthService` → authentication.
-- `TripRepository` → cloud data.
-- `DocumentStorageService` → secure binary files.
-- `AIService` → itinerary assistance.

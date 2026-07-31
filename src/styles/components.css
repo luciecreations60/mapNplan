@@ -320,3 +320,51 @@
   .modal__body { padding: 22px 20px 26px; }
   .trip-form__grid { grid-template-columns: 1fr; }
 }
+
+/* ==========================================================================
+   Inline notices
+   ========================================================================== */
+
+.inline-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 15px 17px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+}
+
+.inline-notice > span {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.inline-notice strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--color-text);
+}
+
+.inline-notice p {
+  margin: 0;
+  font-size: .82rem;
+}
+
+.inline-notice--success {
+  border-color: color-mix(in srgb, var(--color-green) 30%, var(--color-border));
+  background: color-mix(in srgb, var(--color-green-soft) 74%, var(--color-surface));
+}
+
+.inline-notice--success > span { color: var(--color-green); background: var(--color-green-soft); }
+.inline-notice--danger { border-color: color-mix(in srgb, var(--color-danger) 30%, var(--color-border)); background: var(--color-danger-soft); }
+.inline-notice--danger > span { color: var(--color-danger); background: color-mix(in srgb, var(--color-danger) 12%, transparent); }
+.inline-notice--warning { border-color: color-mix(in srgb, var(--color-warning) 35%, var(--color-border)); background: var(--color-warning-soft); }
+.inline-notice--warning > span { color: var(--color-warning); background: color-mix(in srgb, var(--color-warning) 13%, transparent); }

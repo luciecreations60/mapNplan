@@ -2,28 +2,36 @@
 
 All notable changes to this project are documented here.
 
+## [0.1.3] — 2026-07-31
+
+### Added
+
+- Travel tools tab in every trip workspace.
+- Seven-day weather forecast using a dedicated provider adapter.
+- Destination local time resolved from the weather time zone.
+- Reference currency converter with configurable trip and destination currencies.
+- Shared HTTP timeout and error handling service.
+- Persistent response cache for public provider calls.
+- JSON backup export and validated import.
+- Destination currency field for new and existing trips.
+- Visible success and error feedback in Settings.
+
+### Changed
+
+- Trip schema updated to version 4 with non-destructive migration.
+- Settings data action renamed explicitly to **Reset demo data**.
+- Settings now separates appearance, configuration, backups and destructive actions.
+- Project and service-worker versions updated to `0.1.3`.
+
 ## [0.1.2] — 2026-07-31
 
 ### Added
 
-- Interactive Leaflet trip map using configurable OpenStreetMap tiles.
-- Numbered itinerary and reservation map points.
-- Route line between geolocated itinerary activities.
-- Latitude and longitude fields for itinerary activities.
-- Structured reservations for flights, accommodation, transport and activities.
-- Reservation status, confirmation reference, amount, links and notes.
-- Travel document metadata and safe external links.
-- URL protocol validation before links are rendered.
-- Map, reservation and document summaries on the trip overview.
-- Trip schema version 3 with automatic migration.
-- Complete demonstration reservations, documents and Tokyo map data.
-
-### Changed
-
-- Trip workspace navigation now contains eight modules.
-- Overview statistics now include bookings, mapped places and documents.
-- PWA cache version updated to `0.1.2`.
-- Project version updated to `0.1.2`.
+- Leaflet map tab with OpenStreetMap tiles.
+- Coordinates on itinerary activities and reservations.
+- Reservation management for flights, accommodation, transport and activities.
+- Document-reference management with safe external links.
+- Schema version 3 and enriched trip overview.
 
 ## [0.1.1] — 2026-07-31
 
@@ -33,24 +41,15 @@ All notable changes to this project are documented here.
 - Overview with itinerary, budget and checklist summaries.
 - Day-by-day itinerary with activity creation and deletion.
 - Budget management with paid and planned expenses.
-- Category-level spending breakdown.
-- Preparation checklist grouped by category.
-- Persistent free-form travel notes.
-- Stable nested identifiers for future backend entities.
-- Trip data schema versioning and legacy-data migration.
-- Responsive workspace navigation for desktop and mobile.
+- Preparation checklist and persistent notes.
+- Schema version 2 migration.
 
 ## [0.1.0] — 2026-07-31
 
 ### Added
 
 - Initial React and Vite application foundation.
-- Central project configuration and temporary branding.
-- Responsive sidebar, top bar and page layout.
-- Light, dark and system themes.
+- Responsive navigation and themes.
 - Local trip persistence through service abstractions.
 - Dashboard, trip library, explore and settings pages.
-- Trip creation form with validation.
-- Demonstration travel data.
-- PWA manifest and lightweight service worker.
-- Automated GitHub Pages deployment workflow.
+- GitHub Pages workflow and PWA foundation.
