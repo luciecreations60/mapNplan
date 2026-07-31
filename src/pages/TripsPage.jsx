@@ -2,19 +2,20 @@ import { useMemo, useState } from 'react';
 import { Button } from '../components/common/Button.jsx';
 import { CreateTripDialog } from '../components/trips/CreateTripDialog.jsx';
 import { TripCard } from '../components/trips/TripCard.jsx';
+import { useI18n } from '../hooks/useI18n.js';
 import { useTrips } from '../hooks/useTrips.js';
 import { getTripStatus, sortTripsByStartDate } from '../utils/date.js';
-
-const FILTERS = [
-  { id: 'all', label: 'All trips' },
-  { id: 'upcoming', label: 'Upcoming' },
-  { id: 'past', label: 'Past' },
-];
 
 export function TripsPage() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [isCreateOpen, setCreateOpen] = useState(false);
+  const { t } = useI18n();
   const { trips, deleteTrip } = useTrips();
+  const filters = [
+    { id: 'all', label: t('trips.all') },
+    { id: 'upcoming', label: t('trips.upcoming') },
+    { id: 'past', label: t('trips.past') },
+  ];
 
   const filteredTrips = useMemo(() => {
     const sortedTrips = sortTripsByStartDate(trips);
@@ -27,22 +28,22 @@ export function TripsPage() {
 
   function handleDelete(id) {
     const trip = trips.find((item) => item.id === id);
-    if (trip && window.confirm(`Delete “${trip.name}”?`)) deleteTrip(id);
+    if (trip && window.confirm(t('trips.deleteConfirm', { name: trip.name }))) deleteTrip(id);
   }
 
   return (
     <div className="page-stack">
       <section className="page-heading">
         <div>
-          <p className="eyebrow">Travel library</p>
-          <h1>My trips</h1>
-          <p>Plan future adventures and keep completed journeys close.</p>
+          <p className="eyebrow">{t('trips.eyebrow')}</p>
+          <h1>{t('trips.title')}</h1>
+          <p>{t('trips.intro')}</p>
         </div>
-        <Button icon="plus" onClick={() => setCreateOpen(true)}>Create a trip</Button>
+        <Button icon="plus" onClick={() => setCreateOpen(true)}>{t('trips.create')}</Button>
       </section>
 
-      <div className="filter-tabs" role="tablist" aria-label="Trip filters">
-        {FILTERS.map((filter) => (
+      <div className="filter-tabs" role="tablist" aria-label={t('trips.filtersAria')}>
+        {filters.map((filter) => (
           <button
             key={filter.id}
             className={activeFilter === filter.id ? 'filter-tabs__button filter-tabs__button--active' : 'filter-tabs__button'}
@@ -63,9 +64,9 @@ export function TripsPage() {
       ) : (
         <section className="empty-state">
           <span>✈</span>
-          <h2>No journeys here yet</h2>
-          <p>Create a trip and start turning ideas into a clear plan.</p>
-          <Button icon="plus" onClick={() => setCreateOpen(true)}>Create a trip</Button>
+          <h2>{t('trips.emptyTitle')}</h2>
+          <p>{t('trips.emptyText')}</p>
+          <Button icon="plus" onClick={() => setCreateOpen(true)}>{t('trips.create')}</Button>
         </section>
       )}
 

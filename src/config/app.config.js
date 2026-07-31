@@ -7,8 +7,8 @@ import { PROJECT_CONFIG } from '../../project.config.js';
  */
 export const APP_CONFIG = Object.freeze({
   ...PROJECT_CONFIG,
-  defaultLocale: 'en-GB',
-  supportedLocales: ['en-GB', 'fr-FR'],
+  fallbackLocale: 'en-GB',
+  supportedLocales: ['fr-FR', 'en-GB'],
   defaultCurrency: 'EUR',
   storageNamespace: 'tripflow',
   defaultTheme: 'system',

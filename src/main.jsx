@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
+import { LocalizationProvider } from './contexts/LocalizationContext.jsx';
 import { ThemeProvider } from './contexts/ThemeContext.jsx';
 import { TripProvider } from './contexts/TripContext.jsx';
 import { registerServiceWorker } from './services/pwa/registerServiceWorker.js';
@@ -12,11 +13,13 @@ import './styles/pages.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ThemeProvider>
-      <TripProvider>
-        <App />
-      </TripProvider>
-    </ThemeProvider>
+    <LocalizationProvider>
+      <ThemeProvider>
+        <TripProvider>
+          <App />
+        </TripProvider>
+      </ThemeProvider>
+    </LocalizationProvider>
   </StrictMode>,
 );
 

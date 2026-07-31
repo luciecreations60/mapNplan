@@ -11,18 +11,13 @@ import { ReservationsPanel } from '../components/tripWorkspace/ReservationsPanel
 import { TravelToolsPanel } from '../components/tripWorkspace/TravelToolsPanel.jsx';
 import { TripHero } from '../components/tripWorkspace/TripHero.jsx';
 import { TripTabs } from '../components/tripWorkspace/TripTabs.jsx';
+import { useI18n } from '../hooks/useI18n.js';
 import { useTrips } from '../hooks/useTrips.js';
 
-/**
- * Main trip workspace.
- *
- * This page owns module navigation only. Every business area stays isolated so
- * future collaboration, remote storage and affiliate services can be added
- * without turning the route component into a monolith.
- */
 export function TripWorkspacePage() {
   const { tripId } = useParams();
   const navigate = useNavigate();
+  const { t } = useI18n();
   const { getTripById, updateTrip } = useTrips();
   const [activeTab, setActiveTab] = useState('overview');
   const trip = getTripById(tripId);
@@ -35,10 +30,10 @@ export function TripWorkspacePage() {
     return (
       <section className="empty-state empty-state--page">
         <span>?</span>
-        <h1>Trip not found</h1>
-        <p>This journey may have been deleted or the link is no longer valid.</p>
+        <h1>{t('workspace.notFound')}</h1>
+        <p>{t('workspace.notFoundText')}</p>
         <button className="button button--primary button--medium" type="button" onClick={() => navigate('/trips')}>
-          Return to my trips
+          {t('workspace.backTrips')}
         </button>
       </section>
     );

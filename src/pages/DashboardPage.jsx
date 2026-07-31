@@ -7,24 +7,26 @@ import { UpcomingTripCard } from '../components/dashboard/UpcomingTripCard.jsx';
 import { CreateTripDialog } from '../components/trips/CreateTripDialog.jsx';
 import { TripCard } from '../components/trips/TripCard.jsx';
 import { APP_CONFIG } from '../config/app.config.js';
+import { useI18n } from '../hooks/useI18n.js';
 import { useTrips } from '../hooks/useTrips.js';
 import { formatCurrency } from '../utils/currency.js';
 import { getTripStatus, sortTripsByStartDate } from '../utils/date.js';
 
 export function DashboardPage() {
   const [isCreateOpen, setCreateOpen] = useState(false);
+  const { locale, t } = useI18n();
+  const { trips, deleteTrip } = useTrips();
   const now = new Date();
-  const todayLabel = new Intl.DateTimeFormat(APP_CONFIG.defaultLocale, {
+  const todayLabel = new Intl.DateTimeFormat(locale, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
   }).format(now);
   const greeting = now.getHours() < 12
-    ? 'Good morning'
+    ? t('dashboard.goodMorning')
     : now.getHours() < 18
-      ? 'Good afternoon'
-      : 'Good evening';
-  const { trips, deleteTrip } = useTrips();
+      ? t('dashboard.goodAfternoon')
+      : t('dashboard.goodEvening');
 
   const upcomingTrips = useMemo(
     () => sortTripsByStartDate(trips.filter((trip) => ['upcoming', 'ongoing'].includes(getTripStatus(trip)))),
@@ -39,7 +41,7 @@ export function DashboardPage() {
 
   function handleDelete(id) {
     const trip = trips.find((item) => item.id === id);
-    if (trip && window.confirm(`Delete “${trip.name}”?`)) deleteTrip(id);
+    if (trip && window.confirm(t('trips.deleteConfirm', { name: trip.name }))) deleteTrip(id);
   }
 
   return (
@@ -48,28 +50,28 @@ export function DashboardPage() {
         <div>
           <p className="eyebrow">{todayLabel}</p>
           <h1>{greeting}, {APP_CONFIG.demoUserName} <span aria-hidden="true">👋</span></h1>
-          <p>Everything you need for your next adventure, in one place.</p>
+          <p>{t('dashboard.intro')}</p>
         </div>
-        <Button icon="plus" onClick={() => setCreateOpen(true)}>Plan a new trip</Button>
+        <Button icon="plus" onClick={() => setCreateOpen(true)}>{t('dashboard.planTrip')}</Button>
       </section>
 
       <UpcomingTripCard trip={nextTrip} />
 
-      <section className="stats-grid" aria-label="Travel overview">
-        <StatCard icon="trips" label="Active trips" value={upcomingTrips.length} detail={`${trips.length} total journeys`} tone="violet" />
-        <StatCard icon="wallet" label="Planned budget" value={formatCurrency(totalBudget)} detail={`${formatCurrency(totalSpent)} already allocated`} tone="aqua" />
-        <StatCard icon="check" label="Ready to leave" value={`${checklistPercent}%`} detail={`${checklistDone} checklist items complete`} tone="green" />
-        <StatCard icon="globe" label="Countries" value={new Set(trips.map((trip) => trip.country).filter(Boolean)).size} detail="Your personal travel map" tone="coral" />
+      <section className="stats-grid" aria-label={t('dashboard.overviewAria')}>
+        <StatCard icon="trips" label={t('dashboard.activeTrips')} value={upcomingTrips.length} detail={t('dashboard.totalJourneys', { count: trips.length })} tone="violet" />
+        <StatCard icon="wallet" label={t('dashboard.plannedBudget')} value={formatCurrency(totalBudget, 'EUR', locale)} detail={t('dashboard.alreadyAllocated', { amount: formatCurrency(totalSpent, 'EUR', locale) })} tone="aqua" />
+        <StatCard icon="check" label={t('dashboard.readyToLeave')} value={`${checklistPercent}%`} detail={t('dashboard.checklistComplete', { count: checklistDone })} tone="green" />
+        <StatCard icon="globe" label={t('dashboard.countries')} value={new Set(trips.map((trip) => trip.country).filter(Boolean)).size} detail={t('dashboard.personalMap')} tone="coral" />
       </section>
 
       <div className="dashboard-grid">
         <section className="content-section">
           <header className="section-heading">
             <div>
-              <p className="eyebrow">Your journeys</p>
-              <h2>Trips in progress</h2>
+              <p className="eyebrow">{t('dashboard.yourJourneys')}</p>
+              <h2>{t('dashboard.tripsInProgress')}</h2>
             </div>
-            <button className="text-link" type="button">View all <Icon name="arrowRight" size={16} /></button>
+            <button className="text-link" type="button">{t('dashboard.viewAll')} <Icon name="arrowRight" size={16} /></button>
           </header>
 
           <div className="trip-grid trip-grid--dashboard">
@@ -82,15 +84,15 @@ export function DashboardPage() {
         <Card className="quick-actions-card">
           <header className="section-heading section-heading--compact">
             <div>
-              <p className="eyebrow">Shortcuts</p>
-              <h2>Quick actions</h2>
+              <p className="eyebrow">{t('dashboard.shortcuts')}</p>
+              <h2>{t('dashboard.quickActions')}</h2>
             </div>
           </header>
           <div className="quick-actions">
-            <button type="button"><span><Icon name="calendar" /></span><div><strong>Build itinerary</strong><small>Organise each day</small></div><Icon name="chevronRight" size={17} /></button>
-            <button type="button"><span><Icon name="wallet" /></span><div><strong>Update budget</strong><small>Track planned costs</small></div><Icon name="chevronRight" size={17} /></button>
-            <button type="button"><span><Icon name="check" /></span><div><strong>Travel checklist</strong><small>Prepare without stress</small></div><Icon name="chevronRight" size={17} /></button>
-            <button type="button"><span><Icon name="folder" /></span><div><strong>Reservations</strong><small>Keep documents together</small></div><Icon name="chevronRight" size={17} /></button>
+            <button type="button"><span><Icon name="calendar" /></span><div><strong>{t('dashboard.buildItinerary')}</strong><small>{t('dashboard.organiseDay')}</small></div><Icon name="chevronRight" size={17} /></button>
+            <button type="button"><span><Icon name="wallet" /></span><div><strong>{t('dashboard.updateBudget')}</strong><small>{t('dashboard.trackCosts')}</small></div><Icon name="chevronRight" size={17} /></button>
+            <button type="button"><span><Icon name="check" /></span><div><strong>{t('dashboard.travelChecklist')}</strong><small>{t('dashboard.prepareStressFree')}</small></div><Icon name="chevronRight" size={17} /></button>
+            <button type="button"><span><Icon name="folder" /></span><div><strong>{t('dashboard.reservations')}</strong><small>{t('dashboard.keepDocuments')}</small></div><Icon name="chevronRight" size={17} /></button>
           </div>
         </Card>
       </div>

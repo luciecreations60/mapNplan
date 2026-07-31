@@ -1,13 +1,13 @@
 /**
  * Central navigation definition.
- * Permissions and feature flags can later be added without rewriting layouts.
+ * Labels are translation keys so layouts remain language-neutral.
  */
 export const PRIMARY_NAVIGATION = Object.freeze([
-  { label: 'Dashboard', path: '/dashboard', icon: 'dashboard' },
-  { label: 'My trips', path: '/trips', icon: 'trips' },
-  { label: 'Explore', path: '/explore', icon: 'explore' },
+  { labelKey: 'nav.dashboard', path: '/dashboard', icon: 'dashboard' },
+  { labelKey: 'nav.trips', path: '/trips', icon: 'trips' },
+  { labelKey: 'nav.explore', path: '/explore', icon: 'explore' },
 ]);
 
 export const SECONDARY_NAVIGATION = Object.freeze([
-  { label: 'Settings', path: '/settings', icon: 'settings' },
+  { labelKey: 'nav.settings', path: '/settings', icon: 'settings' },
 ]);

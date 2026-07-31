@@ -1,35 +1,32 @@
-const DAY_IN_MS = 86_400_000;
-
-export function toLocalDate(dateValue) {
-  if (!dateValue) return null;
-  return new Date(`${dateValue}T12:00:00`);
+export function parseLocalDate(value) {
+  if (!value) return null;
+  const [year, month, day] = value.split('-').map(Number);
+  if (![year, month, day].every(Number.isFinite)) return null;
+  return new Date(year, month - 1, day, 12, 0, 0);
 }
 
-export function getTripStatus(trip, referenceDate = new Date()) {
-  const start = toLocalDate(trip.startDate);
-  const end = toLocalDate(trip.endDate);
-  const today = new Date(referenceDate);
-  today.setHours(12, 0, 0, 0);
-
+export function getTripStatus(trip, today = new Date()) {
+  const start = parseLocalDate(trip.startDate);
+  const end = parseLocalDate(trip.endDate);
   if (!start || !end) return 'draft';
-  if (today < start) return 'upcoming';
-  if (today > end) return 'past';
+
+  const current = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0);
+  if (current < start) return 'upcoming';
+  if (current > end) return 'past';
   return 'ongoing';
 }
 
-export function getDaysUntil(dateValue, referenceDate = new Date()) {
-  const target = toLocalDate(dateValue);
-  if (!target) return null;
-
-  const today = new Date(referenceDate);
-  today.setHours(12, 0, 0, 0);
-  return Math.max(0, Math.ceil((target - today) / DAY_IN_MS));
+export function getDaysUntil(value, today = new Date()) {
+  const target = parseLocalDate(value);
+  if (!target) return 0;
+  const current = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0);
+  return Math.max(0, Math.ceil((target - current) / 86400000));
 }
 
-export function formatDateRange(startDate, endDate, locale = 'en-GB') {
-  const start = toLocalDate(startDate);
-  const end = toLocalDate(endDate);
-  if (!start || !end) return 'Dates to be confirmed';
+export function formatDateRange(startDate, endDate, locale = 'en-GB', fallback = 'Dates to be confirmed') {
+  const start = parseLocalDate(startDate);
+  const end = parseLocalDate(endDate);
+  if (!start || !end) return fallback;
 
   const formatter = new Intl.DateTimeFormat(locale, {
     day: 'numeric',
@@ -37,11 +34,13 @@ export function formatDateRange(startDate, endDate, locale = 'en-GB') {
     year: 'numeric',
   });
 
-  return `${formatter.format(start)} — ${formatter.format(end)}`;
+  return `${formatter.format(start)} – ${formatter.format(end)}`;
 }
 
 export function sortTripsByStartDate(trips) {
-  return [...trips].sort(
-    (first, second) => toLocalDate(first.startDate) - toLocalDate(second.startDate),
-  );
+  return [...trips].sort((left, right) => {
+    const leftDate = parseLocalDate(left.startDate)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+    const rightDate = parseLocalDate(right.startDate)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+    return leftDate - rightDate;
+  });
 }

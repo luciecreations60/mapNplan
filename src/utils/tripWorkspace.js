@@ -1,56 +1,83 @@
 export const EXPENSE_CATEGORIES = Object.freeze([
-  { id: 'transport', label: 'Transport' },
-  { id: 'accommodation', label: 'Accommodation' },
-  { id: 'food', label: 'Food' },
-  { id: 'activities', label: 'Activities' },
-  { id: 'shopping', label: 'Shopping' },
-  { id: 'other', label: 'Other' },
+  { id: 'transport', label: 'Transport', labelKey: 'options.transport' },
+  { id: 'accommodation', label: 'Accommodation', labelKey: 'options.accommodation' },
+  { id: 'food', label: 'Food', labelKey: 'options.food' },
+  { id: 'activities', label: 'Activities', labelKey: 'options.activities' },
+  { id: 'shopping', label: 'Shopping', labelKey: 'options.shopping' },
+  { id: 'other', label: 'Other', labelKey: 'options.other' },
 ]);
 
 export const CHECKLIST_CATEGORIES = Object.freeze([
-  { id: 'documents', label: 'Documents' },
-  { id: 'bookings', label: 'Bookings' },
-  { id: 'packing', label: 'Packing' },
-  { id: 'technology', label: 'Technology' },
-  { id: 'money', label: 'Money' },
-  { id: 'transport', label: 'Transport' },
-  { id: 'activities', label: 'Activities' },
-  { id: 'other', label: 'Other' },
+  { id: 'documents', label: 'Documents', labelKey: 'options.documents' },
+  { id: 'bookings', label: 'Bookings', labelKey: 'options.bookings' },
+  { id: 'packing', label: 'Packing', labelKey: 'options.packing' },
+  { id: 'technology', label: 'Technology', labelKey: 'options.technology' },
+  { id: 'money', label: 'Money', labelKey: 'options.money' },
+  { id: 'transport', label: 'Transport', labelKey: 'options.transport' },
+  { id: 'activities', label: 'Activities', labelKey: 'options.activities' },
+  { id: 'other', label: 'Other', labelKey: 'options.other' },
 ]);
 
 export const ACTIVITY_TYPES = Object.freeze([
-  { id: 'map', label: 'Place' },
-  { id: 'food', label: 'Food' },
-  { id: 'hotel', label: 'Hotel' },
-  { id: 'plane', label: 'Flight' },
-  { id: 'car', label: 'Transport' },
-  { id: 'ticket', label: 'Activity' },
+  { id: 'map', label: 'Place', labelKey: 'options.place' },
+  { id: 'food', label: 'Food', labelKey: 'options.food' },
+  { id: 'hotel', label: 'Hotel', labelKey: 'options.hotel' },
+  { id: 'plane', label: 'Flight', labelKey: 'options.flight' },
+  { id: 'car', label: 'Transport', labelKey: 'options.transport' },
+  { id: 'ticket', label: 'Activity', labelKey: 'options.activity' },
 ]);
 
 export const RESERVATION_TYPES = Object.freeze([
-  { id: 'flight', label: 'Flight' },
-  { id: 'accommodation', label: 'Accommodation' },
-  { id: 'transport', label: 'Transport' },
-  { id: 'activity', label: 'Activity' },
+  { id: 'flight', label: 'Flight', labelKey: 'options.flight' },
+  { id: 'accommodation', label: 'Accommodation', labelKey: 'options.accommodation' },
+  { id: 'transport', label: 'Transport', labelKey: 'options.transport' },
+  { id: 'activity', label: 'Activity', labelKey: 'options.activity' },
 ]);
 
 export const RESERVATION_STATUSES = Object.freeze([
-  { id: 'confirmed', label: 'Confirmed' },
-  { id: 'pending', label: 'Pending' },
-  { id: 'cancelled', label: 'Cancelled' },
+  { id: 'confirmed', label: 'Confirmed', labelKey: 'options.confirmed' },
+  { id: 'pending', label: 'Pending', labelKey: 'options.pending' },
+  { id: 'cancelled', label: 'Cancelled', labelKey: 'options.cancelled' },
 ]);
 
 export const DOCUMENT_TYPES = Object.freeze([
-  { id: 'passport', label: 'Passport' },
-  { id: 'identity', label: 'Identity' },
-  { id: 'ticket', label: 'Ticket' },
-  { id: 'booking', label: 'Booking' },
-  { id: 'insurance', label: 'Insurance' },
-  { id: 'other', label: 'Other' },
+  { id: 'passport', label: 'Passport', labelKey: 'options.passport' },
+  { id: 'identity', label: 'Identity', labelKey: 'options.identity' },
+  { id: 'ticket', label: 'Ticket', labelKey: 'options.ticket' },
+  { id: 'booking', label: 'Booking', labelKey: 'options.booking' },
+  { id: 'insurance', label: 'Insurance', labelKey: 'options.insurance' },
+  { id: 'other', label: 'Other', labelKey: 'options.other' },
 ]);
 
-export function getCategoryLabel(collection, id) {
-  return collection.find((item) => item.id === id)?.label || 'Other';
+export function getOptionLabel(collection, id, t = (key) => key) {
+  const option = collection.find((item) => item.id === id);
+  return option ? t(option.labelKey) : t('options.other');
+}
+
+export function calculateChecklistProgress(checklist = []) {
+  if (!checklist.length) return 0;
+  const completed = checklist.filter((item) => item.completed).length;
+  return Math.round((completed / checklist.length) * 100);
+}
+
+export function calculatePlannedExpenses(expenses = []) {
+  return expenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+}
+
+export function calculatePaidExpenses(expenses = []) {
+  return expenses
+    .filter((expense) => expense.paid)
+    .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+}
+
+export function countConfirmedReservations(reservations = []) {
+  return reservations.filter((reservation) => reservation.status === 'confirmed').length;
+}
+
+export function getCategoryLabel(collection, id, t = null) {
+  const option = collection.find((item) => item.id === id);
+  if (!option) return t ? t('options.other') : 'Other';
+  return t ? t(option.labelKey) : option.label;
 }
 
 export function getItineraryItemCount(itinerary = []) {
@@ -58,13 +85,11 @@ export function getItineraryItemCount(itinerary = []) {
 }
 
 export function getPaidExpenseTotal(expenses = []) {
-  return expenses
-    .filter((expense) => expense.paid)
-    .reduce((total, expense) => total + expense.amount, 0);
+  return expenses.filter((expense) => expense.paid).reduce((total, expense) => total + Number(expense.amount || 0), 0);
 }
 
 export function getPlannedExpenseTotal(expenses = []) {
-  return expenses.reduce((total, expense) => total + expense.amount, 0);
+  return expenses.reduce((total, expense) => total + Number(expense.amount || 0), 0);
 }
 
 export function getConfirmedReservationCount(reservations = []) {

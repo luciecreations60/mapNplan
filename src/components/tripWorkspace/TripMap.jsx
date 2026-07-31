@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useI18n } from '../../hooks/useI18n.js';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MAP_CONFIG } from '../../config/map.config.js';
@@ -10,6 +11,7 @@ import { MAP_CONFIG } from '../../config/map.config.js';
  * change possible without rewriting the trip workspace.
  */
 export function TripMap({ points }) {
+  const { t } = useI18n();
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const layerGroupRef = useRef(null);
@@ -75,7 +77,7 @@ export function TripMap({ points }) {
         direction: 'center',
         className: 'trip-map__sequence',
       });
-      marker.bindPopup(createPopupNode(point));
+      marker.bindPopup(createPopupNode(point, t));
       marker.addTo(layerGroup);
     });
 
@@ -93,23 +95,23 @@ export function TripMap({ points }) {
     } else {
       map.fitBounds(bounds, { padding: [36, 36], maxZoom: MAP_CONFIG.focusedZoom });
     }
-  }, [points]);
+  }, [points, t]);
 
-  return <div ref={containerRef} className="trip-map" aria-label="Interactive trip map" />;
+  return <div ref={containerRef} className="trip-map" aria-label={t('map.aria')} />;
 }
 
-function createPopupNode(point) {
+function createPopupNode(point, t) {
   const wrapper = document.createElement('div');
   wrapper.className = 'trip-map-popup';
 
   const source = document.createElement('small');
-  source.textContent = point.source === 'reservation' ? 'Reservation' : 'Itinerary';
+  source.textContent = point.source === 'reservation' ? t('map.reservation') : t('map.itinerary');
 
   const title = document.createElement('strong');
   title.textContent = point.title;
 
   const subtitle = document.createElement('span');
-  subtitle.textContent = point.subtitle || 'Saved place';
+  subtitle.textContent = point.subtitle || t('map.savedCoordinates');
 
   wrapper.append(source, title, subtitle);
   return wrapper;

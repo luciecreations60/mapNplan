@@ -2,54 +2,65 @@
 
 All notable changes to this project are documented here.
 
+## [0.1.4] — 2026-07-31
+
+### Added
+
+- French and English interface translation system.
+- Automatic browser-language detection on first visit.
+- Manual language selector in Settings.
+- Persisted language preference per browser.
+- Locale-aware dates, times, currencies, weather labels, categories and statuses.
+- Localised accessibility labels and system messages.
+
+### Fixed
+
+- Chromium desktop layout displaying content inside the sidebar column.
+- Sidebar positioning by replacing the desktop fixed element with a sticky grid item.
+- Main-content width and overflow issues on narrow and medium screens.
+- Responsive sidebar behaviour on tablet and mobile.
+- Card, form, settings and workspace layouts at small breakpoints.
+
+### Changed
+
+- Desktop sidebar now scrolls independently while remaining in document layout.
+- Tablet and mobile navigation now use an off-canvas drawer at `960px` and below.
+- Service-worker cache version updated to force refreshed application assets.
+- Project version updated to `0.1.4`.
+
 ## [0.1.3] — 2026-07-31
 
 ### Added
 
-- Travel tools tab in every trip workspace.
-- Seven-day weather forecast using a dedicated provider adapter.
-- Destination local time resolved from the weather time zone.
-- Reference currency converter with configurable trip and destination currencies.
-- Shared HTTP timeout and error handling service.
-- Persistent response cache for public provider calls.
+- Destination weather and seven-day forecast.
+- Destination local time.
+- Reference currency converter.
+- External-response cache.
 - JSON backup export and validated import.
-- Destination currency field for new and existing trips.
-- Visible success and error feedback in Settings.
-
-### Changed
-
-- Trip schema updated to version 4 with non-destructive migration.
-- Settings data action renamed explicitly to **Reset demo data**.
-- Settings now separates appearance, configuration, backups and destructive actions.
-- Project and service-worker versions updated to `0.1.3`.
+- Explicit demonstration-data reset action.
 
 ## [0.1.2] — 2026-07-31
 
 ### Added
 
-- Leaflet map tab with OpenStreetMap tiles.
-- Coordinates on itinerary activities and reservations.
-- Reservation management for flights, accommodation, transport and activities.
-- Document-reference management with safe external links.
-- Schema version 3 and enriched trip overview.
+- Interactive Leaflet/OpenStreetMap trip map.
+- Geographical coordinates on activities and reservations.
+- Reservation management.
+- Document references and safe external links.
+- Schema 3 migration.
 
 ## [0.1.1] — 2026-07-31
 
 ### Added
 
-- Complete trip workspace available from every trip card.
-- Overview with itinerary, budget and checklist summaries.
-- Day-by-day itinerary with activity creation and deletion.
-- Budget management with paid and planned expenses.
-- Preparation checklist and persistent notes.
-- Schema version 2 migration.
+- Complete trip workspace.
+- Overview, itinerary, budget, checklist and notes.
+- Stable nested identifiers and schema migration.
 
 ## [0.1.0] — 2026-07-31
 
 ### Added
 
 - Initial React and Vite application foundation.
-- Responsive navigation and themes.
-- Local trip persistence through service abstractions.
 - Dashboard, trip library, explore and settings pages.
-- GitHub Pages workflow and PWA foundation.
+- Themes, local persistence, PWA foundation and GitHub Pages deployment.

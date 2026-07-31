@@ -1,21 +1,20 @@
 import { useMemo, useState } from 'react';
+import { useI18n } from '../../hooks/useI18n.js';
+import { createId } from '../../utils/id.js';
+import { CHECKLIST_CATEGORIES, getCategoryLabel } from '../../utils/tripWorkspace.js';
 import { Button } from '../common/Button.jsx';
 import { Card } from '../common/Card.jsx';
 import { Icon } from '../common/Icon.jsx';
 import { ProgressBar } from '../common/ProgressBar.jsx';
-import { createId } from '../../utils/id.js';
-import { CHECKLIST_CATEGORIES, getCategoryLabel } from '../../utils/tripWorkspace.js';
 
 export function ChecklistPanel({ trip, onUpdate }) {
+  const { t } = useI18n();
   const [label, setLabel] = useState('');
   const [category, setCategory] = useState('documents');
-  const progress = trip.checklistTotal > 0
-    ? (trip.checklistCompleted / trip.checklistTotal) * 100
-    : 0;
+  const progress = trip.checklistTotal > 0 ? (trip.checklistCompleted / trip.checklistTotal) * 100 : 0;
 
   const groupedItems = useMemo(() => {
     const groups = new Map();
-
     trip.checklist.forEach((item) => {
       const currentItems = groups.get(item.category) || [];
       groups.set(item.category, [...currentItems, item]);
@@ -24,51 +23,38 @@ export function ChecklistPanel({ trip, onUpdate }) {
     return [...groups.entries()]
       .map(([categoryId, items]) => ({
         id: categoryId,
-        label: getCategoryLabel(CHECKLIST_CATEGORIES, categoryId),
+        label: getCategoryLabel(CHECKLIST_CATEGORIES, categoryId, t),
         items,
       }))
       .sort((left, right) => left.label.localeCompare(right.label));
-  }, [trip.checklist]);
+  }, [t, trip.checklist]);
 
   function addItem(event) {
     event.preventDefault();
     if (!label.trim()) return;
-
     onUpdate({
-      checklist: [
-        ...trip.checklist,
-        {
-          id: createId('check'),
-          label: label.trim(),
-          category,
-          completed: false,
-        },
-      ],
+      checklist: [...trip.checklist, { id: createId('check'), label: label.trim(), category, completed: false }],
     });
     setLabel('');
   }
 
   function toggleItem(itemId) {
     onUpdate({
-      checklist: trip.checklist.map((item) => (
-        item.id === itemId ? { ...item, completed: !item.completed } : item
-      )),
+      checklist: trip.checklist.map((item) => item.id === itemId ? { ...item, completed: !item.completed } : item),
     });
   }
 
   function removeItem(itemId) {
-    onUpdate({
-      checklist: trip.checklist.filter((item) => item.id !== itemId),
-    });
+    onUpdate({ checklist: trip.checklist.filter((item) => item.id !== itemId) });
   }
 
   return (
     <div className="workspace-section">
       <section className="workspace-section__heading">
         <div>
-          <p className="eyebrow">Nothing forgotten</p>
-          <h2>Checklist</h2>
-          <p>Group preparation tasks by topic and track progress at a glance.</p>
+          <p className="eyebrow">{t('checklist.eyebrow')}</p>
+          <h2>{t('checklist.title')}</h2>
+          <p>{t('checklist.intro')}</p>
         </div>
       </section>
 
@@ -76,28 +62,28 @@ export function ChecklistPanel({ trip, onUpdate }) {
         <div>
           <span className="checklist-progress-card__icon"><Icon name="checklist" size={24} /></span>
           <div>
-            <span>Preparation progress</span>
-            <strong>{trip.checklistCompleted} of {trip.checklistTotal} completed</strong>
+            <span>{t('checklist.progress')}</span>
+            <strong>{t('checklist.completedCount', { done: trip.checklistCompleted, total: trip.checklistTotal })}</strong>
           </div>
         </div>
         <div>
           <strong>{Math.round(progress)}%</strong>
-          <ProgressBar value={progress} label="Checklist completion" />
+          <ProgressBar value={progress} label={t('checklist.completion')} />
         </div>
       </Card>
 
       <Card className="checklist-add-card">
         <form className="checklist-add-form" onSubmit={addItem}>
           <label>
-            <span className="sr-only">New checklist item</span>
-            <input value={label} onChange={(event) => setLabel(event.target.value)} placeholder="Add a preparation task…" />
+            <span className="sr-only">{t('checklist.newItem')}</span>
+            <input value={label} onChange={(event) => setLabel(event.target.value)} placeholder={t('checklist.placeholder')} />
           </label>
-          <select aria-label="Checklist category" value={category} onChange={(event) => setCategory(event.target.value)}>
+          <select aria-label={t('checklist.category')} value={category} onChange={(event) => setCategory(event.target.value)}>
             {CHECKLIST_CATEGORIES.map((item) => (
-              <option key={item.id} value={item.id}>{item.label}</option>
+              <option key={item.id} value={item.id}>{t(item.labelKey)}</option>
             ))}
           </select>
-          <Button type="submit" icon="plus">Add</Button>
+          <Button type="submit" icon="plus">{t('common.add')}</Button>
         </form>
       </Card>
 
@@ -105,25 +91,20 @@ export function ChecklistPanel({ trip, onUpdate }) {
         <div className="checklist-groups">
           {groupedItems.map((group) => (
             <Card key={group.id} className="checklist-group">
-              <header>
-                <div>
-                  <h3>{group.label}</h3>
-                  <span>{group.items.filter((item) => item.completed).length}/{group.items.length}</span>
-                </div>
-              </header>
+              <header><div><h3>{group.label}</h3><span>{group.items.filter((item) => item.completed).length}/{group.items.length}</span></div></header>
               <div className="checklist-items">
                 {group.items.map((item) => (
                   <article key={item.id} className={item.completed ? 'checklist-item checklist-item--completed' : 'checklist-item'}>
                     <button
                       className="checklist-item__toggle"
                       type="button"
-                      aria-label={item.completed ? `Mark ${item.label} as incomplete` : `Mark ${item.label} as complete`}
+                      aria-label={t(item.completed ? 'checklist.markIncomplete' : 'checklist.markComplete', { label: item.label })}
                       onClick={() => toggleItem(item.id)}
                     >
                       <Icon name={item.completed ? 'check' : 'circle'} size={17} />
                     </button>
                     <span>{item.label}</span>
-                    <button className="icon-button icon-button--small" type="button" aria-label={`Delete ${item.label}`} onClick={() => removeItem(item.id)}>
+                    <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.delete')} ${item.label}`} onClick={() => removeItem(item.id)}>
                       <Icon name="trash" size={15} />
                     </button>
                   </article>
@@ -135,8 +116,8 @@ export function ChecklistPanel({ trip, onUpdate }) {
       ) : (
         <section className="workspace-large-empty">
           <span><Icon name="checklist" size={28} /></span>
-          <h3>No preparation tasks yet</h3>
-          <p>Add passport checks, bookings, packing and practical reminders above.</p>
+          <h3>{t('checklist.emptyTitle')}</h3>
+          <p>{t('checklist.emptyText')}</p>
         </section>
       )}
     </div>

@@ -1,20 +1,23 @@
+import { useI18n } from '../../hooks/useI18n.js';
 import { Icon } from '../common/Icon.jsx';
 
 export const TRIP_TABS = Object.freeze([
-  { id: 'overview', label: 'Overview', icon: 'dashboard' },
-  { id: 'itinerary', label: 'Itinerary', icon: 'calendarDays' },
-  { id: 'map', label: 'Map', icon: 'map' },
-  { id: 'tools', label: 'Travel tools', icon: 'globe' },
-  { id: 'reservations', label: 'Reservations', icon: 'ticket' },
-  { id: 'budget', label: 'Budget', icon: 'wallet' },
-  { id: 'checklist', label: 'Checklist', icon: 'checklist' },
-  { id: 'documents', label: 'Documents', icon: 'folder' },
-  { id: 'notes', label: 'Notes', icon: 'notebook' },
+  { id: 'overview', labelKey: 'workspace.overview', icon: 'dashboard' },
+  { id: 'itinerary', labelKey: 'workspace.itinerary', icon: 'calendarDays' },
+  { id: 'map', labelKey: 'workspace.map', icon: 'map' },
+  { id: 'tools', labelKey: 'workspace.tools', icon: 'globe' },
+  { id: 'reservations', labelKey: 'workspace.reservations', icon: 'ticket' },
+  { id: 'budget', labelKey: 'workspace.budget', icon: 'wallet' },
+  { id: 'checklist', labelKey: 'workspace.checklistTab', icon: 'checklist' },
+  { id: 'documents', labelKey: 'workspace.documents', icon: 'folder' },
+  { id: 'notes', labelKey: 'workspace.notes', icon: 'notebook' },
 ]);
 
 export function TripTabs({ activeTab, onChange }) {
+  const { t } = useI18n();
+
   return (
-    <nav className="trip-tabs" aria-label="Trip workspace">
+    <nav className="trip-tabs" aria-label={t('workspace.aria')}>
       {TRIP_TABS.map((tab) => (
         <button
           key={tab.id}
@@ -24,7 +27,7 @@ export function TripTabs({ activeTab, onChange }) {
           onClick={() => onChange(tab.id)}
         >
           <Icon name={tab.icon} size={18} />
-          <span>{tab.label}</span>
+          <span>{t(tab.labelKey)}</span>
         </button>
       ))}
     </nav>

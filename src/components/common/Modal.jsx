@@ -1,7 +1,10 @@
 import { useEffect } from 'react';
+import { useI18n } from '../../hooks/useI18n.js';
 import { Icon } from './Icon.jsx';
 
 export function Modal({ isOpen, title, description, children, onClose }) {
+  const { t } = useI18n();
+
   useEffect(() => {
     if (!isOpen) return undefined;
 
@@ -32,11 +35,11 @@ export function Modal({ isOpen, title, description, children, onClose }) {
       >
         <header className="modal__header">
           <div>
-            <p className="eyebrow">New adventure</p>
+            <p className="eyebrow">{t('modal.eyebrow')}</p>
             <h2 id="modal-title">{title}</h2>
             {description && <p id="modal-description">{description}</p>}
           </div>
-          <button className="icon-button" type="button" aria-label="Close" onClick={onClose}>
+          <button className="icon-button" type="button" aria-label={t('common.close')} onClick={onClose}>
             <Icon name="close" />
           </button>
         </header>

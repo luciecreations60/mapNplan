@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useI18n } from '../../hooks/useI18n.js';
 import { weatherService } from '../../services/weather/WeatherService.js';
 import { getPrimaryTripLocation } from '../../utils/travelTools.js';
 import { Card } from '../common/Card.jsx';
@@ -8,6 +9,7 @@ import { LocalTimeCard } from './tools/LocalTimeCard.jsx';
 import { WeatherCard } from './tools/WeatherCard.jsx';
 
 export function TravelToolsPanel({ trip, onOpenTab }) {
+  const { t } = useI18n();
   const location = getPrimaryTripLocation(trip);
   const [forecast, setForecast] = useState(null);
   const [status, setStatus] = useState(location ? 'loading' : 'idle');
@@ -15,7 +17,6 @@ export function TravelToolsPanel({ trip, onOpenTab }) {
 
   const loadForecast = useCallback(async (forceRefresh = false) => {
     if (!location) return;
-
     setStatus('loading');
     setError('');
     try {
@@ -27,10 +28,10 @@ export function TravelToolsPanel({ trip, onOpenTab }) {
       setForecast(result);
       setStatus('success');
     } catch (loadError) {
-      setError(loadError.message || 'The forecast could not be loaded.');
+      setError(loadError.message || t('tools.forecastLoadError'));
       setStatus('error');
     }
-  }, [location?.latitude, location?.longitude]);
+  }, [location?.latitude, location?.longitude, t]);
 
   useEffect(() => {
     loadForecast(false);
@@ -40,12 +41,12 @@ export function TravelToolsPanel({ trip, onOpenTab }) {
     return (
       <Card className="travel-tools-empty">
         <span><Icon name="map" size={30} /></span>
-        <p className="eyebrow">Travel tools</p>
-        <h2>Add one mapped place first</h2>
-        <p>Weather and local time need coordinates. Add latitude and longitude to an itinerary activity or reservation.</p>
+        <p className="eyebrow">{t('tools.title')}</p>
+        <h2>{t('tools.emptyTitle')}</h2>
+        <p>{t('tools.emptyText')}</p>
         <div>
-          <button className="button button--primary button--medium" type="button" onClick={() => onOpenTab('itinerary')}>Open itinerary</button>
-          <button className="button button--secondary button--medium" type="button" onClick={() => onOpenTab('reservations')}>Open reservations</button>
+          <button className="button button--primary button--medium" type="button" onClick={() => onOpenTab('itinerary')}>{t('tools.openItinerary')}</button>
+          <button className="button button--secondary button--medium" type="button" onClick={() => onOpenTab('reservations')}>{t('tools.openReservations')}</button>
         </div>
       </Card>
     );
@@ -55,38 +56,22 @@ export function TravelToolsPanel({ trip, onOpenTab }) {
     <div className="travel-tools-panel">
       <section className="travel-tools-heading">
         <div>
-          <p className="eyebrow">Travel companion</p>
-          <h2>Useful information at a glance</h2>
-          <p>Live conditions use the first mapped itinerary location: <strong>{location.label}</strong>.</p>
+          <p className="eyebrow">{t('tools.eyebrow')}</p>
+          <h2>{t('tools.heading')}</h2>
+          <p>{t('tools.liveFrom')} <strong>{location.label}</strong>.</p>
         </div>
-        <span><Icon name="sparkles" /> No account or API key required</span>
+        <span><Icon name="sparkles" /> {t('tools.noKey')}</span>
       </section>
 
       <div className="travel-tools-grid">
-        <WeatherCard
-          forecast={forecast}
-          location={location}
-          status={status}
-          error={error}
-          onRefresh={() => loadForecast(true)}
-        />
+        <WeatherCard forecast={forecast} location={location} status={status} error={error} onRefresh={() => loadForecast(true)} />
         <div className="travel-tools-grid__side">
-          <LocalTimeCard
-            timezone={forecast?.timezone}
-            timezoneAbbreviation={forecast?.timezoneAbbreviation}
-            locationLabel={location.label}
-          />
-          <CurrencyConverter
-            baseCurrency={trip.currency}
-            destinationCurrency={trip.destinationCurrency}
-          />
+          <LocalTimeCard timezone={forecast?.timezone} timezoneAbbreviation={forecast?.timezoneAbbreviation} locationLabel={location.label} />
+          <CurrencyConverter baseCurrency={trip.currency} destinationCurrency={trip.destinationCurrency} />
         </div>
       </div>
 
-      <Card className="travel-tools-disclaimer">
-        <Icon name="info" size={18} />
-        <p>Weather forecasts and exchange rates are informational. Confirm critical travel decisions with official providers and your bank.</p>
-      </Card>
+      <Card className="travel-tools-disclaimer"><Icon name="info" size={18} /><p>{t('tools.disclaimer')}</p></Card>
     </div>
   );
 }

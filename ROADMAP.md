@@ -5,56 +5,59 @@
 ### Part 1 — Foundation
 
 - [x] React and Vite foundation
-- [x] Responsive application shell
-- [x] Design tokens and dark mode
+- [x] Application shell and design tokens
 - [x] Dashboard and trip library
-- [x] Trip creation
-- [x] Local persistence service
-- [x] GitHub Pages deployment
-- [x] PWA foundation
+- [x] Trip creation and local persistence
+- [x] GitHub Pages and PWA foundation
 
 ### Part 2 — Planning workspace
 
 - [x] Trip overview
 - [x] Day-by-day itinerary
-- [x] Budget and expense status
+- [x] Budget and expenses
 - [x] Preparation checklist
 - [x] Persistent notes
 - [x] Versioned trip schema
 
 ### Part 3 — Map, reservations and documents
 
-- [x] Leaflet map adapter
-- [x] OpenStreetMap tile configuration
+- [x] Leaflet/OpenStreetMap adapter
 - [x] Itinerary markers and route line
 - [x] Coordinates on activities
 - [x] Reservation management
 - [x] Document references and safe links
-- [x] Schema 3 migration
 
 ### Part 4 — Travel companion and data portability
 
-- [x] Weather provider abstraction
-- [x] Seven-day destination forecast
+- [x] Weather and seven-day forecast
 - [x] Destination local time
-- [x] Currency provider abstraction
-- [x] Reference currency converter
-- [x] External-response cache
-- [x] Export trips to JSON
-- [x] Import and validate JSON backups
-- [x] Explicit Reset demo data action
-- [x] Schema 4 migration
+- [x] Currency converter
+- [x] Provider-response cache
+- [x] JSON backup export and import
+- [x] Demonstration-data reset action
 
-### Part 5 — Editing and usability completion
+### Part 5 — Responsive stability and localisation
 
+- [x] Chromium desktop-shell correction
+- [x] Sticky desktop sidebar
+- [x] Tablet/mobile navigation drawer
+- [x] Fluid page and card layouts
+- [x] French and English interface
+- [x] Browser-language detection
+- [x] Persisted language selector
+- [x] Locale-aware formatting
+- [x] Translation-key integrity check
+
+### Part 6 — Editing and usability completion
+
+- [ ] Edit trip identity, dates, travellers and currencies
 - [ ] Edit existing activities
 - [ ] Edit existing reservations and documents
-- [ ] Trip settings and trip editing
 - [ ] Reusable toast notification system
-- [ ] Confirmation dialog component
+- [ ] Reusable confirmation dialog
 - [ ] Drag-and-drop itinerary ordering
-- [ ] Accessibility audit
-- [ ] Production build audit after GitHub deployment
+- [ ] Search and filter within a trip
+- [ ] Accessibility and keyboard-navigation audit
 
 ## V0.2 — Place discovery and intelligent routing
 

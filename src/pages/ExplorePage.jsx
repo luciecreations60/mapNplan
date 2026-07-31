@@ -1,25 +1,28 @@
 import { Button } from '../components/common/Button.jsx';
 import { Card } from '../components/common/Card.jsx';
 import { Icon } from '../components/common/Icon.jsx';
+import { useI18n } from '../hooks/useI18n.js';
 
 const DESTINATIONS = [
-  { city: 'Kyoto', country: 'Japan', tag: 'Culture & food', accent: 'violet', days: '5–7 days' },
-  { city: 'Reykjavík', country: 'Iceland', tag: 'Nature & road trip', accent: 'aqua', days: '7–10 days' },
-  { city: 'Florence', country: 'Italy', tag: 'Art & gastronomy', accent: 'coral', days: '3–5 days' },
+  { city: 'Kyoto', country: 'Japan', tagKey: 'explore.cultureFood', accent: 'violet', range: '5–7' },
+  { city: 'Reykjavík', country: 'Iceland', tagKey: 'explore.natureRoadTrip', accent: 'aqua', range: '7–10' },
+  { city: 'Florence', country: 'Italy', tagKey: 'explore.artFood', accent: 'coral', range: '3–5' },
 ];
 
 export function ExplorePage() {
+  const { t } = useI18n();
+
   return (
     <div className="page-stack">
       <section className="explore-hero">
         <div>
-          <p className="eyebrow">Inspiration</p>
-          <h1>Where will you go next?</h1>
-          <p>Discover a destination, estimate the rhythm of your stay and turn inspiration into a trip.</p>
+          <p className="eyebrow">{t('explore.eyebrow')}</p>
+          <h1>{t('explore.title')}</h1>
+          <p>{t('explore.intro')}</p>
           <div className="explore-search">
             <Icon name="search" size={20} />
-            <input aria-label="Search a destination" placeholder="Search a city, country or travel style" />
-            <Button>Explore</Button>
+            <input aria-label={t('explore.searchAria')} placeholder={t('explore.searchPlaceholder')} />
+            <Button>{t('explore.action')}</Button>
           </div>
         </div>
         <div className="explore-hero__art" aria-hidden="true">
@@ -33,8 +36,8 @@ export function ExplorePage() {
       <section className="content-section">
         <header className="section-heading">
           <div>
-            <p className="eyebrow">Starter ideas</p>
-            <h2>Destinations to explore</h2>
+            <p className="eyebrow">{t('explore.ideas')}</p>
+            <h2>{t('explore.destinations')}</h2>
           </div>
         </header>
         <div className="destination-grid">
@@ -42,10 +45,10 @@ export function ExplorePage() {
             <Card key={destination.city} className={`destination-card destination-card--${destination.accent}`}>
               <div className="destination-card__art"><Icon name="map" size={42} /></div>
               <div className="destination-card__body">
-                <span>{destination.tag}</span>
+                <span>{t(destination.tagKey)}</span>
                 <h3>{destination.city}</h3>
-                <p>{destination.country} · {destination.days}</p>
-                <button className="text-link" type="button">See trip idea <Icon name="arrowRight" size={16} /></button>
+                <p>{destination.country} · {t('explore.days', { range: destination.range })}</p>
+                <button className="text-link" type="button">{t('explore.seeIdea')} <Icon name="arrowRight" size={16} /></button>
               </div>
             </Card>
           ))}

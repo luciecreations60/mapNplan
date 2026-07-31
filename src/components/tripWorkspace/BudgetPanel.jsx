@@ -1,8 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Button } from '../common/Button.jsx';
-import { Card } from '../common/Card.jsx';
-import { Icon } from '../common/Icon.jsx';
-import { ProgressBar } from '../common/ProgressBar.jsx';
+import { useI18n } from '../../hooks/useI18n.js';
 import { formatCurrency } from '../../utils/currency.js';
 import { createId } from '../../utils/id.js';
 import {
@@ -11,20 +8,18 @@ import {
   getPaidExpenseTotal,
   getPlannedExpenseTotal,
 } from '../../utils/tripWorkspace.js';
+import { Button } from '../common/Button.jsx';
+import { Card } from '../common/Card.jsx';
+import { Icon } from '../common/Icon.jsx';
+import { ProgressBar } from '../common/ProgressBar.jsx';
 
 const EMPTY_FORM = {
-  label: '',
-  category: 'transport',
-  amount: '',
-  date: '',
-  paid: true,
+  label: '', category: 'transport', amount: '', date: '', paid: true,
 };
 
 export function BudgetPanel({ trip, onUpdate }) {
-  const [form, setForm] = useState(() => ({
-    ...EMPTY_FORM,
-    date: new Date().toISOString().slice(0, 10),
-  }));
+  const { locale, t } = useI18n();
+  const [form, setForm] = useState(() => ({ ...EMPTY_FORM, date: new Date().toISOString().slice(0, 10) }));
   const [isFormOpen, setFormOpen] = useState(false);
 
   const paidTotal = getPaidExpenseTotal(trip.expenses);
@@ -38,7 +33,7 @@ export function BudgetPanel({ trip, onUpdate }) {
         ...category,
         total: trip.expenses
           .filter((expense) => expense.category === category.id)
-          .reduce((sum, expense) => sum + expense.amount, 0),
+          .reduce((sum, expense) => sum + Number(expense.amount || 0), 0),
       }))
       .filter((category) => category.total > 0)
       .sort((left, right) => right.total - left.total),
@@ -81,44 +76,42 @@ export function BudgetPanel({ trip, onUpdate }) {
   }
 
   function removeExpense(expenseId) {
-    onUpdate({
-      expenses: trip.expenses.filter((expense) => expense.id !== expenseId),
-    });
+    onUpdate({ expenses: trip.expenses.filter((expense) => expense.id !== expenseId) });
   }
 
   return (
     <div className="workspace-section">
       <section className="workspace-section__heading">
         <div>
-          <p className="eyebrow">Money without spreadsheets</p>
-          <h2>Budget</h2>
-          <p>Separate paid expenses from future estimates and keep the total visible.</p>
+          <p className="eyebrow">{t('budget.eyebrow')}</p>
+          <h2>{t('budget.title')}</h2>
+          <p>{t('budget.intro')}</p>
         </div>
         <Button icon={isFormOpen ? 'close' : 'plus'} onClick={() => setFormOpen((value) => !value)}>
-          {isFormOpen ? 'Close' : 'Add expense'}
+          {isFormOpen ? t('common.close') : t('budget.addExpense')}
         </Button>
       </section>
 
       <section className="budget-kpi-grid">
         <Card className="budget-kpi">
-          <span>Trip budget</span>
-          <strong>{formatCurrency(trip.budget, trip.currency)}</strong>
-          <small>Maximum planned amount</small>
+          <span>{t('budget.tripBudget')}</span>
+          <strong>{formatCurrency(trip.budget, trip.currency, locale)}</strong>
+          <small>{t('budget.maxPlanned')}</small>
         </Card>
         <Card className="budget-kpi">
-          <span>Paid</span>
-          <strong>{formatCurrency(paidTotal, trip.currency)}</strong>
-          <small>Confirmed transactions</small>
+          <span>{t('budget.paid')}</span>
+          <strong>{formatCurrency(paidTotal, trip.currency, locale)}</strong>
+          <small>{t('budget.confirmed')}</small>
         </Card>
         <Card className="budget-kpi">
-          <span>Planned total</span>
-          <strong>{formatCurrency(plannedTotal, trip.currency)}</strong>
-          <small>Paid and estimated</small>
+          <span>{t('budget.plannedTotal')}</span>
+          <strong>{formatCurrency(plannedTotal, trip.currency, locale)}</strong>
+          <small>{t('budget.paidEstimated')}</small>
         </Card>
         <Card className="budget-kpi budget-kpi--primary">
-          <span>Remaining</span>
-          <strong>{formatCurrency(remaining, trip.currency)}</strong>
-          <ProgressBar value={progress} label="Budget used" tone="light" />
+          <span>{t('budget.remaining')}</span>
+          <strong>{formatCurrency(remaining, trip.currency, locale)}</strong>
+          <ProgressBar value={progress} label={t('budget.budgetUsed')} tone="light" />
         </Card>
       </section>
 
@@ -126,33 +119,30 @@ export function BudgetPanel({ trip, onUpdate }) {
         <Card className="workspace-form-card">
           <form className="workspace-form" onSubmit={submitExpense}>
             <div className="workspace-form__grid">
-              <Field label="Expense" className="workspace-form__wide">
-                <input name="label" value={form.label} onChange={updateField} placeholder="Flights, hotel, museum tickets…" required />
+              <Field label={t('budget.expense')} className="workspace-form__wide">
+                <input name="label" value={form.label} onChange={updateField} placeholder={t('budget.placeholder')} required />
               </Field>
-              <Field label="Category">
+              <Field label={t('budget.category')}>
                 <select name="category" value={form.category} onChange={updateField}>
                   {EXPENSE_CATEGORIES.map((category) => (
-                    <option key={category.id} value={category.id}>{category.label}</option>
+                    <option key={category.id} value={category.id}>{t(category.labelKey)}</option>
                   ))}
                 </select>
               </Field>
-              <Field label={`Amount (${trip.currency})`}>
+              <Field label={`${t('tools.amount')} (${trip.currency})`}>
                 <input name="amount" type="number" min="0.01" step="0.01" value={form.amount} onChange={updateField} required />
               </Field>
-              <Field label="Date">
+              <Field label={t('budget.date')}>
                 <input name="date" type="date" value={form.date} onChange={updateField} />
               </Field>
               <label className="workspace-checkbox-field">
                 <input name="paid" type="checkbox" checked={form.paid} onChange={updateField} />
-                <span>
-                  <strong>Already paid</strong>
-                  <small>Include this expense in the amount spent.</small>
-                </span>
+                <span><strong>{t('budget.alreadyPaid')}</strong><small>{t('budget.includePaid')}</small></span>
               </label>
             </div>
             <div className="workspace-form__actions">
-              <Button variant="ghost" onClick={() => setFormOpen(false)}>Cancel</Button>
-              <Button type="submit" icon="plus">Save expense</Button>
+              <Button variant="ghost" onClick={() => setFormOpen(false)}>{t('common.cancel')}</Button>
+              <Button type="submit" icon="plus">{t('budget.saveExpense')}</Button>
             </div>
           </form>
         </Card>
@@ -161,37 +151,27 @@ export function BudgetPanel({ trip, onUpdate }) {
       <div className="budget-content-grid">
         <Card className="workspace-panel">
           <header className="workspace-panel__header">
-            <div>
-              <p className="eyebrow">Breakdown</p>
-              <h2>By category</h2>
-            </div>
+            <div><p className="eyebrow">{t('budget.breakdown')}</p><h2>{t('budget.byCategory')}</h2></div>
           </header>
           {categoryTotals.length > 0 ? (
             <div className="category-breakdown">
               {categoryTotals.map((category) => {
                 const percentage = plannedTotal > 0 ? (category.total / plannedTotal) * 100 : 0;
+                const categoryLabel = t(category.labelKey);
                 return (
                   <div key={category.id} className="category-breakdown__row">
-                    <div>
-                      <span>{category.label}</span>
-                      <strong>{formatCurrency(category.total, trip.currency)}</strong>
-                    </div>
-                    <ProgressBar value={percentage} label={`${category.label} share`} />
+                    <div><span>{categoryLabel}</span><strong>{formatCurrency(category.total, trip.currency, locale)}</strong></div>
+                    <ProgressBar value={percentage} label={categoryLabel} />
                   </div>
                 );
               })}
             </div>
-          ) : (
-            <p className="workspace-muted-copy">Add an expense to create the category breakdown.</p>
-          )}
+          ) : <p className="workspace-muted-copy">{t('budget.noBreakdown')}</p>}
         </Card>
 
         <Card className="workspace-panel">
           <header className="workspace-panel__header">
-            <div>
-              <p className="eyebrow">Transactions</p>
-              <h2>Expenses</h2>
-            </div>
+            <div><p className="eyebrow">{t('budget.transactions')}</p><h2>{t('budget.expenses')}</h2></div>
             <span className="workspace-count">{trip.expenses.length}</span>
           </header>
 
@@ -202,7 +182,7 @@ export function BudgetPanel({ trip, onUpdate }) {
                   <button
                     className={expense.paid ? 'expense-row__status expense-row__status--paid' : 'expense-row__status'}
                     type="button"
-                    aria-label={expense.paid ? `Mark ${expense.label} as unpaid` : `Mark ${expense.label} as paid`}
+                    aria-label={expense.paid ? `${t('budget.paid')}: ${expense.label}` : `${t('budget.plannedTotal')}: ${expense.label}`}
                     onClick={() => togglePaid(expense.id)}
                   >
                     <Icon name={expense.paid ? 'check' : 'circle'} size={16} />
@@ -210,22 +190,20 @@ export function BudgetPanel({ trip, onUpdate }) {
                   <div>
                     <strong>{expense.label}</strong>
                     <small>
-                      {getCategoryLabel(EXPENSE_CATEGORIES, expense.category)}
-                      {expense.date && ` · ${formatExpenseDate(expense.date)}`}
+                      {getCategoryLabel(EXPENSE_CATEGORIES, expense.category, t)}
+                      {expense.date && ` · ${formatExpenseDate(expense.date, locale)}`}
                     </small>
                   </div>
                   <span className={expense.paid ? 'expense-row__amount' : 'expense-row__amount expense-row__amount--planned'}>
-                    {formatCurrency(expense.amount, trip.currency)}
+                    {formatCurrency(expense.amount, trip.currency, locale)}
                   </span>
-                  <button className="icon-button icon-button--small" type="button" aria-label={`Delete ${expense.label}`} onClick={() => removeExpense(expense.id)}>
+                  <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.delete')} ${expense.label}`} onClick={() => removeExpense(expense.id)}>
                     <Icon name="trash" size={16} />
                   </button>
                 </article>
               ))}
             </div>
-          ) : (
-            <p className="workspace-muted-copy">No expenses yet.</p>
-          )}
+          ) : <p className="workspace-muted-copy">{t('budget.noExpenses')}</p>}
         </Card>
       </div>
     </div>
@@ -233,15 +211,10 @@ export function BudgetPanel({ trip, onUpdate }) {
 }
 
 function Field({ label, className = '', children }) {
-  return (
-    <label className={`workspace-field ${className}`.trim()}>
-      <span>{label}</span>
-      {children}
-    </label>
-  );
+  return <label className={`workspace-field ${className}`.trim()}><span>{label}</span>{children}</label>;
 }
 
-function formatExpenseDate(date) {
-  return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' })
+function formatExpenseDate(date, locale) {
+  return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' })
     .format(new Date(`${date}T12:00:00`));
 }

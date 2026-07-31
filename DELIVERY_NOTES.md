@@ -1,54 +1,58 @@
-# Delivery notes — V0.1 Part 4
+# Delivery notes — V0.1 Part 5
+
+## Purpose
+
+This release fixes the Chromium layout issue reported after V0.1 Part 4 and introduces the first complete localisation layer.
 
 ## Functional additions
 
-- Travel tools workspace tab.
-- Seven-day destination weather.
-- Destination local time.
-- Currency conversion between budget and destination currencies.
-- Cached provider responses.
-- JSON backup export and import.
-- Explicit Reset demo data action and visible feedback.
+- French and English interface.
+- Automatic browser-language detection on first visit.
+- Manual language selection in **Settings → Language**.
+- Locally persisted language preference.
+- Locale-aware dates, times, amounts, weather, categories and statuses.
+
+## Responsive corrections
+
+- Desktop sidebar changed from fixed positioning to a sticky CSS-grid item.
+- Main content explicitly occupies the flexible grid column.
+- Tablet/mobile breakpoint moved to `960px` for a reliable drawer experience.
+- Drawer overlay and body-scroll locking added.
+- Width constraints, `min-width: 0` protections and fluid page padding added.
+- Settings, cards, forms and workspace panels hardened for small screens.
 
 ## Main new files
 
-- `src/config/external-services.config.js`
-- `src/services/http/HttpService.js`
-- `src/services/storage/ResponseCacheService.js`
-- `src/services/weather/WeatherService.js`
-- `src/services/currency/CurrencyService.js`
-- `src/services/data/DataPortabilityService.js`
-- `src/utils/weather.js`
-- `src/utils/travelTools.js`
-- `src/components/feedback/InlineNotice.jsx`
-- `src/components/tripWorkspace/TravelToolsPanel.jsx`
-- `src/components/tripWorkspace/tools/WeatherCard.jsx`
-- `src/components/tripWorkspace/tools/LocalTimeCard.jsx`
-- `src/components/tripWorkspace/tools/CurrencyConverter.jsx`
+- `src/config/localization.config.js`
+- `src/i18n/translations.js`
+- `src/contexts/LocalizationContext.jsx`
+- `src/hooks/useI18n.js`
 
-## Main modified files
+## Main modified areas
 
-- `package.json`
-- `project.config.js`
-- `public/service-worker.js`
-- `src/config/app.config.js`
-- `src/data/demoTrips.js`
-- `src/services/trips/TripService.js`
-- `src/contexts/TripContext.jsx`
-- `src/pages/SettingsPage.jsx`
-- `src/pages/TripWorkspacePage.jsx`
-- `src/components/common/Icon.jsx`
-- `src/components/trips/CreateTripDialog.jsx`
-- `src/components/tripWorkspace/TripTabs.jsx`
-- `src/styles/components.css`
-- `src/styles/pages.css`
+- Application provider composition in `src/main.jsx`.
+- Application shell and navigation components.
+- All route pages and trip-workspace panels.
+- Locale-sensitive utility functions.
+- `src/styles/layout.css`, `global.css` and `pages.css`.
+- Project, service-worker and documentation versions.
+
+## Data impact
+
+- No trip-schema migration.
+- No automatic reset of existing trips.
+- The interface language is stored under the application LocalStorage namespace.
+- User-created content is never automatically translated.
 
 ## Verification performed
 
-- All JSON files parsed successfully.
+- 69 JavaScript/JSX files parsed by TypeScript with no syntax diagnostics.
 - All relative imports resolved.
-- All JavaScript and JSX files parsed individually by TypeScript without syntax diagnostics.
+- All named/default relative imports matched exported symbols.
+- 373 statically referenced translation keys found in both French and English dictionaries.
+- JSON files parsed successfully.
 - CSS block delimiters checked.
-- Archive contents and checksums generated.
+- Visible JSX text reviewed for untranslated application copy.
+- Archive integrity and checksums regenerated after final changes.
 
-A complete npm build could not run in the generation environment because its internal package registry does not contain the Vite React plugin version already used by the deployed project. GitHub Actions performs the actual installation and production build after upload.
+A complete npm build could not run in the generation environment because its internal package registry does not contain the Vite React plugin version used by the project. GitHub Actions performs the actual dependency installation and production build after upload.

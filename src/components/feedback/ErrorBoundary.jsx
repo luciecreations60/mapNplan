@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { translateForCurrentBrowser } from '../../contexts/LocalizationContext.jsx';
 
 export class ErrorBoundary extends Component {
   state = { hasError: false };
@@ -17,10 +18,10 @@ export class ErrorBoundary extends Component {
         <main className="fatal-error">
           <div className="fatal-error__panel">
             <span className="fatal-error__symbol" aria-hidden="true">!</span>
-            <h1>Something went wrong</h1>
-            <p>Refresh the page. Your locally saved trips have not been deleted.</p>
+            <h1>{translateForCurrentBrowser('error.title')}</h1>
+            <p>{translateForCurrentBrowser('error.message')}</p>
             <button className="button button--primary button--medium" onClick={() => window.location.reload()}>
-              Reload application
+              {translateForCurrentBrowser('error.reload')}
             </button>
           </div>
         </main>

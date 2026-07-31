@@ -2328,3 +2328,95 @@
   .currency-converter__swap { align-self: end; grid-column: 1 / -1; width: 100%; }
   .travel-tools-empty > div { width: 100%; flex-direction: column; }
 }
+
+/* ========================================================================== */
+/* V0.1.4 — Responsive shell and interface language                           */
+/* ========================================================================== */
+
+.language-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.language-option {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  text-align: left;
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+}
+
+.language-option > span {
+  display: grid;
+  width: 46px;
+  height: 38px;
+  place-items: center;
+  border-radius: 11px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  font-size: .78rem;
+  font-weight: 850;
+  letter-spacing: .08em;
+}
+
+.language-option div {
+  display: grid;
+  min-width: 0;
+}
+
+.language-option small {
+  color: var(--color-text-soft);
+  font-size: .68rem;
+}
+
+.language-option i {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-border-strong);
+  border-radius: 50%;
+}
+
+.language-option--active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.language-option--active i {
+  border: 5px solid var(--color-primary);
+}
+
+.settings-helper {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 16px 0 0;
+  color: var(--color-text-muted);
+  font-size: .74rem;
+}
+
+@media (max-width: 720px) {
+  .language-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 580px) {
+  .settings-card,
+  .workspace-panel,
+  .quick-actions-card {
+    padding: 18px;
+  }
+
+  .configuration-list div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+}

@@ -1,28 +1,30 @@
-# Upload V0.1 Part 4 to GitHub
+# Envoyer la V0.1 Partie 5 sur GitHub
 
-This archive contains the complete project, not only the changed files.
+Cette archive contient le projet complet et remplace la Partie 4.
 
-1. Extract `travel-planner-v0.1-part4.zip`.
-2. Open the `luciecreations60/travel-planner` repository.
-3. Select **Add file → Upload files**.
-4. Drag the contents of the extracted folder into GitHub.
-5. Confirm replacement of files with identical paths.
-6. Enter the commit message:
+1. Décompresser `travel-planner-v0.1-part5.zip`.
+2. Ouvrir le dépôt `luciecreations60/travel-planner`.
+3. Cliquer sur **Add file → Upload files**.
+4. Déposer tout le contenu du dossier décompressé.
+5. Accepter le remplacement des fichiers portant le même chemin.
+6. Saisir le message de commit :
 
 ```text
-feat: add v0.1.3 travel tools and backups
+feat: add v0.1.4 responsive bilingual interface
 ```
 
-7. Select **Commit directly to the main branch**.
-8. Confirm the commit.
-9. Open the **Actions** tab.
-10. Wait for **Deploy TripFlow to GitHub Pages** to show a green check.
+7. Sélectionner **Commit directly to the main branch**.
+8. Valider le commit.
+9. Ouvrir l’onglet **Actions**.
+10. Attendre la coche verte du déploiement GitHub Pages.
 
-The existing GitHub Pages settings do not need to be changed.
+Aucun changement n’est nécessaire dans **Settings → Pages**.
 
-## After deployment
+## Après le déploiement
 
-1. Open **My trips**.
-2. Open **Japan Discovery**.
-3. Select **Travel tools**.
-4. Open **Settings** to test **Export backup**, **Import backup** and **Reset demo data**.
+1. Dans Chrome, effectuer une actualisation forcée avec `Ctrl + F5`.
+2. Vérifier que le contenu utilise toute la largeur disponible.
+3. Réduire la fenêtre sous 960 px et vérifier l’ouverture du menu en tiroir.
+4. Ouvrir **Paramètres → Langue** pour choisir Français ou English.
+
+Au premier chargement sans préférence déjà enregistrée, un navigateur configuré en français ouvre automatiquement l’interface française. Toute autre langue non prise en charge utilise l’anglais.

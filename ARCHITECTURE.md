@@ -1,8 +1,8 @@
-# Architecture — V0.1.3
+# Architecture — V0.1.4
 
 ## Goals
 
-The architecture separates interface composition, domain behaviour, persistence and external providers. The current implementation remains static and free to host while preparing for authentication, cloud synchronisation, secure files, affiliations and artificial intelligence.
+The architecture separates interface composition, domain behaviour, persistence, localisation and external providers. The current implementation remains static and free to host while preparing for authentication, cloud synchronisation, secure files, affiliations and artificial intelligence.
 
 ## Dependency direction
 
@@ -21,13 +21,51 @@ Components do not access LocalStorage or provider endpoints directly.
 ## Main boundaries
 
 - `components/`: reusable interface and feature components.
-- `config/`: branding, feature flags, navigation and provider settings.
-- `contexts/`: React state backed by domain services.
+- `config/`: branding, features, navigation, languages and provider settings.
+- `contexts/`: React state backed by application services.
 - `hooks/`: stable component-facing APIs.
+- `i18n/`: central interface translations.
 - `pages/`: route-level composition only.
 - `services/`: persistence, data portability and provider adapters.
 - `styles/`: tokens, global rules, layouts and feature styling.
 - `utils/`: deterministic validation, formatting and aggregation helpers.
+
+## Responsive application shell
+
+Desktop layout:
+
+```text
+.app-shell (CSS grid)
+├── Sidebar (sticky grid item)
+└── Main column
+    ├── Top bar (sticky)
+    └── Fluid page container
+```
+
+The desktop sidebar participates in the grid and is no longer `position: fixed`. This prevents Chromium from placing the main content in the sidebar column. At `960px` and below, the shell becomes a single-column layout and the sidebar becomes an off-canvas drawer with an overlay.
+
+All grid and flex children use `min-width: 0` where required, preventing long content from forcing horizontal overflow. Page padding and card grids use fluid breakpoints for desktop, tablet and mobile widths.
+
+## Localisation boundary
+
+```text
+LocalizationProvider
+├── browser-language resolver
+├── persisted language preference
+├── translation dictionary
+└── locale-aware formatters
+```
+
+- `localization.config.js` owns supported language metadata.
+- `translations.js` owns application copy only.
+- `LocalizationContext.jsx` exposes `language`, `locale`, `setLanguage()` and `t()`.
+- `useI18n()` is the component-facing API.
+- The first visit follows `navigator.languages`.
+- A manual setting is persisted through `LocalStorageService`.
+- Unsupported browser languages fall back to English.
+- User-created content remains unchanged.
+
+Adding a language requires one configuration entry and a complete translation branch; pages and components do not require structural changes.
 
 ## Trip aggregate
 
@@ -50,14 +88,14 @@ Every nested record owns a stable identifier. `TripService` normalises the compl
 
 ## Schema migration
 
-The current schema version is `4`.
+The current trip schema version remains `4`.
 
 - Schema 1: trip summary fields.
 - Schema 2: itinerary, expenses, checklist and notes.
 - Schema 3: reservations, documents and coordinates.
 - Schema 4: destination currency and travel-tool defaults.
 
-Existing trips are normalised non-destructively. Demonstration properties are added only when the property did not previously exist.
+V0.1.4 changes interface preferences and layout only; trip records are not rewritten.
 
 ## External provider boundary
 
@@ -71,31 +109,15 @@ TravelToolsPanel
     └── ResponseCacheService
 ```
 
-`HttpService` centralises timeout and JSON error handling. Provider services translate raw responses into application-owned models. `ResponseCacheService` stores short-lived results under the application LocalStorage namespace.
-
 Provider URLs and limits live in `external-services.config.js`. Replacing Open-Meteo or Frankfurter does not require changes to workspace components.
-
-## Location selection
-
-`getPrimaryTripLocation()` currently selects the first itinerary map point, then falls back to a mapped reservation. This rule is isolated so a future dedicated destination entity or place-search provider can replace it without changing travel-tool components.
 
 ## Data portability
 
-`DataPortabilityService` creates a versioned JSON envelope:
-
-```text
-Backup
-├── format
-├── version
-├── exportedAt
-└── trips[]
-```
-
-Imported trips are validated, then passed through `TripService.replaceAll()` so current normalisation and schema rules are always applied.
+`DataPortabilityService` creates and validates a versioned JSON envelope before replacing locally stored trips through `TripService`.
 
 ## Map integration
 
-`TripMap` is the only component coupled to Leaflet. It receives provider-neutral map points from `getTripMapPoints()` and knows nothing about persistence or editing.
+`TripMap` is the only component coupled to Leaflet. It receives provider-neutral points from `getTripMapPoints()` and knows nothing about persistence or editing.
 
 ## Security boundaries
 
