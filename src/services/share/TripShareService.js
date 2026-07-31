@@ -78,6 +78,7 @@ class TripShareService {
               category: expense.category,
               amount: expense.amount,
               paid: expense.paid,
+              paidAmount: Number(expense.paidAmount || 0),
             }))
           : [],
         shareOptions: { includeBudget, includeNotes, includeChecklist },

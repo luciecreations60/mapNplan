@@ -10,6 +10,7 @@ export const TRIP_TABS = Object.freeze([
   { id: 'tools', labelKey: 'workspace.tools', icon: 'globe' },
   { id: 'reservations', labelKey: 'workspace.reservations', icon: 'ticket' },
   { id: 'budget', labelKey: 'workspace.budget', icon: 'wallet' },
+  { id: 'expenses', labelKey: 'workspace.sharedExpenses', icon: 'receipt' },
   { id: 'statistics', labelKey: 'workspace.statistics', icon: 'chart' },
   { id: 'checklist', labelKey: 'workspace.checklistTab', icon: 'checklist' },
   { id: 'documents', labelKey: 'workspace.documents', icon: 'folder' },

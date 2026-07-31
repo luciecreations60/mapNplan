@@ -61,7 +61,9 @@ export function SharedTripPage() {
   }
 
   const { trip, createdAt } = snapshot;
-  const paidTotal = trip.expenses.filter((expense) => expense.paid).reduce((sum, expense) => sum + expense.amount, 0);
+  const paidTotal = trip.expenses.reduce((sum, expense) => (
+    sum + Math.min(Number(expense.amount || 0), Math.max(0, Number(expense.paidAmount ?? (expense.paid ? expense.amount : 0)) || 0))
+  ), 0);
   const checklistCompleted = trip.checklist.filter((item) => item.completed).length;
 
   return (

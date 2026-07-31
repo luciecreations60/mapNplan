@@ -49,6 +49,10 @@ export function BudgetPanel({ trip, onUpdate }) {
     event.preventDefault();
     if (!form.label.trim() || Number(form.amount) <= 0) return;
 
+    const amount = Number(form.amount);
+    const currentParticipant = trip.travelParty?.find((participant) => participant.isCurrentUser)
+      || trip.travelParty?.[0];
+
     onUpdate({
       expenses: [
         ...trip.expenses,
@@ -56,9 +60,13 @@ export function BudgetPanel({ trip, onUpdate }) {
           id: createId('expense'),
           label: form.label.trim(),
           category: form.category,
-          amount: Number(form.amount),
+          amount,
+          paidAmount: form.paid ? amount : 0,
           date: form.date,
           paid: form.paid,
+          paidById: currentParticipant?.id || null,
+          splitBetweenIds: (trip.travelParty || []).map((participant) => participant.id),
+          notes: '',
         },
       ],
     });
@@ -69,9 +77,15 @@ export function BudgetPanel({ trip, onUpdate }) {
 
   function togglePaid(expenseId) {
     onUpdate({
-      expenses: trip.expenses.map((expense) => (
-        expense.id === expenseId ? { ...expense, paid: !expense.paid } : expense
-      )),
+      expenses: trip.expenses.map((expense) => {
+        if (expense.id !== expenseId) return expense;
+        const isFullyPaid = Number(expense.paidAmount || 0) >= Number(expense.amount || 0);
+        return {
+          ...expense,
+          paid: !isFullyPaid,
+          paidAmount: isFullyPaid ? 0 : Number(expense.amount || 0),
+        };
+      }),
     });
   }
 
@@ -180,12 +194,12 @@ export function BudgetPanel({ trip, onUpdate }) {
               {[...trip.expenses].reverse().map((expense) => (
                 <article key={expense.id} className="expense-row">
                   <button
-                    className={expense.paid ? 'expense-row__status expense-row__status--paid' : 'expense-row__status'}
+                    className={Number(expense.paidAmount || 0) >= Number(expense.amount || 0) ? 'expense-row__status expense-row__status--paid' : 'expense-row__status'}
                     type="button"
-                    aria-label={expense.paid ? `${t('budget.paid')}: ${expense.label}` : `${t('budget.plannedTotal')}: ${expense.label}`}
+                    aria-label={Number(expense.paidAmount || 0) >= Number(expense.amount || 0) ? `${t('budget.paid')}: ${expense.label}` : `${t('budget.plannedTotal')}: ${expense.label}`}
                     onClick={() => togglePaid(expense.id)}
                   >
-                    <Icon name={expense.paid ? 'check' : 'circle'} size={16} />
+                    <Icon name={Number(expense.paidAmount || 0) >= Number(expense.amount || 0) ? 'check' : 'circle'} size={16} />
                   </button>
                   <div>
                     <strong>{expense.label}</strong>
@@ -194,7 +208,7 @@ export function BudgetPanel({ trip, onUpdate }) {
                       {expense.date && ` · ${formatExpenseDate(expense.date, locale)}`}
                     </small>
                   </div>
-                  <span className={expense.paid ? 'expense-row__amount' : 'expense-row__amount expense-row__amount--planned'}>
+                  <span className={Number(expense.paidAmount || 0) >= Number(expense.amount || 0) ? 'expense-row__amount' : 'expense-row__amount expense-row__amount--planned'}>
                     {formatCurrency(expense.amount, trip.currency, locale)}
                   </span>
                   <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.delete')} ${expense.label}`} onClick={() => removeExpense(expense.id)}>

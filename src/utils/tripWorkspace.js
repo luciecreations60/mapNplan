@@ -65,9 +65,13 @@ export function calculatePlannedExpenses(expenses = []) {
 }
 
 export function calculatePaidExpenses(expenses = []) {
-  return expenses
-    .filter((expense) => expense.paid)
-    .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+  return expenses.reduce((sum, expense) => {
+    const amount = Math.max(0, Number(expense.amount) || 0);
+    const paidAmount = expense.paidAmount === null || expense.paidAmount === undefined
+      ? (expense.paid ? amount : 0)
+      : Math.min(amount, Math.max(0, Number(expense.paidAmount) || 0));
+    return sum + paidAmount;
+  }, 0);
 }
 
 export function countConfirmedReservations(reservations = []) {
@@ -85,7 +89,7 @@ export function getItineraryItemCount(itinerary = []) {
 }
 
 export function getPaidExpenseTotal(expenses = []) {
-  return expenses.filter((expense) => expense.paid).reduce((total, expense) => total + Number(expense.amount || 0), 0);
+  return calculatePaidExpenses(expenses);
 }
 
 export function getPlannedExpenseTotal(expenses = []) {

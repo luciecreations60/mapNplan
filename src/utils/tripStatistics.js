@@ -22,7 +22,13 @@ export function buildTripStatistics(trip) {
   const mappedActivities = activities.filter((item) => hasValidCoordinates(item.latitude, item.longitude)).length;
   const mappedReservations = reservations.filter((item) => hasValidCoordinates(item.latitude, item.longitude)).length;
   const plannedExpense = expenses.reduce((sum, item) => sum + Number(item.amount || 0), 0);
-  const paidExpense = expenses.filter((item) => item.paid).reduce((sum, item) => sum + Number(item.amount || 0), 0);
+  const paidExpense = expenses.reduce((sum, item) => {
+    const amount = Math.max(0, Number(item.amount) || 0);
+    const paidAmount = item.paidAmount === null || item.paidAmount === undefined
+      ? (item.paid ? amount : 0)
+      : Math.min(amount, Math.max(0, Number(item.paidAmount) || 0));
+    return sum + paidAmount;
+  }, 0);
   const estimatedActivityCost = activities.reduce((sum, item) => sum + Number(item.estimatedCost || 0), 0);
   const totalActivityMinutes = activities.reduce((sum, item) => sum + Number(item.durationMinutes || 0), 0);
 

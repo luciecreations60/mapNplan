@@ -3060,3 +3060,395 @@
 .shared-trip-error__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .7rem; }
 .shared-trip-error__actions label { cursor: pointer; }
 .shared-trip-file-error { color: var(--color-danger); font-weight: 700; }
+
+/* ==========================================================================
+   Shared expenses and traveller balances — V0.1 Part 11
+   ========================================================================== */
+
+.workspace-heading-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: .65rem;
+}
+
+.shared-expenses {
+  min-width: 0;
+}
+
+.shared-expense-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.shared-expenses__main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(310px, .65fr);
+  gap: 1rem;
+}
+
+.participant-balances,
+.travel-party-list,
+.shared-expense-list,
+.settlement-history {
+  display: grid;
+}
+
+.participant-balance-row,
+.travel-party-row,
+.settlement-history-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: .75rem;
+  align-items: center;
+  padding: .8rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.participant-balance-row:last-child,
+.travel-party-row:last-child,
+.settlement-history-row:last-child {
+  border-bottom: 0;
+}
+
+.participant-balance-row > div:nth-child(2),
+.travel-party-row > div,
+.settlement-history-row > div {
+  min-width: 0;
+}
+
+.participant-balance-row strong,
+.participant-balance-row small,
+.travel-party-row strong,
+.travel-party-row small,
+.settlement-history-row strong,
+.settlement-history-row small {
+  display: block;
+}
+
+.participant-balance-row small,
+.travel-party-row small,
+.settlement-history-row small {
+  margin-top: .12rem;
+  color: var(--color-text-muted);
+}
+
+.participant-balance {
+  display: grid;
+  justify-items: end;
+  gap: .1rem;
+}
+
+.participant-balance--credit strong {
+  color: var(--color-success, #218739);
+}
+
+.participant-balance--debt strong {
+  color: var(--color-danger, #d14343);
+}
+
+.settlement-suggestions {
+  display: grid;
+  gap: .65rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.settlement-suggestions h4,
+.travel-party-form h4 {
+  margin: 0;
+}
+
+.settlement-suggestion {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: .7rem;
+  align-items: center;
+  padding: .75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+}
+
+.settlement-suggestion > div {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  min-width: 0;
+}
+
+.settlement-suggestion p {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.travel-party-row {
+  grid-template-columns: auto minmax(0, 1fr) auto auto auto;
+}
+
+.travel-party-form {
+  display: grid;
+  gap: .75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.travel-party-form label,
+.settlement-form label {
+  display: grid;
+  gap: .38rem;
+  font-size: .78rem;
+  font-weight: 700;
+}
+
+.shared-expense-filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) repeat(3, minmax(150px, auto));
+  gap: .7rem;
+  margin-bottom: 1rem;
+}
+
+.shared-expense-search {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  min-width: 0;
+  padding: 0 .75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.shared-expense-search:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.shared-expense-search input {
+  min-width: 0;
+  width: 100%;
+  padding: .72rem 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+}
+
+.shared-expense-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  gap: .85rem;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.shared-expense-row:last-child {
+  border-bottom: 0;
+}
+
+.shared-expense-row__icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.shared-expense-row__main {
+  min-width: 0;
+}
+
+.shared-expense-row__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem;
+}
+
+.shared-expense-row__main > small,
+.shared-expense-row__main > p {
+  display: block;
+  margin: .18rem 0 0;
+  color: var(--color-text-muted);
+  font-size: .76rem;
+}
+
+.shared-expense-row__notes {
+  white-space: pre-wrap;
+}
+
+.shared-expense-row .progress {
+  max-width: 320px;
+  margin-top: .55rem;
+}
+
+.shared-expense-row__amounts {
+  display: grid;
+  justify-items: end;
+  gap: .12rem;
+  white-space: nowrap;
+}
+
+.shared-expense-row__amounts small {
+  color: var(--color-text-muted);
+}
+
+.shared-expense-row__actions {
+  display: flex;
+  gap: .35rem;
+}
+
+.settlement-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(130px, 1fr));
+  gap: .7rem;
+  align-items: end;
+  margin-bottom: 1rem;
+  padding: .9rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+}
+
+.settlement-form__notes {
+  grid-column: 1 / -2;
+}
+
+.settlement-history-row {
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+}
+
+.settlement-history-row > span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.shared-expense-form {
+  min-width: min(680px, 78vw);
+}
+
+.participant-split-field {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.participant-split-field legend {
+  margin-bottom: .5rem;
+  font-size: .78rem;
+  font-weight: 700;
+}
+
+.participant-split-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .55rem;
+}
+
+@media (max-width: 1180px) {
+  .shared-expense-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .shared-expenses__main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .shared-expense-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .settlement-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .settlement-form__notes {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 720px) {
+  .workspace-heading-actions,
+  .workspace-heading-actions .button {
+    width: 100%;
+  }
+
+  .workspace-heading-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .shared-expense-kpis,
+  .shared-expense-filters,
+  .settlement-form {
+    grid-template-columns: 1fr;
+  }
+
+  .shared-expense-row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: start;
+  }
+
+  .shared-expense-row__amounts {
+    grid-column: 2;
+    justify-items: start;
+  }
+
+  .shared-expense-row__actions {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    flex-direction: column;
+  }
+
+  .settlement-suggestion {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .settlement-suggestion .button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .travel-party-row {
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+  }
+
+  .travel-party-row .badge {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .shared-expense-form {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .workspace-heading-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .shared-expense-kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .participant-balance-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .participant-balance {
+    grid-column: 2;
+    justify-items: start;
+  }
+}

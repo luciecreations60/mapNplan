@@ -6,7 +6,7 @@ import { normalizeExternalUrl } from '../../utils/url.js';
 import { localStorageService } from '../storage/LocalStorageService.js';
 
 const STORAGE_KEY = 'trips';
-const CURRENT_TRIP_SCHEMA_VERSION = 9;
+const CURRENT_TRIP_SCHEMA_VERSION = 10;
 
 /**
  * Trip repository façade.
@@ -52,6 +52,8 @@ class TripService {
       pinnedAt: null,
       itinerary: [],
       expenses: [],
+      settlements: [],
+      travelParty: [],
       checklist: [],
       reservations: [],
       documents: [],
@@ -87,6 +89,14 @@ class TripService {
     if (!sourceTrip) return null;
 
     const now = new Date().toISOString();
+    const participantIdMap = new Map(
+      sourceTrip.travelParty.map((participant) => [participant.id, createId('traveller')]),
+    );
+    const duplicatedTravelParty = sourceTrip.travelParty.map((participant) => ({
+      ...participant,
+      id: participantIdMap.get(participant.id),
+      createdAt: now,
+    }));
     const duplicateTrip = this.#normalize({
       ...structuredClone(sourceTrip),
       id: createId('trip'),
@@ -102,7 +112,22 @@ class TripService {
         routePlan: this.#normalizeRoutePlan(null),
         items: day.items.map((item) => ({ ...item, id: createId('activity'), comments: [] })),
       })),
-      expenses: sourceTrip.expenses.map((expense) => ({ ...expense, id: createId('expense') })),
+      travelParty: duplicatedTravelParty,
+      expenses: sourceTrip.expenses.map((expense) => ({
+        ...expense,
+        id: createId('expense'),
+        paidById: participantIdMap.get(expense.paidById) || duplicatedTravelParty[0]?.id || null,
+        splitBetweenIds: (expense.splitBetweenIds || [])
+          .map((participantId) => participantIdMap.get(participantId))
+          .filter(Boolean),
+      })),
+      settlements: sourceTrip.settlements.map((settlement) => ({
+        ...settlement,
+        id: createId('settlement'),
+        fromParticipantId: participantIdMap.get(settlement.fromParticipantId),
+        toParticipantId: participantIdMap.get(settlement.toParticipantId),
+        createdAt: now,
+      })),
       checklist: sourceTrip.checklist.map((item) => ({ ...item, id: createId('check') })),
       reservations: sourceTrip.reservations.map((reservation) => ({
         ...reservation,
@@ -212,15 +237,21 @@ class TripService {
   }
 
   #normalize(trip) {
-    const expenses = this.#normalizeExpenses(trip.expenses);
+    const collaboration = this.#normalizeCollaboration(trip.collaboration, trip);
+    const travelParty = this.#normalizeTravelParty(
+      trip.travelParty,
+      collaboration,
+      trip.travelers,
+      trip.createdAt,
+    );
+    const expenses = this.#normalizeExpenses(trip.expenses, travelParty);
+    const settlements = this.#normalizeSettlements(trip.settlements, travelParty);
     const checklist = this.#normalizeChecklist(trip.checklist);
     const itinerary = this.#normalizeItinerary(trip.itinerary);
     const reservations = this.#normalizeReservations(trip.reservations);
     const documents = this.#normalizeDocuments(trip.documents);
-    const collaboration = this.#normalizeCollaboration(trip.collaboration, trip);
     const calculatedSpent = expenses
-      .filter((expense) => expense.paid)
-      .reduce((sum, expense) => sum + expense.amount, 0);
+      .reduce((sum, expense) => sum + expense.paidAmount, 0);
     const checklistCompleted = checklist.filter((item) => item.completed).length;
 
     return {
@@ -254,6 +285,8 @@ class TripService {
       notes: String(trip.notes || ''),
       itinerary,
       expenses,
+      settlements,
+      travelParty,
       checklist,
       reservations,
       documents,
@@ -266,17 +299,121 @@ class TripService {
     };
   }
 
-  #normalizeExpenses(expenses) {
+  #normalizeExpenses(expenses, travelParty) {
     if (!Array.isArray(expenses)) return [];
 
-    return expenses.map((expense) => ({
-      id: expense.id || createId('expense'),
-      label: String(expense.label || 'Expense').trim(),
-      category: String(expense.category || 'other').trim(),
-      amount: Math.max(0, Number(expense.amount) || 0),
-      date: expense.date || '',
-      paid: Boolean(expense.paid),
+    const participantIds = new Set(travelParty.map((participant) => participant.id));
+    const defaultParticipantId = travelParty.find((participant) => participant.isCurrentUser)?.id
+      || travelParty[0]?.id
+      || null;
+
+    return expenses.map((expense) => {
+      const amount = Math.max(0, Number(expense.amount) || 0);
+      const legacyPaidAmount = expense.paid ? amount : 0;
+      const paidAmount = Math.min(
+        amount,
+        Math.max(0, Number(expense.paidAmount ?? legacyPaidAmount) || 0),
+      );
+      const requestedSplitIds = Array.isArray(expense.splitBetweenIds)
+        ? expense.splitBetweenIds.map(String).filter((id) => participantIds.has(id))
+        : [];
+      const splitBetweenIds = [...new Set(requestedSplitIds)];
+
+      return {
+        id: expense.id || createId('expense'),
+        label: String(expense.label || 'Expense').trim(),
+        category: String(expense.category || 'other').trim(),
+        amount,
+        paidAmount,
+        date: expense.date || '',
+        paid: amount > 0 && paidAmount >= amount,
+        paidById: participantIds.has(expense.paidById)
+          ? expense.paidById
+          : defaultParticipantId,
+        splitBetweenIds: splitBetweenIds.length > 0
+          ? splitBetweenIds
+          : travelParty.map((participant) => participant.id),
+        notes: String(expense.notes || '').trim(),
+      };
+    });
+  }
+
+  #normalizeTravelParty(travelParty, collaboration, travelerCount, createdAt) {
+    const now = createdAt || new Date().toISOString();
+    const source = Array.isArray(travelParty) ? travelParty : [];
+    const collaborationMembers = Array.isArray(collaboration?.members)
+      ? collaboration.members
+      : [];
+    const fallbackSource = source.length > 0
+      ? source
+      : collaborationMembers.map((member) => ({
+          id: member.id,
+          name: member.name,
+          email: member.email,
+          isCurrentUser: member.role === 'owner',
+          createdAt: member.addedAt,
+        }));
+
+    let participants = fallbackSource.map((participant, index) => ({
+      id: participant.id || createId('traveller'),
+      name: String(participant.name || `Traveler ${index + 1}`).trim(),
+      email: String(participant.email || '').trim().toLowerCase(),
+      isCurrentUser: Boolean(participant.isCurrentUser),
+      createdAt: participant.createdAt || now,
     }));
+
+    const desiredCount = Math.max(1, Number(travelerCount) || 1);
+    while (participants.length < desiredCount) {
+      participants.push({
+        id: createId('traveller'),
+        name: `Traveler ${participants.length + 1}`,
+        email: '',
+        isCurrentUser: false,
+        createdAt: now,
+      });
+    }
+
+    if (participants.length === 0) {
+      participants = [{
+        id: createId('traveller'),
+        name: APP_CONFIG.demoUserName,
+        email: '',
+        isCurrentUser: true,
+        createdAt: now,
+      }];
+    }
+
+    const currentUserIndex = participants.findIndex((participant) => participant.isCurrentUser);
+    return participants.map((participant, index) => ({
+      ...participant,
+      isCurrentUser: currentUserIndex >= 0 ? index === currentUserIndex : index === 0,
+    }));
+  }
+
+  #normalizeSettlements(settlements, travelParty) {
+    if (!Array.isArray(settlements)) return [];
+    const participantIds = new Set(travelParty.map((participant) => participant.id));
+
+    return settlements
+      .map((settlement) => ({
+        id: settlement.id || createId('settlement'),
+        fromParticipantId: participantIds.has(settlement.fromParticipantId)
+          ? settlement.fromParticipantId
+          : null,
+        toParticipantId: participantIds.has(settlement.toParticipantId)
+          ? settlement.toParticipantId
+          : null,
+        amount: Math.max(0, Number(settlement.amount) || 0),
+        date: settlement.date || '',
+        notes: String(settlement.notes || '').trim(),
+        createdAt: settlement.createdAt || new Date().toISOString(),
+      }))
+      .filter((settlement) => (
+        settlement.fromParticipantId
+        && settlement.toParticipantId
+        && settlement.fromParticipantId !== settlement.toParticipantId
+        && settlement.amount > 0
+      ));
   }
 
   #normalizeChecklist(checklist) {

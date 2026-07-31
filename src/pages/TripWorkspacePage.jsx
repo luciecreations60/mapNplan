@@ -11,6 +11,7 @@ import { NotesPanel } from '../components/tripWorkspace/NotesPanel.jsx';
 import { OverviewPanel } from '../components/tripWorkspace/OverviewPanel.jsx';
 import { ReservationsPanel } from '../components/tripWorkspace/ReservationsPanel.jsx';
 import { RouteOptimizerPanel } from '../components/tripWorkspace/RouteOptimizerPanel.jsx';
+import { SharedExpensesPanel } from '../components/tripWorkspace/SharedExpensesPanel.jsx';
 import { StatisticsPanel } from '../components/tripWorkspace/StatisticsPanel.jsx';
 import { TravelToolsPanel } from '../components/tripWorkspace/TravelToolsPanel.jsx';
 import { TripHero } from '../components/tripWorkspace/TripHero.jsx';
@@ -84,6 +85,7 @@ export function TripWorkspacePage() {
         {activeTab === 'tools' && <TravelToolsPanel trip={trip} onOpenTab={handleTabChange} />}
         {activeTab === 'reservations' && <ReservationsPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'budget' && <BudgetPanel trip={trip} onUpdate={handleUpdate} />}
+        {activeTab === 'expenses' && <SharedExpensesPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'statistics' && <StatisticsPanel trip={trip} />}
         {activeTab === 'checklist' && <ChecklistPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'documents' && <DocumentsPanel trip={trip} onUpdate={handleUpdate} />}
