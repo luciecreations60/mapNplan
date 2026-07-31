@@ -3,10 +3,11 @@ import { DEMO_TRIPS } from '../../data/demoTrips.js';
 import { createId } from '../../utils/id.js';
 import { hasValidCoordinates } from '../../utils/map.js';
 import { normalizeExternalUrl } from '../../utils/url.js';
+import { normalizeCompanionSettings } from '../../utils/travelCompanion.js';
 import { localStorageService } from '../storage/LocalStorageService.js';
 
 const STORAGE_KEY = 'trips';
-const CURRENT_TRIP_SCHEMA_VERSION = 10;
+const CURRENT_TRIP_SCHEMA_VERSION = 11;
 
 /**
  * Trip repository façade.
@@ -59,6 +60,7 @@ class TripService {
       documents: [],
       notes: '',
       collaboration: null,
+      companion: null,
       destinationCurrency: payload.destinationCurrency || payload.currency || APP_CONFIG.defaultCurrency,
     });
 
@@ -110,7 +112,7 @@ class TripService {
         ...day,
         id: createId('day'),
         routePlan: this.#normalizeRoutePlan(null),
-        items: day.items.map((item) => ({ ...item, id: createId('activity'), comments: [] })),
+        items: day.items.map((item) => ({ ...item, id: createId('activity'), completedAt: null, comments: [] })),
       })),
       travelParty: duplicatedTravelParty,
       expenses: sourceTrip.expenses.map((expense) => ({
@@ -140,6 +142,10 @@ class TripService {
         id: createId('document'),
         createdAt: now,
       })),
+      companion: {
+        ...sourceTrip.companion,
+        lastPreparedAt: null,
+      },
       collaboration: {
         members: [{
           id: createId('member'),
@@ -250,6 +256,7 @@ class TripService {
     const itinerary = this.#normalizeItinerary(trip.itinerary);
     const reservations = this.#normalizeReservations(trip.reservations);
     const documents = this.#normalizeDocuments(trip.documents);
+    const companion = normalizeCompanionSettings(trip.companion);
     const calculatedSpent = expenses
       .reduce((sum, expense) => sum + expense.paidAmount, 0);
     const checklistCompleted = checklist.filter((item) => item.completed).length;
@@ -290,6 +297,7 @@ class TripService {
       checklist,
       reservations,
       documents,
+      companion,
       collaboration,
       archivedAt: trip.archivedAt || null,
       isFavorite: Boolean(trip.isFavorite),
@@ -448,6 +456,7 @@ class TripService {
               durationMinutes: Math.max(0, Number(item.durationMinutes) || 0),
               estimatedCost: Math.max(0, Number(item.estimatedCost) || 0),
               notes: String(item.notes || '').trim(),
+              completedAt: item.completedAt || null,
               comments: this.#normalizeComments(item.comments),
             }))
           : [],
