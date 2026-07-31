@@ -1,4 +1,4 @@
-# TripFlow — V0.1.10
+# TripFlow — V0.1.11
 
 > Temporary product code name — *Every journey starts here.*
 
@@ -18,7 +18,7 @@ React and Vite and deployed at zero infrastructure cost through GitHub Pages.
 - read-only sharing and local collaboration;
 - French/English interface and PWA foundation.
 
-## Part 11 highlight
+## Part 12 highlight
 
 Open a trip and select **Group expenses** to record who paid, split costs,
 manage partial payments and calculate the smallest set of reimbursements needed
@@ -44,3 +44,9 @@ the GitHub Actions workflow.
 
 All user data is currently stored in browser LocalStorage. Use **Settings →
 Backup and restore** to move or protect data before clearing browser storage.
+
+## V0.1.11 highlights
+
+- Chrome-safe responsive itinerary actions.
+- Focused workspace tab navigation.
+- Travel-day companion with daily agenda, quick files, expenses and emergency information.

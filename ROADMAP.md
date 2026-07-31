@@ -10,22 +10,15 @@
 - Part 10: local itinerary optimisation and route estimates.
 - Part 11: group expenses, partial payments, traveller balances, settlements and
   CSV export.
+- Part 12: Chrome workspace corrections and travel-day companion.
 
 ## Next planned milestones
 
-### Part 12 — Travel-day companion
-
-- focused “Today” mode;
-- current and next activity;
-- quick access to tickets and reservations;
-- offline-friendly daily plan;
-- expense quick-add;
-- practical alerts and emergency information.
-
 ### Part 13 — Discovery and reusable templates
 
-- destination templates;
-- reusable checklist and itinerary templates;
+- destination starter templates;
+- reusable checklist templates;
+- reusable itinerary templates;
 - richer Explore page;
 - trip creation from a template.
 
@@ -36,10 +29,17 @@
 - Supabase schema proposal;
 - remote/local synchronization strategy.
 
-### Later commercial milestones
+### Part 15 — Commercial preparation
 
 - affiliate provider configuration;
-- SEO destination content;
+- non-intrusive booking call-to-actions;
+- click attribution boundary;
+- SEO destination page structure;
+- consent and privacy preparation.
+
+## Later milestones
+
 - optional premium features;
 - AI itinerary assistance;
-- real-time collaboration.
+- real-time collaboration;
+- native mobile packaging if validated by usage.

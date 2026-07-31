@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.11] - 2026-07-31
+
+### Added
+
+- Travel-day companion with daily agenda and current/next activity.
+- Activity completion states.
+- Quick access to reservations and documents.
+- Quick paid-expense entry.
+- Practical daily alerts and locally stored emergency information.
+
+### Fixed
+
+- Itinerary action buttons overflowing to the right in Chrome.
+- Workspace tab changes returning to the large trip header.
+- Edit actions scrolling to the page top instead of their form.
+
+
 ## [0.1.10] — 2026-07-31
 
 ### Added

@@ -1,67 +1,61 @@
-# V0.1 — Part 11 delivery notes
+# V0.1 — Part 12 delivery notes
 
 ## Release
 
-- Application version: `0.1.10`
-- Data schema: `10`
+- Application version: `0.1.11`
+- Data schema: `11`
 - Delivery date: `2026-07-31`
 
 ## Purpose
 
-Part 11 introduces a finance layer designed for real group travel. The existing
-Budget tab remains the high-level planning view. The new **Group expenses** tab
-handles actual payments, partial provider payments, cost splitting and traveller
-reimbursements.
+Part 12 corrects two cross-browser workspace issues and introduces the first
+travel-day companion. The workspace now keeps the horizontal tab bar as the
+navigation reference when changing sections, while activity actions remain
+inside their cards on Chrome, Safari, tablets and phones.
 
-## Main additions
+## Cross-browser corrections
 
-- Independent travel-party list for finance calculations.
-- Planned, partially paid and fully paid expense states.
-- Payer selection and multi-person cost splitting.
-- Pure balance engine: persisted totals are never trusted or duplicated.
-- Simplified reimbursement suggestions.
-- Manual reimbursement history.
-- Participant, category, status and text filters.
-- CSV export compatible with common spreadsheet applications.
-- Responsive desktop, tablet and mobile layouts.
-- Complete French and English interface copy.
+- Chrome-safe activity action layout with flexible wrapping.
+- No action button can overflow to the right of an itinerary card.
+- Tab changes scroll to the horizontal workspace navigation instead of the
+  large trip header.
+- Editing an activity, reservation or document scrolls directly to its form.
+- Sticky tabs preserve their active item in the visible horizontal area.
+
+## Travel-day companion
+
+The new **Today / Aujourd’hui** tab provides:
+
+- a selectable travel date;
+- current and next activity;
+- completion state for itinerary activities;
+- a compact daily timeline;
+- quick access to same-day reservations and travel documents;
+- local/offline availability information;
+- practical alerts for pending or cancelled reservations, unmapped places,
+  busy days and departure checklist gaps;
+- quick entry of a paid expense, optionally shared between all travellers;
+- locally stored emergency contact, insurance and essential medical notes.
 
 ## Data migration
 
-Schema 10 is non-destructive.
-
-Existing expenses receive:
-
-- `paidAmount` from the legacy `paid` flag;
-- a default payer;
-- a split across all trip travellers;
-- an empty note.
-
-Existing trips receive:
-
-- `travelParty` generated from collaboration members and traveller count;
-- `settlements: []`.
-
-## Important calculation rule
-
-Group balances use the amount that has actually been paid (`paidAmount`), not
-the full planned cost. A partially paid hotel therefore affects traveller
-balances only for the portion already advanced.
+Schema 11 is non-destructive. Existing activities receive `completedAt: null`
+and existing trips receive a normalized `companion` object. No trip, expense,
+reservation, document or note is removed.
 
 ## Files added
 
-- `src/components/tripWorkspace/SharedExpensesPanel.jsx`
-- `src/utils/sharedExpenses.js`
+- `src/components/tripWorkspace/TodayPanel.jsx`
+- `src/utils/travelCompanion.js`
 
 ## Main files updated
 
-- `src/services/trips/TripService.js`
-- `src/components/tripWorkspace/BudgetPanel.jsx`
-- `src/components/tripWorkspace/TripTabs.jsx`
 - `src/pages/TripWorkspacePage.jsx`
-- `src/utils/tripWorkspace.js`
-- `src/utils/tripStatistics.js`
+- `src/components/tripWorkspace/TripTabs.jsx`
+- `src/components/tripWorkspace/ItineraryPanel.jsx`
+- `src/components/tripWorkspace/ReservationsPanel.jsx`
+- `src/components/tripWorkspace/DocumentsPanel.jsx`
+- `src/services/trips/TripService.js`
 - `src/i18n/translations.js`
 - `src/styles/pages.css`
-- `src/config/app.config.js`
-- version and documentation files
+- version, PWA and documentation files
