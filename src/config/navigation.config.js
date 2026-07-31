@@ -5,6 +5,7 @@
 export const PRIMARY_NAVIGATION = Object.freeze([
   { labelKey: 'nav.dashboard', path: '/dashboard', icon: 'dashboard' },
   { labelKey: 'nav.trips', path: '/trips', icon: 'trips' },
+  { labelKey: 'nav.templates', path: '/templates', icon: 'copy' },
   { labelKey: 'nav.explore', path: '/explore', icon: 'explore' },
 ]);
 

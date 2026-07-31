@@ -7,6 +7,7 @@ import { NotFoundPage } from './pages/NotFoundPage.jsx';
 import { PrintTripPage } from './pages/PrintTripPage.jsx';
 import { SharedTripPage } from './pages/SharedTripPage.jsx';
 import { SettingsPage } from './pages/SettingsPage.jsx';
+import { TemplatesPage } from './pages/TemplatesPage.jsx';
 import { TripWorkspacePage } from './pages/TripWorkspacePage.jsx';
 import { TripsPage } from './pages/TripsPage.jsx';
 
@@ -28,6 +29,7 @@ export default function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/trips" element={<TripsPage />} />
             <Route path="/trips/:tripId" element={<TripWorkspacePage />} />
+            <Route path="/templates" element={<TemplatesPage />} />
             <Route path="/explore" element={<ExplorePage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<NotFoundPage />} />

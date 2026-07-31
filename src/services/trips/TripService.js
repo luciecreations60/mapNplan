@@ -7,7 +7,7 @@ import { normalizeCompanionSettings } from '../../utils/travelCompanion.js';
 import { localStorageService } from '../storage/LocalStorageService.js';
 
 const STORAGE_KEY = 'trips';
-const CURRENT_TRIP_SCHEMA_VERSION = 12;
+const CURRENT_TRIP_SCHEMA_VERSION = 13;
 
 /**
  * Trip repository façade.
@@ -225,6 +225,8 @@ class TripService {
       destinationLongitude: Object.hasOwn(trip, 'destinationLongitude')
         ? trip.destinationLongitude
         : this.#findLegacyDestinationCoordinate(trip, 'longitude'),
+      sourceTemplateId: Object.hasOwn(trip, 'sourceTemplateId') ? trip.sourceTemplateId : null,
+      sourceTemplateName: Object.hasOwn(trip, 'sourceTemplateName') ? trip.sourceTemplateName : '',
     };
 
     if (!demoTrip) return migratedTrip;
@@ -290,6 +292,8 @@ class TripService {
         : Math.max(0, Number(trip.checklistTotal) || 0),
       accent: ['violet', 'aqua', 'coral'].includes(trip.accent) ? trip.accent : 'violet',
       summary: String(trip.summary || '').trim(),
+      sourceTemplateId: trip.sourceTemplateId ? String(trip.sourceTemplateId) : null,
+      sourceTemplateName: String(trip.sourceTemplateName || '').trim(),
       notes: String(trip.notes || ''),
       itinerary,
       expenses,
