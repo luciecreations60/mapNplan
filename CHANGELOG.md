@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.1.10] — 2026-07-31
+
+### Added
+
+- Group expense workspace with traveller-specific balances.
+- Partial provider payments and expense payment progress.
+- Expense payer and multi-person split selection.
+- Simplified reimbursement suggestions and settlement history.
+- Traveller management for financial participation.
+- Search and filters for the detailed expense ledger.
+- UTF-8 CSV expense export.
+- Schema 10 migration for finance participants and settlements.
+
+### Changed
+
+- Paid totals now use `paidAmount` instead of only the legacy boolean flag.
+- Budget quick-add creates finance-compatible expenses.
+- Trip duplication remaps all participant references.
+- Service-worker cache updated to `tripflow-v0.1.10`.
+
 ## [0.1.9] — 2026-07-31
 
 ### Added

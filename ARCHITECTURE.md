@@ -1,118 +1,89 @@
-# Architecture — V0.1.9
+# Architecture — V0.1.10
 
-## Goals
+## Finance domain introduced in Part 11
 
-TripFlow separates interface composition, domain behaviour, persistence, localization and external providers. The current application remains static and free to host while preparing for accounts, cloud synchronization, commercial providers, affiliations and artificial intelligence.
-
-## Dependency direction
-
-```text
-Pages and components
-        ↓
-Contexts and hooks
-        ↓
-Domain / provider services
-        ↓
-Storage, HTTP and future backend adapters
-```
-
-React components never access LocalStorage or remote provider endpoints directly.
-
-## Main boundaries
-
-- `components/`: reusable interface and feature components.
-- `config/`: branding, features, languages and provider parameters.
-- `contexts/`: React state backed by application services.
-- `hooks/`: stable component-facing APIs.
-- `i18n/`: central interface translations.
-- `pages/`: route-level composition.
-- `services/`: persistence, data portability and provider adapters.
-- `styles/`: tokens, global rules, layouts and feature styling.
-- `utils/`: deterministic validation, routing, formatting and aggregation helpers.
-
-## Trip aggregate
+The finance implementation keeps persisted source data separate from derived
+calculations.
 
 ```text
 Trip
-├── itinerary[]
-│   ├── day.routePlan
-│   └── day.items[]
-│       ├── latitude / longitude
-│       ├── durationMinutes
-│       └── comments[]
-├── expenses[]
-├── checklist[]
-├── reservations[]
-├── documents[]
-├── collaboration
-├── destination coordinates
-├── currencies
-└── lifecycle metadata
+├── budget                  Planned maximum for the whole trip
+├── expenses[]              Provider expenses and payment progress
+├── travelParty[]           People participating in expense splits
+└── settlements[]           Reimbursements made between travellers
 ```
 
-Every nested record owns a stable identifier. `TripService` normalizes the complete aggregate and stores a `schemaVersion`.
+### Expense shape
 
-## Route-planning boundary
-
-```text
-RouteOptimizerPanel
-        ↓
-RoutePlanningService
-        ↓
-Local route-estimation engine
+```js
+{
+  id,
+  label,
+  category,
+  amount,                   // planned provider amount
+  paidAmount,               // amount actually advanced so far
+  paid,                     // compatibility/derived full-payment flag
+  date,
+  paidById,                 // traveller who advanced the money
+  splitBetweenIds,          // travellers sharing the paid amount
+  notes
+}
 ```
 
-`RoutePlanningService` exposes a stable contract:
+### Traveller shape
 
-- `analyse(day, mode)`
-- `optimize(day, options)`
-- `restore(day)`
-- `move(day, activityId, direction)`
-- `getMapPoints(day)`
-
-The current engine uses the Haversine distance, configurable distance multipliers and average speeds. This keeps V0.1 free and deterministic. A future routing provider such as OSRM, GraphHopper or Mapbox can replace the service implementation without rewriting the workspace.
-
-Configuration lives in `src/config/routing.config.js`. UI components contain no provider URL, speed or warning threshold.
-
-## Route-plan persistence
-
-Each itinerary day contains:
-
-```text
-routePlan
-├── mode
-├── startStrategy
-├── startTime
-├── optimizedAt
-├── previousOrder[]
-├── previousTimes{}
-├── manuallyOrderedAt
-├── estimatedDistanceKm
-└── estimatedTravelMinutes
+```js
+{
+  id,
+  name,
+  email,
+  isCurrentUser,
+  createdAt
+}
 ```
 
-Before optimization, the current activity order and times are saved. Undo restores those values. Editing, deleting or manually moving an activity invalidates stale route estimates.
+### Settlement shape
 
-## Schema migration
+```js
+{
+  id,
+  fromParticipantId,
+  toParticipantId,
+  amount,
+  date,
+  notes,
+  createdAt
+}
+```
 
-Current trip schema: `9`.
+## Calculation boundary
 
-1. Summary fields
-2. Itinerary, expenses, checklist and notes
-3. Reservations, documents and coordinates
-4. Destination currency and travel tools
-5. Archive lifecycle
-6. Favorites and pinned trips
-7. Collaboration, comments and privacy-aware sharing
-8. Explicit destination coordinates
-9. Route planning, reversible optimization and manual ordering
+`src/utils/sharedExpenses.js` contains pure functions for:
 
-Migration is non-destructive. Existing activity order is preserved.
+- payment status;
+- equal-share allocation with cent-safe rounding;
+- participant balances;
+- simplified reimbursement suggestions;
+- finance summaries;
+- CSV generation.
 
-## Responsive architecture
+No balance is persisted. Every total is recalculated from expenses and
+settlements, preventing stale or contradictory data.
 
-Desktop uses a grid shell with a sticky sidebar. Tablet and mobile use a single-column layout with an off-canvas navigation drawer. Route controls collapse from five columns to two and then one; map and segment panels stack below 960 px.
+## Persistence boundary
 
-## Localization
+`TripService` remains the only persistence façade. It normalizes legacy data,
+validates participant references and migrates schema 9 to schema 10 without
+removing user content.
 
-Interface copy is stored in `src/i18n/translations.js`. French and English share identical keys. User-created content is never translated automatically.
+## Future backend compatibility
+
+The current structures map directly to relational entities:
+
+- `trip_participants`;
+- `expenses`;
+- `expense_participants`;
+- `settlements`.
+
+The React components do not access LocalStorage and therefore will not require a
+UI rewrite when Supabase or another backend is introduced.

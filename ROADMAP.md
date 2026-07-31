@@ -1,66 +1,45 @@
 # Product roadmap
 
-## V0.1 — Complete local travel workspace
+## Delivered V0.1 foundation
 
-### Parts 1–9
+- Parts 1–5: architecture, dashboard, trip workspace, maps, tools, backups,
+  responsive design and bilingual interface.
+- Parts 6–8: full editing, lifecycle, search, reporting, sharing and local
+  collaboration.
+- Part 9: smart place autocomplete and automatic coordinates.
+- Part 10: local itinerary optimisation and route estimates.
+- Part 11: group expenses, partial payments, traveller balances, settlements and
+  CSV export.
 
-- [x] React/Vite foundation and GitHub Pages deployment
-- [x] Responsive application shell and design system
-- [x] Trip creation, editing, lifecycle and local persistence
-- [x] Itinerary, calendar, map, reservations and documents
-- [x] Budget, checklist, notes and statistics
-- [x] Weather, local time and currency conversion
-- [x] French/English localization
-- [x] Search, favorites, PDF reporting and backups
-- [x] Local collaboration and privacy-aware sharing
-- [x] Smart place search and automatic coordinates
+## Next planned milestones
 
-### Part 10 — Route optimization
+### Part 12 — Travel-day companion
 
-- [x] Replaceable route-planning service boundary
-- [x] Walking, cycling, driving and transit estimates
-- [x] Distance and travel-time calculation
-- [x] Nearest-neighbour day optimization
-- [x] Automatic schedule recalculation
-- [x] Reversible optimization
-- [x] Manual activity ordering
-- [x] Route map and segment preview
-- [x] Workload and missing-coordinate warnings
-- [x] Schema 9 migration
+- focused “Today” mode;
+- current and next activity;
+- quick access to tickets and reservations;
+- offline-friendly daily plan;
+- expense quick-add;
+- practical alerts and emergency information.
 
-### V0.1 finishing work
+### Part 13 — Discovery and reusable templates
 
-- [ ] Full accessibility and keyboard-navigation audit
-- [ ] Automated unit-test suite in GitHub Actions
-- [ ] Empty/loading/error-state consistency pass
-- [ ] Performance and Lighthouse audit
-- [ ] Final temporary-brand visual review
+- destination templates;
+- reusable checklist and itinerary templates;
+- richer Explore page;
+- trip creation from a template.
 
-## V0.2 — Discovery and advanced routing
+### Part 14 — Backend preparation
 
-- [ ] Place-result preview on the map
-- [ ] Real routing-provider adapter
-- [ ] Live traffic and public-transport provider study
-- [ ] Drag-and-drop itinerary ordering
-- [ ] Map/timeline synchronization
-- [ ] Opening hours and visit-duration suggestions
-- [ ] Destination content model
-- [ ] Offline map strategy study
+- repository interfaces;
+- authentication boundary;
+- Supabase schema proposal;
+- remote/local synchronization strategy.
 
-## V0.3 — Accounts and synchronization
+### Later commercial milestones
 
-- [ ] Authentication
-- [ ] Cloud trip repository
-- [ ] Secure document storage
-- [ ] Sharing permissions
-- [ ] Real-time collaborative editing
-- [ ] Reservation email-import preparation
-
-## V0.4 — Monetization foundation
-
-- [ ] Affiliate provider configuration
-- [ ] Hotel, flight, activity, insurance and eSIM calls to action
-- [ ] Conversion event tracking
-- [ ] SEO destination and itinerary pages
-- [ ] Consent and analytics controls
-- [ ] Premium-plan feature model
+- affiliate provider configuration;
+- SEO destination content;
+- optional premium features;
+- AI itinerary assistance;
+- real-time collaboration.

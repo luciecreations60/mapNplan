@@ -1,61 +1,46 @@
-# TripFlow — V0.1.9
+# TripFlow — V0.1.10
 
-> Every journey starts here.
+> Temporary product code name — *Every journey starts here.*
 
-TripFlow is a responsive travel-planning web application built with React and Vite. The current version runs entirely in the browser, stores trips locally and deploys for free through GitHub Pages.
+TripFlow is a responsive, bilingual travel-planning web application built with
+React and Vite and deployed at zero infrastructure cost through GitHub Pages.
 
-## Current capabilities
+## Available features
 
-- Dashboard and trip library
-- Trip creation, editing, duplication, archive and favorites
-- Day-by-day itinerary with mapped locations
-- Local route optimization with transport-mode estimates
-- Calendar, map, reservations, budget, checklist, notes and documents
-- Weather, local time and currency conversion
-- Global search and printable/PDF travel report
-- Read-only sharing snapshots and local collaboration metadata
-- French and English interface with browser-language detection
-- JSON backup and restore
-- PWA foundation and automated GitHub Pages deployment
+- dashboard and trip lifecycle;
+- itinerary, calendar and route optimisation;
+- OpenStreetMap map and place autocomplete;
+- reservations, documents, checklist and notes;
+- weather, local time and currency tools;
+- budget planning and group expense splitting;
+- traveller balances and reimbursements;
+- search, statistics, printing and JSON backup;
+- read-only sharing and local collaboration;
+- French/English interface and PWA foundation.
 
-## Development
+## Part 11 highlight
+
+Open a trip and select **Group expenses** to record who paid, split costs,
+manage partial payments and calculate the smallest set of reimbursements needed
+to settle the group.
+
+## Local development
 
 ```bash
 npm install
 npm run dev
 ```
 
-Production build:
+## Production build
 
 ```bash
 npm run build
 ```
 
-## Repository structure
+The generated application is written to `dist/` and deployed automatically by
+the GitHub Actions workflow.
 
-```text
-src/
-├── components/       Reusable UI and feature components
-├── config/           Central application and provider configuration
-├── contexts/         React application state boundaries
-├── data/             Demonstration data
-├── hooks/            Component-facing APIs
-├── i18n/             French and English interface copy
-├── layouts/          Application shell
-├── pages/            Route-level composition
-├── services/         Persistence and provider adapters
-├── styles/           Design tokens, layouts and feature styles
-└── utils/            Pure domain and formatting helpers
-```
+## Data
 
-## Data and privacy
-
-V0.1 stores data in the browser through LocalStorage. No account or backend is required. Clearing browser storage removes local trips unless a JSON backup has been exported.
-
-## Deployment
-
-The workflow in `.github/workflows/deploy.yml` builds and publishes the application to GitHub Pages after every push to `main`.
-
-## Project status
-
-This is a product-development foundation. The temporary brand name can be replaced centrally through `project.config.js` when the final commercial name is selected.
+All user data is currently stored in browser LocalStorage. Use **Settings →
+Backup and restore** to move or protect data before clearing browser storage.
