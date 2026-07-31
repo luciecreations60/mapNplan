@@ -2,7 +2,7 @@
 
 > Every journey starts here.
 
-TripFlow is the temporary code name for a modern travel-planning application. Version `0.1.7` provides a complete local workspace with itinerary, map, reservations, budget, checklist, documents, notes and practical travel tools. The interface is responsive and available in French and English.
+TripFlow is the temporary code name for a modern travel-planning application. Version `0.1.8` provides a complete local workspace with itinerary, map, reservations, budget, checklist, documents, notes and practical travel tools. The interface is responsive and available in French and English.
 
 ## Included
 
@@ -36,6 +36,8 @@ TripFlow is the temporary code name for a modern travel-planning application. Ve
 - Planning, budget and readiness statistics
 - Printable full-trip report with browser PDF export
 - Day-by-day itinerary with activity edition
+- Search-as-you-type place selection for destinations, activities and reservations
+- Automatic coordinate capture from selected places
 - Interactive Leaflet/OpenStreetMap map
 - Editable flight, accommodation, transport and activity reservations
 - Paid and planned expense tracking
@@ -91,7 +93,7 @@ A manual selection in **Settings → Language** is stored locally and takes prio
 6. Commit directly to `main`.
 7. Open **Actions** and wait for the Pages deployment to complete.
 
-Existing browser data is migrated automatically from earlier schemas to schema 7. No saved trip is reset; the migration adds collaboration, comments and sharing metadata without deleting existing content.
+Existing browser data is migrated automatically from earlier schemas to schema 8. No saved trip is reset; the migration adds collaboration, comments and sharing metadata without deleting existing content.
 
 ## Local development
 
@@ -116,9 +118,10 @@ Edit `project.config.js`. Application branding and the browser title derive from
 React components never access LocalStorage directly. They use services and contexts. A later migration to Supabase or another backend therefore does not require rewriting the workspace interface.
 
 
-## V0.1.7 highlights
+## V0.1.8 highlights
 
-- Read-only sharing links with privacy controls
-- Participants and local roles
-- Comments on activities and reservations
-- Collaboration history and local notifications
+- Search-as-you-type place autocomplete
+- Destination, activity and reservation geocoding
+- Automatic latitude and longitude capture
+- Destination coordinates reused by map, weather and local time
+- Provider abstraction ready for a private or commercial geocoder

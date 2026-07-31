@@ -72,10 +72,30 @@
 - [ ] Drag-and-drop itinerary ordering
 - [ ] Accessibility and keyboard-navigation audit
 
+
+### Part 8 — Sharing and local collaboration
+
+- [x] Privacy-aware read-only trip sharing
+- [x] Downloadable share snapshot
+- [x] Participants and local roles
+- [x] Activity and reservation discussions
+- [x] Collaboration activity log
+- [x] Local notifications
+
+### Part 9 — Smart place search
+
+- [x] Place-search service abstraction
+- [x] Search-as-you-type geocoding provider
+- [x] Destination autocomplete
+- [x] Activity and reservation place autocomplete
+- [x] Automatic coordinate capture
+- [x] Search debounce, cancellation and cache
+- [x] Keyboard-accessible result list
+- [x] Destination map and travel-tool integration
+- [x] Schema 8 migration
+
 ## V0.2 — Place discovery and intelligent routing
 
-- [ ] Place-search service abstraction
-- [ ] Geocoding provider
 - [ ] Search result preview on map
 - [ ] Route duration estimates
 - [ ] Map and timeline synchronisation
@@ -109,17 +129,10 @@
 - Travel journal and shareable recap
 
 
-## Completed in V0.1.7
-
-- [x] Read-only trip sharing
-- [x] Privacy-filtered share snapshots
-- [x] Participant and role model
-- [x] Activity and reservation discussions
-- [x] Local activity log and notifications
-
 ## Next recommended milestone
 
-- Account/authentication abstraction
-- Remote persistence adapter
-- Real-time collaboration
-- Invitation delivery and revocation
+- Drag-and-drop itinerary ordering
+- Search-result preview directly on the map
+- Route duration and distance estimates
+- Accessibility and keyboard-navigation audit
+- Production geocoder-provider strategy

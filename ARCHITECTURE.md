@@ -1,4 +1,4 @@
-# Architecture — V0.1.7
+# Architecture — V0.1.8
 
 ## Goals
 
@@ -91,7 +91,7 @@ Every nested record owns a stable identifier. `TripService` normalises the compl
 
 ## Schema migration
 
-The current trip schema version is `7`.
+The current trip schema version is `8`.
 
 - Schema 1: trip summary fields.
 - Schema 2: itinerary, expenses, checklist and notes.
@@ -100,8 +100,9 @@ The current trip schema version is `7`.
 - Schema 5: reversible archive lifecycle through `archivedAt`.
 - Schema 6: local-library preferences through `isFavorite` and `pinnedAt`.
 - Schema 7: participants, role metadata, comments, activity history and privacy-aware sharing.
+- Schema 8: explicit destination latitude and longitude for geocoding and travel tools.
 
-Migration is non-destructive. Existing records receive a local owner, empty discussion arrays and collaboration metadata; all existing identifiers and user content remain unchanged.
+Migration is non-destructive. Existing records receive destination coordinates from the first already mapped activity or reservation when available; all identifiers and user content remain unchanged.
 
 
 ## Editing and lifecycle boundary
@@ -161,6 +162,35 @@ TravelToolsPanel
 ```
 
 Provider URLs and limits live in `external-services.config.js`. Replacing Open-Meteo or Frankfurter does not require changes to workspace components.
+
+
+
+## Place-search boundary
+
+```text
+LocationAutocomplete
+        ↓
+GeocodingService
+        ↓
+HttpService + ResponseCacheService
+        ↓
+Configurable Photon endpoint
+```
+
+`LocationAutocomplete` is an accessible controlled combobox shared by trip,
+itinerary and reservation forms. It applies a debounce, cancels stale requests,
+supports keyboard selection and preserves manual text entry.
+
+`GeocodingService` converts provider-specific GeoJSON into a stable application
+place model. Components only receive labels, country metadata and coordinates.
+The current public Photon demo endpoint is isolated in
+`external-services.config.js`; a self-hosted Photon instance or another provider
+can replace it without changing forms.
+
+Selected destination coordinates are stored on the trip aggregate. Activity and
+reservation selections fill their existing latitude/longitude fields. The map,
+weather and local-time tools therefore reuse one consistent coordinate model.
+
 
 ## Data portability
 

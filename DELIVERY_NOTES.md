@@ -1,33 +1,37 @@
-# V0.1 — Part 8 delivery notes
+# V0.1 — Part 9 delivery notes
 
 ## Version
 
-- Application: `0.1.7`
-- Trip schema: `7`
+- Application: `0.1.8`
+- Trip schema: `8`
 
 ## Added
 
-- Privacy-aware read-only sharing links.
-- Standalone shared trip page that does not require local trip data.
-- Downloadable `.tripflow-share.json` fallback.
-- Participants with owner, editor and viewer roles.
-- Local discussions attached to itinerary activities and reservations.
-- Language-neutral collaboration activity log.
-- Local notification centre in the top navigation.
-- Automatic migration of existing trips and nested entities.
+- Reusable search-as-you-type location combobox.
+- Destination search in the trip creation and edition dialog.
+- Location search in activity and reservation forms.
+- Automatic latitude and longitude capture.
+- Automatic country and country-code capture for trip destinations.
+- Keyboard navigation with Arrow Up, Arrow Down, Enter and Escape.
+- Debounced requests, cancellation of obsolete requests and a 24-hour cache.
+- Photon/OpenStreetMap attribution in the suggestion panel.
+- Destination marker on the map and direct reuse by weather/local-time tools.
 
-## Privacy model
+## Behaviour
 
-Shared snapshots never contain:
+Typing at least three characters starts a search after 500 ms. Selecting a
+result stores its formatted label and coordinates. The input remains editable,
+and users can ignore suggestions or enter a location manually when the provider
+is unavailable.
 
-- booking confirmation numbers;
-- document references or URLs;
-- private booking links;
-- internal discussion comments;
-- participant email addresses.
+## Architecture
 
-Budget, notes and checklist inclusion are explicitly configurable when generating a link.
+The provider is isolated behind `GeocodingService`. The public Photon endpoint
+is appropriate for prototype traffic only. A private Photon instance or another
+provider can later be configured without changing React forms.
 
-## Current limitation
+## Migration
 
-Collaboration is local in this version. Members and roles prepare the future data model, but real-time multi-device editing requires authentication and a backend planned for a later milestone.
+Schema 8 adds `destinationLatitude` and `destinationLongitude`. Older trips are
+migrated non-destructively; when possible, the first existing mapped activity or
+reservation supplies the initial destination coordinates.
