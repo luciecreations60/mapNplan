@@ -1,0 +1,17 @@
+{
+  "name": "TripFlow",
+  "short_name": "TripFlow",
+  "description": "Every journey starts here.",
+  "start_url": "./#/",
+  "display": "standalone",
+  "background_color": "#f5f6fb",
+  "theme_color": "#5b5ce2",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
