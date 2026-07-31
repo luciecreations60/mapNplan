@@ -1,30 +1,22 @@
-# TripFlow — V0.1.11
+# TripFlow — V0.1.12
 
-> Temporary product code name — *Every journey starts here.*
+> Every journey starts here.
 
-TripFlow is a responsive, bilingual travel-planning web application built with
-React and Vite and deployed at zero infrastructure cost through GitHub Pages.
+TripFlow is a responsive, bilingual travel-planning application built with
+React and Vite. The current release includes trip planning, maps, reservations,
+budgets, group expenses, travel-day assistance, sharing, route optimization and
+a private local document vault.
 
-## Available features
+## Local document vault
 
-- dashboard and trip lifecycle;
-- itinerary, calendar and route optimisation;
-- OpenStreetMap map and place autocomplete;
-- reservations, documents, checklist and notes;
-- weather, local time and currency tools;
-- budget planning and group expense splitting;
-- traveller balances and reimbursements;
-- search, statistics, printing and JSON backup;
-- read-only sharing and local collaboration;
-- French/English interface and PWA foundation.
+Travel documents may contain local PDF, image, text, Word or spreadsheet files.
+Metadata remains in the trip model while binary content is stored in IndexedDB,
+preventing LocalStorage quota problems.
 
-## Part 12 highlight
+Files can be previewed, downloaded, renamed, deleted and included in portable
+JSON backups. They are never added to read-only public share links.
 
-Open a trip and select **Group expenses** to record who paid, split costs,
-manage partial payments and calculate the smallest set of reimbursements needed
-to settle the group.
-
-## Local development
+## Run locally
 
 ```bash
 npm install
@@ -37,16 +29,4 @@ npm run dev
 npm run build
 ```
 
-The generated application is written to `dist/` and deployed automatically by
-the GitHub Actions workflow.
-
-## Data
-
-All user data is currently stored in browser LocalStorage. Use **Settings →
-Backup and restore** to move or protect data before clearing browser storage.
-
-## V0.1.11 highlights
-
-- Chrome-safe responsive itinerary actions.
-- Focused workspace tab navigation.
-- Travel-day companion with daily agenda, quick files, expenses and emergency information.
+GitHub Actions deploys the generated `dist` directory to GitHub Pages.

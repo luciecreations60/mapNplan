@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.12] - 2026-07-31
+
+### Added
+
+- IndexedDB-backed local document vault.
+- PDF and image preview, download, rename and deletion.
+- Optional document-to-reservation association.
+- Attachment storage usage in Settings.
+- Backup format 2 with binary attachment export and import.
+- Attachment file-name support in global search.
+
+### Changed
+
+- Trip schema upgraded from 11 to 12.
+- Document deletion and trip deletion now clean up local binary files.
+- Service-worker cache updated to `tripflow-v0.1.12`.
+
 ## [0.1.11] - 2026-07-31
 
 ### Added

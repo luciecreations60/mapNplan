@@ -1,70 +1,63 @@
-# Architecture — V0.1.11
+# Architecture — V0.1.12
 
-## Workspace navigation behaviour
+## Data boundaries
 
-`TripWorkspacePage` owns the active tab and a reference to the horizontal tab
-bar. A tab change sets a one-shot focus request. After React renders the target
-panel, the tab bar is scrolled to the top of the content viewport and the active
-button is centred horizontally when required.
+### Trip domain data
 
-This replaces global `window.scrollTo(0, 0)` calls and keeps the large trip hero
-out of the way during normal workspace navigation.
+Trip metadata, itinerary, reservations, expenses, document records and file
+metadata are normalized by `TripService` and persisted through
+`LocalStorageService`.
 
-Editing forms use local scroll anchors. Activity, reservation and document
-components therefore scroll only to their own form.
+### Binary attachments
 
-## Chrome-safe activity layout
+`AttachmentStorageService` stores `Blob` values in IndexedDB. Each record is
+indexed by `tripId` and `documentId` and contains:
 
-Activity cards use named CSS grid areas:
+- file identifier;
+- trip and document identifiers;
+- optional reservation identifier;
+- name, MIME type, size and timestamps;
+- the binary `Blob`.
 
-```text
-Desktop
-┌────────┬──────┬─────────────────────────┐
-│ time   │ icon │ content                 │
-├────────┴──────┼─────────────────────────┤
-│               │ actions (flex/wrapping) │
-└───────────────┴─────────────────────────┘
+React components never access IndexedDB directly. They call the storage service,
+which can later be replaced by Supabase Storage, S3 or another provider.
+
+## Document model
+
+Each trip document now contains:
+
+```js
+{
+  id,
+  type,
+  title,
+  reference,
+  url,
+  expiryDate,
+  notes,
+  linkedReservationId,
+  attachments: [{ id, name, type, size, lastModified, createdAt, updatedAt }]
+}
 ```
 
-The action group no longer occupies a fixed 34 px column. It is constrained by
-the content track and wraps without overflowing.
+The metadata allows rendering and searching without reading binary values.
 
-## Travel-day companion domain
+## Backup format 2
 
-```text
-Trip
-├── itinerary[].items[].completedAt
-└── companion
-    ├── localEmergencyNumber
-    ├── emergencyContactName
-    ├── emergencyContactPhone
-    ├── insuranceProvider
-    ├── insurancePolicyNumber
-    ├── medicalNotes
-    └── lastPreparedAt
-```
+`DataPortabilityService` exports trips and attachment records. Binary values are
+encoded as data URLs only during export. Version 1 backups remain importable and
+produce an empty attachment collection.
 
-`src/utils/travelCompanion.js` contains pure functions for:
+## Privacy rules
 
-- choosing the initial travel date;
-- selecting activities and reservations for one day;
-- identifying current and next activities;
-- deriving practical alerts;
-- normalizing companion information.
+- Public share snapshots do not contain documents or binary files.
+- Local attachments remain in the current browser profile.
+- Deletion and reset operations clean up IndexedDB records.
+- Imported backups replace both trips and the local file vault atomically at the
+  application workflow level.
 
-`TodayPanel` composes these derived values but persists only source data through
-`TripContext` and `TripService`.
+## Future backend migration
 
-## Offline boundary
-
-The companion does not create a second copy of trip data. It reads the same
-LocalStorage-backed trip model already available to the PWA. The service worker
-caches application assets, while itinerary and personal information remain in
-the existing storage adapter. A future IndexedDB or remote repository can
-replace that adapter without changing the panel.
-
-## Safety boundary
-
-No emergency number is guessed by the application. The user stores a verified
-number for the destination. The interface explicitly states that personal notes
-do not replace official travel or medical advice.
+The attachment service boundary maps directly to a future object-storage API.
+Only the service implementation and synchronization orchestration should need
+to change; document components and domain metadata can remain stable.

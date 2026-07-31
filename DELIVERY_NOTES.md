@@ -1,61 +1,35 @@
-# V0.1 — Part 12 delivery notes
+# V0.1 — Part 13 delivery notes
 
-## Release
+## Version
 
-- Application version: `0.1.11`
-- Data schema: `11`
-- Delivery date: `2026-07-31`
+- Application: `0.1.12`
+- Trip schema: `12`
+- Backup format: `2`
 
-## Purpose
+## Added
 
-Part 12 corrects two cross-browser workspace issues and introduces the first
-travel-day companion. The workspace now keeps the horizontal tab bar as the
-navigation reference when changing sections, while activity actions remain
-inside their cards on Chrome, Safari, tablets and phones.
+- Local document vault backed by IndexedDB.
+- PDF, image, text, Word and spreadsheet attachments.
+- Maximum size of 15 MB per file.
+- Multiple-file upload, limited to five files per selection.
+- Image and PDF preview inside the application.
+- Download, rename and deletion actions.
+- Optional link between a document and a reservation.
+- File metadata stored in the trip domain; binary content stored separately.
+- Storage usage summary in Settings.
+- Backup export/import including local attachments.
+- Search support for attachment file names.
 
-## Cross-browser corrections
+## Privacy and lifecycle
 
-- Chrome-safe activity action layout with flexible wrapping.
-- No action button can overflow to the right of an itinerary card.
-- Tab changes scroll to the horizontal workspace navigation instead of the
-  large trip header.
-- Editing an activity, reservation or document scrolls directly to its form.
-- Sticky tabs preserve their active item in the visible horizontal area.
+- Files stay inside the browser profile until exported.
+- Shared-trip links never contain local attachment data.
+- Deleting a document also deletes its binary files.
+- Deleting a trip removes every attachment associated with it.
+- Resetting or importing a backup clears the previous attachment vault first.
+- Duplicating a trip keeps document records but does not duplicate binary files.
 
-## Travel-day companion
+## Browser notes
 
-The new **Today / Aujourd’hui** tab provides:
-
-- a selectable travel date;
-- current and next activity;
-- completion state for itinerary activities;
-- a compact daily timeline;
-- quick access to same-day reservations and travel documents;
-- local/offline availability information;
-- practical alerts for pending or cancelled reservations, unmapped places,
-  busy days and departure checklist gaps;
-- quick entry of a paid expense, optionally shared between all travellers;
-- locally stored emergency contact, insurance and essential medical notes.
-
-## Data migration
-
-Schema 11 is non-destructive. Existing activities receive `completedAt: null`
-and existing trips receive a normalized `companion` object. No trip, expense,
-reservation, document or note is removed.
-
-## Files added
-
-- `src/components/tripWorkspace/TodayPanel.jsx`
-- `src/utils/travelCompanion.js`
-
-## Main files updated
-
-- `src/pages/TripWorkspacePage.jsx`
-- `src/components/tripWorkspace/TripTabs.jsx`
-- `src/components/tripWorkspace/ItineraryPanel.jsx`
-- `src/components/tripWorkspace/ReservationsPanel.jsx`
-- `src/components/tripWorkspace/DocumentsPanel.jsx`
-- `src/services/trips/TripService.js`
-- `src/i18n/translations.js`
-- `src/styles/pages.css`
-- version, PWA and documentation files
+IndexedDB is supported by current Chrome and Safari. Private browsing modes may
+apply stricter quotas or remove data when the session ends.
