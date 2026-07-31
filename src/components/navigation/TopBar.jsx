@@ -5,6 +5,7 @@ import { useTheme } from '../../hooks/useTheme.js';
 import { Brand } from '../common/Brand.jsx';
 import { Icon } from '../common/Icon.jsx';
 import { GlobalSearch } from './GlobalSearch.jsx';
+import { NotificationCenter } from './NotificationCenter.jsx';
 
 const ALL_NAVIGATION = [...PRIMARY_NAVIGATION, ...SECONDARY_NAVIGATION];
 
@@ -29,10 +30,7 @@ export function TopBar({ onOpenMenu }) {
 
       <div className="topbar__actions">
         <GlobalSearch />
-        <button className="icon-button" type="button" aria-label={t('nav.notifications')}>
-          <Icon name="bell" />
-          <span className="notification-dot" />
-        </button>
+        <NotificationCenter />
         <button
           className="icon-button"
           type="button"

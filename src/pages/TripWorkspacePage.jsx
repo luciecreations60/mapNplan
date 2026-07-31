@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { CollaborationPanel } from '../components/tripWorkspace/CollaborationPanel.jsx';
 import { CalendarPanel } from '../components/tripWorkspace/CalendarPanel.jsx';
 import { BudgetPanel } from '../components/tripWorkspace/BudgetPanel.jsx';
 import { ChecklistPanel } from '../components/tripWorkspace/ChecklistPanel.jsx';
@@ -85,6 +86,7 @@ export function TripWorkspacePage() {
         {activeTab === 'checklist' && <ChecklistPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'documents' && <DocumentsPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'notes' && <NotesPanel trip={trip} onUpdate={handleUpdate} />}
+        {activeTab === 'collaboration' && <CollaborationPanel trip={trip} onUpdate={handleUpdate} />}
       </div>
 
       <EditTripDialog

@@ -13,6 +13,7 @@ export const TRIP_TABS = Object.freeze([
   { id: 'checklist', labelKey: 'workspace.checklistTab', icon: 'checklist' },
   { id: 'documents', labelKey: 'workspace.documents', icon: 'folder' },
   { id: 'notes', labelKey: 'workspace.notes', icon: 'notebook' },
+  { id: 'collaboration', labelKey: 'workspace.collaboration', icon: 'users' },
 ]);
 
 export function TripTabs({ activeTab, onChange }) {

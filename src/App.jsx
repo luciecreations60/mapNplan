@@ -5,6 +5,7 @@ import { DashboardPage } from './pages/DashboardPage.jsx';
 import { ExplorePage } from './pages/ExplorePage.jsx';
 import { NotFoundPage } from './pages/NotFoundPage.jsx';
 import { PrintTripPage } from './pages/PrintTripPage.jsx';
+import { SharedTripPage } from './pages/SharedTripPage.jsx';
 import { SettingsPage } from './pages/SettingsPage.jsx';
 import { TripWorkspacePage } from './pages/TripWorkspacePage.jsx';
 import { TripsPage } from './pages/TripsPage.jsx';
@@ -21,6 +22,7 @@ export default function App() {
       <HashRouter>
         <Routes>
           <Route path="/trips/:tripId/print" element={<PrintTripPage />} />
+          <Route path="/shared" element={<SharedTripPage />} />
           <Route element={<AppLayout />}>
             <Route index element={<Navigate replace to="/dashboard" />} />
             <Route path="/dashboard" element={<DashboardPage />} />

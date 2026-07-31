@@ -3,6 +3,8 @@ import { useI18n } from '../../hooks/useI18n.js';
 import { formatCurrency } from '../../utils/currency.js';
 import { createId } from '../../utils/id.js';
 import { RESERVATION_STATUSES, RESERVATION_TYPES, getCategoryLabel } from '../../utils/tripWorkspace.js';
+import { appendActivityEntry, createActivityEntry, getCurrentActorName } from '../../utils/collaboration.js';
+import { DiscussionThread } from '../collaboration/DiscussionThread.jsx';
 import { normalizeExternalUrl } from '../../utils/url.js';
 import { Badge } from '../common/Badge.jsx';
 import { Button } from '../common/Button.jsx';
@@ -78,6 +80,7 @@ export function ReservationsPanel({ trip, onUpdate }) {
       latitude: form.latitude === '' ? null : Number(form.latitude),
       longitude: form.longitude === '' ? null : Number(form.longitude),
       notes: form.notes.trim(),
+      comments: previousReservation?.comments || [],
       createdAt: previousReservation?.createdAt || new Date().toISOString(),
     };
 
@@ -96,6 +99,23 @@ export function ReservationsPanel({ trip, onUpdate }) {
   function removeReservation(reservation) {
     if (!window.confirm(t('reservations.deleteConfirm', { name: reservation.title }))) return;
     onUpdate({ reservations: trip.reservations.filter((item) => item.id !== reservation.id) });
+  }
+
+
+  function addReservationComment(reservation, message) {
+    const actorName = getCurrentActorName(trip);
+    const comment = { id: createId('comment'), authorName: actorName, message, createdAt: new Date().toISOString() };
+    const nextReservations = trip.reservations.map((item) => item.id === reservation.id
+      ? { ...item, comments: [...item.comments, comment] }
+      : item);
+    const entry = createActivityEntry({ action: 'commentAdded', actorName, entityType: 'reservation', entityId: reservation.id, targetTitle: reservation.title });
+    onUpdate({ reservations: nextReservations, collaboration: appendActivityEntry(trip.collaboration, entry) });
+  }
+
+  function removeReservationComment(reservationId, commentId) {
+    onUpdate({ reservations: trip.reservations.map((reservation) => reservation.id === reservationId
+      ? { ...reservation, comments: reservation.comments.filter((comment) => comment.id !== commentId) }
+      : reservation) });
   }
 
   return (
@@ -175,6 +195,12 @@ export function ReservationsPanel({ trip, onUpdate }) {
                   </div>
                   {reservation.confirmationNumber && <p className="reservation-card__reference">{t('reservations.confirmation')} <strong>{reservation.confirmationNumber}</strong></p>}
                   {reservation.notes && <p className="reservation-card__notes">{reservation.notes}</p>}
+                  <DiscussionThread
+                    comments={reservation.comments}
+                    currentUserName={getCurrentActorName(trip)}
+                    onAdd={(message) => addReservationComment(reservation, message)}
+                    onRemove={(commentId) => removeReservationComment(reservation.id, commentId)}
+                  />
                   <div className="reservation-card__actions">
                     <label>
                       <span className="sr-only">{t('reservations.status')}</span>

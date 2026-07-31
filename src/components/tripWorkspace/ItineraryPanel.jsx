@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
 import { createId } from '../../utils/id.js';
 import { ACTIVITY_TYPES, getCategoryLabel } from '../../utils/tripWorkspace.js';
+import { appendActivityEntry, createActivityEntry, getCurrentActorName } from '../../utils/collaboration.js';
+import { DiscussionThread } from '../collaboration/DiscussionThread.jsx';
 import { Button } from '../common/Button.jsx';
 import { Card } from '../common/Card.jsx';
 import { Icon } from '../common/Icon.jsx';
@@ -70,6 +72,9 @@ export function ItineraryPanel({ trip, onUpdate }) {
       durationMinutes: Math.max(0, Number(form.durationMinutes) || 0),
       estimatedCost: Math.max(0, Number(form.estimatedCost) || 0),
       notes: form.notes.trim(),
+      comments: editingActivity
+        ? trip.itinerary.flatMap((day) => day.items).find((item) => item.id === editingActivity.activityId)?.comments || []
+        : [],
     };
 
     let nextItinerary = trip.itinerary.map((day) => ({ ...day, items: [...day.items] }));
@@ -100,6 +105,24 @@ export function ItineraryPanel({ trip, onUpdate }) {
     const nextItinerary = trip.itinerary
       .map((day) => day.id === dayId ? { ...day, items: day.items.filter((item) => item.id !== activity.id) } : day)
       .filter((day) => day.items.length > 0);
+    onUpdate({ itinerary: nextItinerary });
+  }
+
+
+  function addActivityComment(dayId, activity, message) {
+    const actorName = getCurrentActorName(trip);
+    const comment = { id: createId('comment'), authorName: actorName, message, createdAt: new Date().toISOString() };
+    const nextItinerary = trip.itinerary.map((day) => day.id === dayId
+      ? { ...day, items: day.items.map((item) => item.id === activity.id ? { ...item, comments: [...item.comments, comment] } : item) }
+      : day);
+    const entry = createActivityEntry({ action: 'commentAdded', actorName, entityType: 'activity', entityId: activity.id, targetTitle: activity.title });
+    onUpdate({ itinerary: nextItinerary, collaboration: appendActivityEntry(trip.collaboration, entry) });
+  }
+
+  function removeActivityComment(dayId, activityId, commentId) {
+    const nextItinerary = trip.itinerary.map((day) => day.id === dayId
+      ? { ...day, items: day.items.map((item) => item.id === activityId ? { ...item, comments: item.comments.filter((comment) => comment.id !== commentId) } : item) }
+      : day);
     onUpdate({ itinerary: nextItinerary });
   }
 
@@ -182,6 +205,12 @@ export function ItineraryPanel({ trip, onUpdate }) {
                         </small>
                       )}
                       {item.notes && <em>{item.notes}</em>}
+                      <DiscussionThread
+                        comments={item.comments}
+                        currentUserName={getCurrentActorName(trip)}
+                        onAdd={(message) => addActivityComment(day.id, item, message)}
+                        onRemove={(commentId) => removeActivityComment(day.id, item.id, commentId)}
+                      />
                     </div>
                     <div className="item-actions">
                       <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.edit')} ${item.title}`} onClick={() => openEditForm(day, item)}>
