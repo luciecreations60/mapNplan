@@ -27,6 +27,28 @@ export const ACTIVITY_TYPES = Object.freeze([
   { id: 'ticket', label: 'Activity' },
 ]);
 
+export const RESERVATION_TYPES = Object.freeze([
+  { id: 'flight', label: 'Flight' },
+  { id: 'accommodation', label: 'Accommodation' },
+  { id: 'transport', label: 'Transport' },
+  { id: 'activity', label: 'Activity' },
+]);
+
+export const RESERVATION_STATUSES = Object.freeze([
+  { id: 'confirmed', label: 'Confirmed' },
+  { id: 'pending', label: 'Pending' },
+  { id: 'cancelled', label: 'Cancelled' },
+]);
+
+export const DOCUMENT_TYPES = Object.freeze([
+  { id: 'passport', label: 'Passport' },
+  { id: 'identity', label: 'Identity' },
+  { id: 'ticket', label: 'Ticket' },
+  { id: 'booking', label: 'Booking' },
+  { id: 'insurance', label: 'Insurance' },
+  { id: 'other', label: 'Other' },
+]);
+
 export function getCategoryLabel(collection, id) {
   return collection.find((item) => item.id === id)?.label || 'Other';
 }
@@ -43,4 +65,8 @@ export function getPaidExpenseTotal(expenses = []) {
 
 export function getPlannedExpenseTotal(expenses = []) {
   return expenses.reduce((total, expense) => total + expense.amount, 0);
+}
+
+export function getConfirmedReservationCount(reservations = []) {
+  return reservations.filter((reservation) => reservation.status === 'confirmed').length;
 }

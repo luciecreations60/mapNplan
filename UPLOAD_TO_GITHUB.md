@@ -1,21 +1,17 @@
-# Upload V0.1 Part 2 to GitHub
+# Upload V0.1.2 to GitHub
 
-This archive contains the complete project, not only changed files.
-
-1. Extract the ZIP archive.
-2. Open `https://github.com/luciecreations60/travel-planner`.
-3. Select **Add file → Upload files**.
-4. Drag the contents of the extracted folder into GitHub.
-5. Confirm replacement of files that already exist.
-6. Enter the commit message:
+1. Unzip `travel-planner-v0.1-part3.zip`.
+2. Open the GitHub repository `luciecreations60/travel-planner`.
+3. Choose **Add file → Upload files**.
+4. Upload the contents of the unzipped folder, including `.github`, `public` and `src`.
+5. Allow GitHub to replace existing files.
+6. Commit directly to `main` with:
 
 ```text
-feat: add v0.1 trip workspace
+feat: add v0.1.2 maps reservations and documents
 ```
 
-7. Select **Commit directly to the main branch**.
-8. Confirm the commit.
-9. Open the **Actions** tab.
-10. Wait for **Deploy TripFlow to GitHub Pages** to show a green check.
+7. Open **Actions** and wait for a green check.
+8. Open the published site and use **Settings → Reset demo data** to load the new complete Japan example when necessary.
 
-The existing GitHub Pages configuration does not need to be changed.
+No change is required in **Settings → Pages**.

@@ -1,16 +1,19 @@
 import { APP_CONFIG } from '../../config/app.config.js';
 import { DEMO_TRIPS } from '../../data/demoTrips.js';
 import { createId } from '../../utils/id.js';
+import { hasValidCoordinates } from '../../utils/map.js';
+import { normalizeExternalUrl } from '../../utils/url.js';
 import { localStorageService } from '../storage/LocalStorageService.js';
 
 const STORAGE_KEY = 'trips';
-const CURRENT_TRIP_SCHEMA_VERSION = 2;
+const CURRENT_TRIP_SCHEMA_VERSION = 3;
 
 /**
  * Trip repository façade.
  *
- * All persistence and normalization rules are centralized here. Pages operate
- * on stable domain objects and remain independent from the storage mechanism.
+ * All persistence, migrations and normalization rules are centralized here.
+ * React pages operate on stable domain objects and remain independent from the
+ * current LocalStorage implementation.
  */
 class TripService {
   getAll() {
@@ -46,6 +49,8 @@ class TripService {
       itinerary: [],
       expenses: [],
       checklist: [],
+      reservations: [],
+      documents: [],
       notes: '',
     });
 
@@ -83,10 +88,9 @@ class TripService {
     return this.getAll();
   }
 
-
   /**
-   * Enriches the original V0.1 demonstration trips once, without overwriting
-   * collections that a user has already edited.
+   * Enriches existing demonstration trips once without overwriting collections
+   * already created or edited by the user.
    */
   #migrateLegacyTrip(trip) {
     const demoTrip = DEMO_TRIPS.find((item) => item.id === trip.id);
@@ -97,6 +101,8 @@ class TripService {
       itinerary: Object.hasOwn(trip, 'itinerary') ? trip.itinerary : demoTrip.itinerary,
       expenses: Object.hasOwn(trip, 'expenses') ? trip.expenses : demoTrip.expenses,
       checklist: Object.hasOwn(trip, 'checklist') ? trip.checklist : demoTrip.checklist,
+      reservations: Object.hasOwn(trip, 'reservations') ? trip.reservations : demoTrip.reservations,
+      documents: Object.hasOwn(trip, 'documents') ? trip.documents : demoTrip.documents,
       notes: Object.hasOwn(trip, 'notes') ? trip.notes : demoTrip.notes,
     };
   }
@@ -105,6 +111,8 @@ class TripService {
     const expenses = this.#normalizeExpenses(trip.expenses);
     const checklist = this.#normalizeChecklist(trip.checklist);
     const itinerary = this.#normalizeItinerary(trip.itinerary);
+    const reservations = this.#normalizeReservations(trip.reservations);
+    const documents = this.#normalizeDocuments(trip.documents);
     const calculatedSpent = expenses
       .filter((expense) => expense.paid)
       .reduce((sum, expense) => sum + expense.amount, 0);
@@ -137,6 +145,8 @@ class TripService {
       itinerary,
       expenses,
       checklist,
+      reservations,
+      documents,
       createdAt: trip.createdAt || new Date().toISOString(),
       updatedAt: trip.updatedAt || new Date().toISOString(),
     };
@@ -182,6 +192,8 @@ class TripService {
                 type: String(item.type || 'map').trim(),
                 title: String(item.title || 'Activity').trim(),
                 location: String(item.location || '').trim(),
+                latitude: this.#normalizeLatitude(item.latitude),
+                longitude: this.#normalizeLongitude(item.longitude),
                 durationMinutes: Math.max(0, Number(item.durationMinutes) || 0),
                 estimatedCost: Math.max(0, Number(item.estimatedCost) || 0),
                 notes: String(item.notes || '').trim(),
@@ -190,6 +202,63 @@ class TripService {
           : [],
       }))
       .sort((left, right) => left.date.localeCompare(right.date));
+  }
+
+  #normalizeReservations(reservations) {
+    if (!Array.isArray(reservations)) return [];
+
+    return reservations.map((reservation) => ({
+      id: reservation.id || createId('reservation'),
+      type: ['flight', 'accommodation', 'transport', 'activity'].includes(reservation.type)
+        ? reservation.type
+        : 'activity',
+      title: String(reservation.title || 'Reservation').trim(),
+      provider: String(reservation.provider || '').trim(),
+      confirmationNumber: String(reservation.confirmationNumber || '').trim(),
+      startDate: reservation.startDate || '',
+      startTime: reservation.startTime || '',
+      endDate: reservation.endDate || '',
+      endTime: reservation.endTime || '',
+      location: String(reservation.location || '').trim(),
+      status: ['confirmed', 'pending', 'cancelled'].includes(reservation.status)
+        ? reservation.status
+        : 'pending',
+      amount: Math.max(0, Number(reservation.amount) || 0),
+      url: normalizeExternalUrl(reservation.url),
+      latitude: this.#normalizeLatitude(reservation.latitude),
+      longitude: this.#normalizeLongitude(reservation.longitude),
+      notes: String(reservation.notes || '').trim(),
+      createdAt: reservation.createdAt || new Date().toISOString(),
+    }));
+  }
+
+  #normalizeDocuments(documents) {
+    if (!Array.isArray(documents)) return [];
+
+    return documents.map((document) => ({
+      id: document.id || createId('document'),
+      type: ['passport', 'identity', 'ticket', 'booking', 'insurance', 'other'].includes(document.type)
+        ? document.type
+        : 'other',
+      title: String(document.title || 'Document').trim(),
+      reference: String(document.reference || '').trim(),
+      url: normalizeExternalUrl(document.url),
+      expiryDate: document.expiryDate || '',
+      notes: String(document.notes || '').trim(),
+      createdAt: document.createdAt || new Date().toISOString(),
+    }));
+  }
+
+  #normalizeLatitude(value) {
+    if (value === null || value === undefined || value === '') return null;
+    const number = Number(value);
+    return hasValidCoordinates(number, 0) ? number : null;
+  }
+
+  #normalizeLongitude(value) {
+    if (value === null || value === undefined || value === '') return null;
+    const number = Number(value);
+    return hasValidCoordinates(0, number) ? number : null;
   }
 }
 

@@ -1,71 +1,81 @@
 # Product roadmap
 
-## V0.1 — Foundation and first planning workspace
+## V0.1 — Complete local travel workspace
 
 ### Part 1 — Foundation
 
 - [x] React and Vite foundation
 - [x] Responsive application shell
 - [x] Design tokens and dark mode
-- [x] Dashboard
-- [x] Trip library
+- [x] Dashboard and trip library
 - [x] Trip creation
 - [x] Local persistence service
 - [x] GitHub Pages deployment
 - [x] PWA foundation
 
-### Part 2 — Usable trip workspace
+### Part 2 — Planning workspace
 
-- [x] Trip overview route
+- [x] Trip overview
 - [x] Day-by-day itinerary
-- [x] Activity creation and deletion
-- [x] Notes
-- [x] Checklist grouped by category
-- [x] Budget categories and expenses
-- [x] Paid versus planned expense status
-- [x] Data schema migration
-- [ ] Activity editing
-- [ ] Drag-and-drop ordering
-- [ ] Trip settings and editing
+- [x] Budget and expense status
+- [x] Preparation checklist
+- [x] Persistent notes
+- [x] Versioned trip schema
 
-## V0.2 — Map and place discovery
+### Part 3 — Map, reservations and documents
 
-- [ ] Leaflet integration
-- [ ] Map-provider abstraction
-- [ ] Place-search abstraction
-- [ ] Itinerary markers
+- [x] Leaflet map adapter
+- [x] OpenStreetMap tile configuration
+- [x] Itinerary map markers and route line
+- [x] Coordinates on itinerary activities
+- [x] Reservation domain model
+- [x] Flights, accommodation, transport and activities
+- [x] Reservation status management
+- [x] Document references and safe links
+- [x] Schema 3 migration
+- [x] Responsive map and reservation layouts
+
+### Part 4 — Editing and usability completion
+
+- [ ] Edit existing activities
+- [ ] Edit existing reservations and documents
+- [ ] Drag-and-drop itinerary ordering
+- [ ] Trip settings and trip editing
+- [ ] Confirmation dialogs and toast notifications
+- [ ] Import/export trip JSON
+- [ ] Accessibility audit
+
+## V0.2 — Place discovery and intelligent routing
+
+- [ ] Place-search service abstraction
+- [ ] Geocoding provider
+- [ ] Search result preview on map
 - [ ] Route duration estimates
+- [ ] Map and timeline synchronisation
 - [ ] Destination content model
-- [ ] Map and timeline synchronization
+- [ ] Offline map strategy study
 
-## V0.3 — Reservations and documents
-
-- [ ] Reservation domain model
-- [ ] Flights, accommodation and activity records
-- [ ] Document metadata and secure storage abstraction
-- [ ] Reservation import preparation
-- [ ] Calendar and PDF export
-
-## V0.4 — Accounts and synchronisation
+## V0.3 — Accounts and synchronisation
 
 - [ ] Authentication provider
 - [ ] Cloud trip repository
+- [ ] Secure document storage
 - [ ] Sharing permissions
 - [ ] Collaborative editing
-- [ ] Secure document storage
+- [ ] Reservation email-import preparation
 
-## V0.5 — Monetisation foundation
+## V0.4 — Monetisation foundation
 
 - [ ] Affiliate provider configuration
 - [ ] Hotel, flight and activity calls to action
 - [ ] Conversion event tracking
-- [ ] SEO landing pages
+- [ ] SEO destination and itinerary pages
 - [ ] Consent and analytics controls
 
 ## Later opportunities
 
 - AI itinerary assistant
-- Reservation email import
+- Calendar and PDF export
 - Offline travel mode
 - Premium plans
 - Group expense settlement

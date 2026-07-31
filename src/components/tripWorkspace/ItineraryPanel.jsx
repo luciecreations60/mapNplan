@@ -11,6 +11,8 @@ const EMPTY_FORM = {
   type: 'map',
   title: '',
   location: '',
+  latitude: '',
+  longitude: '',
   durationMinutes: 60,
   estimatedCost: 0,
   notes: '',
@@ -43,6 +45,8 @@ export function ItineraryPanel({ trip, onUpdate }) {
       type: form.type,
       title: form.title.trim(),
       location: form.location.trim(),
+      latitude: form.latitude === '' ? null : Number(form.latitude),
+      longitude: form.longitude === '' ? null : Number(form.longitude),
       durationMinutes: Math.max(0, Number(form.durationMinutes) || 0),
       estimatedCost: Math.max(0, Number(form.estimatedCost) || 0),
       notes: form.notes.trim(),
@@ -123,6 +127,12 @@ export function ItineraryPanel({ trip, onUpdate }) {
               <Field label="Location" className="workspace-form__wide">
                 <input name="location" value={form.location} onChange={updateField} placeholder="Address or place name" />
               </Field>
+              <Field label="Latitude">
+                <input name="latitude" type="number" min="-90" max="90" step="any" value={form.latitude} onChange={updateField} placeholder="35.6762" />
+              </Field>
+              <Field label="Longitude">
+                <input name="longitude" type="number" min="-180" max="180" step="any" value={form.longitude} onChange={updateField} placeholder="139.6503" />
+              </Field>
               <Field label="Duration (minutes)">
                 <input name="durationMinutes" type="number" min="0" step="15" value={form.durationMinutes} onChange={updateField} />
               </Field>
@@ -163,6 +173,11 @@ export function ItineraryPanel({ trip, onUpdate }) {
                       <span>{getCategoryLabel(ACTIVITY_TYPES, item.type)}</span>
                       <h4>{item.title}</h4>
                       {item.location && <p><Icon name="pin" size={14} /> {item.location}</p>}
+                      {item.latitude !== null && item.longitude !== null && (
+                        <p className="itinerary-item__coordinates">
+                          <Icon name="map" size={14} /> {item.latitude.toFixed(4)}, {item.longitude.toFixed(4)}
+                        </p>
+                      )}
                       {(item.durationMinutes > 0 || item.estimatedCost > 0) && (
                         <small>
                           {item.durationMinutes > 0 && `${item.durationMinutes} min`}

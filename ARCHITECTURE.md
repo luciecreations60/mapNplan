@@ -1,8 +1,8 @@
-# Architecture — V0.1
+# Architecture — V0.1.2
 
 ## Goals
 
-The architecture is designed to keep UI, business behaviour, persistence and configuration separate. The immediate implementation is static and free to host, while the boundaries prepare for authentication, cloud synchronisation, affiliations, mapping and artificial intelligence.
+The architecture separates interface composition, domain behaviour, persistence and external providers. The current implementation remains static and free to host while preparing for authentication, cloud synchronisation, secure file storage, affiliations and artificial intelligence.
 
 ## Dependency direction
 
@@ -16,68 +16,76 @@ Domain services
 Storage / future API adapters
 ```
 
-A component may call a hook. A hook may expose a context. A context may call a service. A component must not access browser storage or a remote provider directly.
+Components must not access LocalStorage or external APIs directly.
 
-## Key folders
+## Main boundaries
 
-- `components/`: reusable interface building blocks and feature components.
-- `config/`: runtime behaviour, navigation and feature flags.
-- `contexts/`: application state exposed to React.
-- `hooks/`: stable access points for contexts and future reusable behaviour.
+- `components/`: reusable interface and feature components.
+- `config/`: branding, feature flags, navigation and provider settings.
+- `contexts/`: React state backed by domain services.
+- `hooks/`: stable component-facing APIs.
 - `pages/`: route-level composition only.
-- `services/`: persistence, APIs and provider integrations.
-- `styles/`: tokens, global rules, layouts, components and pages.
-- `utils/`: deterministic stateless helpers.
+- `services/`: persistence and future provider integrations.
+- `styles/`: tokens, global rules, layouts and feature styling.
+- `utils/`: deterministic validation, formatting and aggregation helpers.
 
-## Persistence strategy
-
-`TripService` owns trip normalisation and CRUD rules. It delegates storage to `LocalStorageService`. A later backend adapter can implement the same responsibilities while retaining the context and page APIs.
-
-## Routing strategy
-
-The application uses `HashRouter` during the GitHub Pages phase. It prevents broken refreshes because GitHub Pages cannot provide SPA rewrite rules for project repositories. A migration to a custom host can replace it with browser routing at the application boundary.
-
-## Branding strategy
-
-The temporary brand, slogan, repository name and version are defined in `project.config.js`, which is shared by Vite and the browser application.
-
-## Styling strategy
-
-Design tokens are CSS custom properties. Component styles consume semantic variables such as `--color-surface` instead of hard-coded light and dark values. Theme switching therefore updates the whole interface without duplicating component CSS.
-
-## Future adapters
-
-Planned boundaries:
-
-- `MapService` → OpenStreetMap / MapLibre / commercial provider.
-- `WeatherService` → weather provider adapter.
-- `AffiliateService` → Booking, Skyscanner and other partner links.
-- `AuthService` → user authentication.
-- `TripRepository` → Supabase or another backend.
-- `AIService` → itinerary generation provider.
-
-
-## V0.1.1 trip workspace
-
-The workspace is organised around a stable aggregate:
+## Trip aggregate
 
 ```text
 Trip
 ├── itinerary[]
 │   └── day.items[]
+│       ├── latitude
+│       └── longitude
 ├── expenses[]
 ├── checklist[]
+├── reservations[]
+├── documents[]
 └── notes
 ```
 
-Each nested entity owns a stable identifier. The current LocalStorage repository stores the aggregate as one document for simplicity, while the shape is intentionally compatible with future relational or document-based persistence.
+Every nested record owns a stable identifier. `TripService` normalises the complete aggregate, calculates derived totals and stores a `schemaVersion`.
 
-`TripWorkspacePage` coordinates module navigation only. It delegates each business area to an isolated component:
+## Schema migration
 
-- `OverviewPanel`
-- `ItineraryPanel`
-- `BudgetPanel`
-- `ChecklistPanel`
-- `NotesPanel`
+The current schema version is `3`.
 
-Detailed totals are derived in `TripService`; presentation components do not duplicate persistence or normalisation rules. Every saved trip includes a `schemaVersion`, enabling explicit migrations as the domain evolves.
+- Schema 1: trip summary fields.
+- Schema 2: itinerary, expenses, checklist and notes.
+- Schema 3: reservations, documents and coordinates.
+
+Existing trips are normalised non-destructively. Demonstration collections are added only when the property did not previously exist.
+
+## Map integration
+
+`TripMap` is the only component coupled to Leaflet. It receives provider-neutral map points from `getTripMapPoints()` and knows nothing about LocalStorage or trip editing.
+
+`map.config.js` centralises:
+
+- default centre and zoom;
+- tile URL;
+- attribution;
+- provider limits.
+
+A future move to MapLibre or a commercial tile service is therefore isolated to the adapter and configuration layer.
+
+## Reservation and document security
+
+External links are passed through `normalizeExternalUrl()`. Only HTTP and HTTPS protocols are exposed in clickable links.
+
+The current document module stores metadata and links, not binary files. Secure uploads require authentication, access policies and cloud object storage and are intentionally deferred.
+
+## Routing
+
+`HashRouter` remains in use for GitHub Pages because the host does not provide project-level SPA rewrite rules. A custom host can later replace it at the application boundary.
+
+## Future adapters
+
+- `PlaceSearchService` → geocoding and place discovery.
+- `RouteService` → travel-time and route calculations.
+- `WeatherService` → forecast provider.
+- `AffiliateService` → Booking, Skyscanner and activity partners.
+- `AuthService` → authentication.
+- `TripRepository` → cloud data.
+- `DocumentStorageService` → secure binary files.
+- `AIService` → itinerary assistance.

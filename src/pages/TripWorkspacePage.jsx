@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BudgetPanel } from '../components/tripWorkspace/BudgetPanel.jsx';
 import { ChecklistPanel } from '../components/tripWorkspace/ChecklistPanel.jsx';
+import { DocumentsPanel } from '../components/tripWorkspace/DocumentsPanel.jsx';
 import { ItineraryPanel } from '../components/tripWorkspace/ItineraryPanel.jsx';
+import { MapPanel } from '../components/tripWorkspace/MapPanel.jsx';
 import { NotesPanel } from '../components/tripWorkspace/NotesPanel.jsx';
 import { OverviewPanel } from '../components/tripWorkspace/OverviewPanel.jsx';
+import { ReservationsPanel } from '../components/tripWorkspace/ReservationsPanel.jsx';
 import { TripHero } from '../components/tripWorkspace/TripHero.jsx';
 import { TripTabs } from '../components/tripWorkspace/TripTabs.jsx';
 import { useTrips } from '../hooks/useTrips.js';
@@ -12,9 +15,9 @@ import { useTrips } from '../hooks/useTrips.js';
 /**
  * Main trip workspace.
  *
- * This page deliberately owns only navigation between workspace modules. Each
- * business area remains isolated so maps, reservations and collaboration can be
- * added later without turning the page into a monolith.
+ * This page owns module navigation only. Every business area stays isolated so
+ * future collaboration, remote storage and affiliate services can be added
+ * without turning the route component into a monolith.
  */
 export function TripWorkspacePage() {
   const { tripId } = useParams();
@@ -52,8 +55,11 @@ export function TripWorkspacePage() {
       <div className="trip-workspace__content">
         {activeTab === 'overview' && <OverviewPanel trip={trip} onOpenTab={setActiveTab} />}
         {activeTab === 'itinerary' && <ItineraryPanel trip={trip} onUpdate={handleUpdate} />}
+        {activeTab === 'map' && <MapPanel trip={trip} onOpenTab={setActiveTab} />}
+        {activeTab === 'reservations' && <ReservationsPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'budget' && <BudgetPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'checklist' && <ChecklistPanel trip={trip} onUpdate={handleUpdate} />}
+        {activeTab === 'documents' && <DocumentsPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'notes' && <NotesPanel trip={trip} onUpdate={handleUpdate} />}
       </div>
     </div>

@@ -16,6 +16,9 @@ export const APP_CONFIG = Object.freeze({
   features: Object.freeze({
     pwa: true,
     demoData: true,
+    maps: true,
+    reservations: true,
+    documents: true,
     affiliateLinks: false,
     aiAssistant: false,
   }),

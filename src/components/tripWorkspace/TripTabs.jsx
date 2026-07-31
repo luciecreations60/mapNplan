@@ -3,8 +3,11 @@ import { Icon } from '../common/Icon.jsx';
 export const TRIP_TABS = Object.freeze([
   { id: 'overview', label: 'Overview', icon: 'dashboard' },
   { id: 'itinerary', label: 'Itinerary', icon: 'calendarDays' },
+  { id: 'map', label: 'Map', icon: 'map' },
+  { id: 'reservations', label: 'Reservations', icon: 'ticket' },
   { id: 'budget', label: 'Budget', icon: 'wallet' },
   { id: 'checklist', label: 'Checklist', icon: 'checklist' },
+  { id: 'documents', label: 'Documents', icon: 'folder' },
   { id: 'notes', label: 'Notes', icon: 'notebook' },
 ]);
 
