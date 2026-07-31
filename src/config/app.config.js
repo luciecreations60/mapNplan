@@ -31,6 +31,7 @@ export const APP_CONFIG = Object.freeze({
     discussions: true,
     localNotifications: true,
     placeAutocomplete: true,
+    itineraryOptimization: true,
     affiliateLinks: false,
     aiAssistant: false,
   }),

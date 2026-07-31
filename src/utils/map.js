@@ -2,6 +2,9 @@
  * Returns true when latitude and longitude can safely be rendered on a map.
  */
 export function hasValidCoordinates(latitude, longitude) {
+  if (latitude === null || latitude === undefined || latitude === ''
+    || longitude === null || longitude === undefined || longitude === '') return false;
+
   const lat = Number(latitude);
   const lng = Number(longitude);
 

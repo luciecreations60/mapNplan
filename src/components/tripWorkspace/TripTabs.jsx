@@ -4,6 +4,7 @@ import { Icon } from '../common/Icon.jsx';
 export const TRIP_TABS = Object.freeze([
   { id: 'overview', labelKey: 'workspace.overview', icon: 'dashboard' },
   { id: 'itinerary', labelKey: 'workspace.itinerary', icon: 'calendarDays' },
+  { id: 'route', labelKey: 'workspace.route', icon: 'route' },
   { id: 'calendar', labelKey: 'workspace.calendar', icon: 'calendarRange' },
   { id: 'map', labelKey: 'workspace.map', icon: 'map' },
   { id: 'tools', labelKey: 'workspace.tools', icon: 'globe' },

@@ -10,6 +10,7 @@ import { MapPanel } from '../components/tripWorkspace/MapPanel.jsx';
 import { NotesPanel } from '../components/tripWorkspace/NotesPanel.jsx';
 import { OverviewPanel } from '../components/tripWorkspace/OverviewPanel.jsx';
 import { ReservationsPanel } from '../components/tripWorkspace/ReservationsPanel.jsx';
+import { RouteOptimizerPanel } from '../components/tripWorkspace/RouteOptimizerPanel.jsx';
 import { StatisticsPanel } from '../components/tripWorkspace/StatisticsPanel.jsx';
 import { TravelToolsPanel } from '../components/tripWorkspace/TravelToolsPanel.jsx';
 import { TripHero } from '../components/tripWorkspace/TripHero.jsx';
@@ -77,6 +78,7 @@ export function TripWorkspacePage() {
       <div className="trip-workspace__content">
         {activeTab === 'overview' && <OverviewPanel trip={trip} onOpenTab={handleTabChange} />}
         {activeTab === 'itinerary' && <ItineraryPanel trip={trip} onUpdate={handleUpdate} />}
+        {activeTab === 'route' && <RouteOptimizerPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} />}
         {activeTab === 'calendar' && <CalendarPanel trip={trip} onOpenTab={handleTabChange} />}
         {activeTab === 'map' && <MapPanel trip={trip} onOpenTab={handleTabChange} />}
         {activeTab === 'tools' && <TravelToolsPanel trip={trip} onOpenTab={handleTabChange} />}

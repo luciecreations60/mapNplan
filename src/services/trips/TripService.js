@@ -6,7 +6,7 @@ import { normalizeExternalUrl } from '../../utils/url.js';
 import { localStorageService } from '../storage/LocalStorageService.js';
 
 const STORAGE_KEY = 'trips';
-const CURRENT_TRIP_SCHEMA_VERSION = 8;
+const CURRENT_TRIP_SCHEMA_VERSION = 9;
 
 /**
  * Trip repository façade.
@@ -99,6 +99,7 @@ class TripService {
       itinerary: sourceTrip.itinerary.map((day) => ({
         ...day,
         id: createId('day'),
+        routePlan: this.#normalizeRoutePlan(null),
         items: day.items.map((item) => ({ ...item, id: createId('activity'), comments: [] })),
       })),
       expenses: sourceTrip.expenses.map((expense) => ({ ...expense, id: createId('expense') })),
@@ -297,25 +298,58 @@ class TripService {
         id: day.id || createId('day'),
         date: day.date || '',
         title: String(day.title || '').trim(),
+        routePlan: this.#normalizeRoutePlan(day.routePlan),
         items: Array.isArray(day.items)
-          ? day.items
-              .map((item) => ({
-                id: item.id || createId('activity'),
-                time: item.time || '',
-                type: String(item.type || 'map').trim(),
-                title: String(item.title || 'Activity').trim(),
-                location: String(item.location || '').trim(),
-                latitude: this.#normalizeLatitude(item.latitude),
-                longitude: this.#normalizeLongitude(item.longitude),
-                durationMinutes: Math.max(0, Number(item.durationMinutes) || 0),
-                estimatedCost: Math.max(0, Number(item.estimatedCost) || 0),
-                notes: String(item.notes || '').trim(),
-                comments: this.#normalizeComments(item.comments),
-              }))
-              .sort((left, right) => left.time.localeCompare(right.time))
+          ? day.items.map((item) => ({
+              id: item.id || createId('activity'),
+              time: item.time || '',
+              type: String(item.type || 'map').trim(),
+              title: String(item.title || 'Activity').trim(),
+              location: String(item.location || '').trim(),
+              latitude: this.#normalizeLatitude(item.latitude),
+              longitude: this.#normalizeLongitude(item.longitude),
+              durationMinutes: Math.max(0, Number(item.durationMinutes) || 0),
+              estimatedCost: Math.max(0, Number(item.estimatedCost) || 0),
+              notes: String(item.notes || '').trim(),
+              comments: this.#normalizeComments(item.comments),
+            }))
           : [],
       }))
       .sort((left, right) => left.date.localeCompare(right.date));
+  }
+
+  #normalizeRoutePlan(routePlan) {
+    const previousTimes = routePlan?.previousTimes && typeof routePlan.previousTimes === 'object'
+      ? Object.fromEntries(
+          Object.entries(routePlan.previousTimes)
+            .map(([id, time]) => [String(id), String(time || '')])
+            .slice(0, 100),
+        )
+      : {};
+
+    return {
+      mode: ['walking', 'cycling', 'driving', 'transit'].includes(routePlan?.mode)
+        ? routePlan.mode
+        : 'walking',
+      startStrategy: routePlan?.startStrategy === 'destination' ? 'destination' : 'firstActivity',
+      startTime: /^\d{2}:\d{2}$/.test(String(routePlan?.startTime || ''))
+        ? routePlan.startTime
+        : '09:00',
+      optimizedAt: routePlan?.optimizedAt || null,
+      previousOrder: Array.isArray(routePlan?.previousOrder)
+        ? routePlan.previousOrder.map(String).slice(0, 100)
+        : [],
+      previousTimes,
+      manuallyOrderedAt: routePlan?.manuallyOrderedAt || null,
+      estimatedDistanceKm: routePlan?.estimatedDistanceKm === null
+        || routePlan?.estimatedDistanceKm === undefined
+        ? null
+        : Math.max(0, Number(routePlan.estimatedDistanceKm) || 0),
+      estimatedTravelMinutes: routePlan?.estimatedTravelMinutes === null
+        || routePlan?.estimatedTravelMinutes === undefined
+        ? null
+        : Math.max(0, Number(routePlan.estimatedTravelMinutes) || 0),
+    };
   }
 
   #normalizeReservations(reservations) {

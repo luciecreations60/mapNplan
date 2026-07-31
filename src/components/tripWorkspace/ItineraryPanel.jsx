@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
 import { createId } from '../../utils/id.js';
+import { routePlanningService } from '../../services/routing/RoutePlanningService.js';
+import { invalidateDayRoutePlan } from '../../utils/routeOptimization.js';
 import { ACTIVITY_TYPES, getCategoryLabel } from '../../utils/tripWorkspace.js';
 import { appendActivityEntry, createActivityEntry, getCurrentActorName } from '../../utils/collaboration.js';
 import { DiscussionThread } from '../collaboration/DiscussionThread.jsx';
@@ -83,7 +85,7 @@ export function ItineraryPanel({ trip, onUpdate }) {
     if (editingActivity) {
       nextItinerary = nextItinerary
         .map((day) => day.id === editingActivity.dayId
-          ? { ...day, items: day.items.filter((item) => item.id !== editingActivity.activityId) }
+          ? invalidateDayRoutePlan({ ...day, items: day.items.filter((item) => item.id !== editingActivity.activityId) })
           : day)
         .filter((day) => day.items.length > 0);
     }
@@ -91,7 +93,7 @@ export function ItineraryPanel({ trip, onUpdate }) {
     const destinationDay = nextItinerary.find((day) => day.date === form.date);
     if (destinationDay) {
       nextItinerary = nextItinerary.map((day) => day.id === destinationDay.id
-        ? { ...day, items: [...day.items, activity].sort((left, right) => left.time.localeCompare(right.time)) }
+        ? invalidateDayRoutePlan({ ...day, items: [...day.items, activity].sort((left, right) => left.time.localeCompare(right.time)) })
         : day);
     } else {
       nextItinerary = [...nextItinerary, { id: createId('day'), date: form.date, title: '', items: [activity] }];
@@ -104,11 +106,18 @@ export function ItineraryPanel({ trip, onUpdate }) {
   function removeActivity(dayId, activity) {
     if (!window.confirm(t('itinerary.deleteConfirm', { name: activity.title }))) return;
     const nextItinerary = trip.itinerary
-      .map((day) => day.id === dayId ? { ...day, items: day.items.filter((item) => item.id !== activity.id) } : day)
+      .map((day) => day.id === dayId ? invalidateDayRoutePlan({ ...day, items: day.items.filter((item) => item.id !== activity.id) }) : day)
       .filter((day) => day.items.length > 0);
     onUpdate({ itinerary: nextItinerary });
   }
 
+
+  function moveActivity(dayId, activityId, direction) {
+    const nextItinerary = trip.itinerary.map((day) => (
+      day.id === dayId ? routePlanningService.move(day, activityId, direction) : day
+    ));
+    onUpdate({ itinerary: nextItinerary });
+  }
 
   function addActivityComment(dayId, activity, message) {
     const actorName = getCurrentActorName(trip);
@@ -208,7 +217,7 @@ export function ItineraryPanel({ trip, onUpdate }) {
                 </div>
               </header>
               <div className="itinerary-list">
-                {day.items.map((item) => (
+                {day.items.map((item, itemIndex) => (
                   <article key={item.id} className="itinerary-item">
                     <time>{item.time || '—'}</time>
                     <span className={`itinerary-item__icon itinerary-item__icon--${item.type}`}><Icon name={item.type} size={18} /></span>
@@ -235,6 +244,24 @@ export function ItineraryPanel({ trip, onUpdate }) {
                       />
                     </div>
                     <div className="item-actions">
+                      <button
+                        className="icon-button icon-button--small"
+                        type="button"
+                        disabled={itemIndex === 0}
+                        aria-label={t('itinerary.moveUp', { name: item.title })}
+                        onClick={() => moveActivity(day.id, item.id, 'up')}
+                      >
+                        <Icon name="chevronUp" size={16} />
+                      </button>
+                      <button
+                        className="icon-button icon-button--small"
+                        type="button"
+                        disabled={itemIndex === day.items.length - 1}
+                        aria-label={t('itinerary.moveDown', { name: item.title })}
+                        onClick={() => moveActivity(day.id, item.id, 'down')}
+                      >
+                        <Icon name="chevronDown" size={16} />
+                      </button>
                       <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.edit')} ${item.title}`} onClick={() => openEditForm(day, item)}>
                         <Icon name="edit" size={16} />
                       </button>
