@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.13] - 2026-07-31
+
+### Added
+
+- Dedicated reusable-template workspace.
+- Four translated built-in trip templates.
+- Personal trip-template creation with selective content.
+- Reusable itinerary-day library and day insertion.
+- Checklist presets for four travel styles.
+- Versioned template-library JSON import and export.
+
+### Changed
+
+- Trip schema upgraded from 12 to 13 with template provenance fields.
+- Main navigation now includes the Templates workspace.
+- Service-worker cache updated to `tripflow-v0.1.13`.
+
 ## [0.1.12] - 2026-07-31
 
 ### Added

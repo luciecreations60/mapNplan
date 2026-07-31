@@ -10,31 +10,25 @@
 - Part 11: group expenses, balances, settlements and CSV export.
 - Part 12: Chrome workspace corrections and travel-day companion.
 - Part 13: local document vault, IndexedDB files and attachment backups.
+- Part 14: reusable trip templates, checklist presets and day-plan library.
 
 ## Next planned milestones
 
-### Part 14 — Discovery and reusable templates
-
-- destination starter templates;
-- reusable checklist templates;
-- reusable itinerary templates;
-- richer Explore page;
-- trip creation from a template.
-
 ### Part 15 — Backend preparation
 
-- repository interfaces;
-- authentication boundary;
+- repository interfaces for local and remote data;
+- authentication boundary and account model;
 - Supabase schema proposal;
 - remote/local synchronization strategy;
-- object-storage adapter for documents.
+- object-storage adapter for document files;
+- environment-based feature configuration.
 
 ### Part 16 — Commercial preparation
 
 - affiliate provider configuration;
-- non-intrusive booking call-to-actions;
-- click attribution boundary;
-- SEO destination page structure;
+- non-intrusive booking calls to action;
+- click-attribution boundary;
+- SEO destination-page structure;
 - consent and privacy preparation.
 
 ## Later milestones
@@ -42,4 +36,5 @@
 - optional premium features;
 - AI itinerary assistance;
 - real-time collaboration;
+- community and commercial template marketplace;
 - native mobile packaging if validated by usage.
