@@ -12,7 +12,7 @@ const STATUS_KEYS = {
   draft: 'workspace.planningDraft',
 };
 
-export function TripHero({ trip }) {
+export function TripHero({ trip, onEdit }) {
   const { locale, t } = useI18n();
   const status = getTripStatus(trip);
   const daysUntil = getDaysUntil(trip.startDate);
@@ -24,6 +24,10 @@ export function TripHero({ trip }) {
       <div className="trip-workspace-hero__grid" aria-hidden="true" />
 
       <div className="trip-workspace-hero__content">
+        <button className="trip-workspace-hero__edit" type="button" onClick={onEdit}>
+          <Icon name="edit" size={16} />
+          {t('editTrip.action')}
+        </button>
         <Link className="trip-back-link" to="/trips">
           <Icon name="arrowLeft" size={17} />
           {t('workspace.allTrips')}

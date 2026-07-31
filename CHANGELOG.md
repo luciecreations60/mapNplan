@@ -2,6 +2,33 @@
 
 All notable changes to this project are documented here.
 
+## [0.1.5] — 2026-07-31
+
+### Added
+
+- Shared trip form for creation and edition.
+- Complete trip edition from the library and workspace hero.
+- Activity, reservation and document edition workflows.
+- Trip duplication with regenerated nested identifiers.
+- Reversible archive and restore lifecycle.
+- Archived-trip filter and status.
+- Reusable confirmation dialog and bilingual action feedback.
+- Schema 5 migration with the `archivedAt` field.
+
+### Changed
+
+- Trip cards now expose contextual management actions.
+- Demonstration and imported data are normalised to schema 5.
+- Dashboard statistics ignore archived trips.
+- Dependency versions aligned with published stable npm releases.
+- Service-worker cache version updated to `tripflow-v0.1.5`.
+
+### Fixed
+
+- Creation and edition fields can no longer drift because both use the same form component.
+- Editing an activity can safely move it between itinerary days without leaving empty days.
+- Duplicate trips no longer reuse nested record identifiers.
+
 ## [0.1.4] — 2026-07-31
 
 ### Added

@@ -48,13 +48,15 @@
 - [x] Locale-aware formatting
 - [x] Translation-key integrity check
 
-### Part 6 — Editing and usability completion
+### Part 6 — Editing and trip lifecycle
 
-- [ ] Edit trip identity, dates, travellers and currencies
-- [ ] Edit existing activities
-- [ ] Edit existing reservations and documents
-- [ ] Reusable toast notification system
-- [ ] Reusable confirmation dialog
+- [x] Edit trip identity, dates, travellers, currencies, colour and summary
+- [x] Edit existing activities, including moving them to another day
+- [x] Edit existing reservations and documents
+- [x] Duplicate a complete trip with regenerated identifiers
+- [x] Archive and restore trips
+- [x] Reusable confirmation dialog
+- [x] Bilingual success and confirmation messages
 - [ ] Drag-and-drop itinerary ordering
 - [ ] Search and filter within a trip
 - [ ] Accessibility and keyboard-navigation audit

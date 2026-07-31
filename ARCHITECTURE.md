@@ -1,4 +1,4 @@
-# Architecture — V0.1.4
+# Architecture — V0.1.5
 
 ## Goals
 
@@ -81,6 +81,7 @@ Trip
 ├── documents[]
 ├── currency
 ├── destinationCurrency
+├── archivedAt
 └── notes
 ```
 
@@ -88,14 +89,33 @@ Every nested record owns a stable identifier. `TripService` normalises the compl
 
 ## Schema migration
 
-The current trip schema version remains `4`.
+The current trip schema version is `5`.
 
 - Schema 1: trip summary fields.
 - Schema 2: itinerary, expenses, checklist and notes.
 - Schema 3: reservations, documents and coordinates.
 - Schema 4: destination currency and travel-tool defaults.
+- Schema 5: reversible archive lifecycle through `archivedAt`.
 
-V0.1.4 changes interface preferences and layout only; trip records are not rewritten.
+Migration is non-destructive. Existing records receive `archivedAt: null` and all nested identifiers remain unchanged.
+
+
+## Editing and lifecycle boundary
+
+`TripFormDialog` is shared by creation and edition so field definitions and validation rules cannot diverge. Nested itinerary, reservation and document editors reuse the same normalised trip aggregate through `TripContext`.
+
+Trip lifecycle operations are repository methods:
+
+```text
+TripService
+├── update(id, patch)
+├── duplicate(id, name)
+├── archive(id)
+├── restore(id)
+└── remove(id)
+```
+
+Duplication regenerates every nested identifier. Archiving is reversible and does not remove data. Permanent deletion remains a separate confirmed action.
 
 ## External provider boundary
 

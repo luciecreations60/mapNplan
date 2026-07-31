@@ -1,58 +1,60 @@
-# Delivery notes — V0.1 Part 5
+# Delivery notes — V0.1 Part 6
 
-## Purpose
+## Release
 
-This release fixes the Chromium layout issue reported after V0.1 Part 4 and introduces the first complete localisation layer.
+- Application version: `0.1.5`
+- Trip schema: `5`
+- Service-worker cache: `tripflow-v0.1.5`
 
-## Functional additions
+## Delivered features
 
-- French and English interface.
-- Automatic browser-language detection on first visit.
-- Manual language selection in **Settings → Language**.
-- Locally persisted language preference.
-- Locale-aware dates, times, amounts, weather, categories and statuses.
+### Trip management
 
-## Responsive corrections
+- Edit the trip name, destination, country, country code, dates, travellers, budget, currencies, card colour and summary.
+- Open the editor from **My trips** or from the trip workspace hero.
+- Duplicate a complete trip.
+- Regenerate trip, day, activity, expense, checklist, reservation and document identifiers during duplication.
+- Archive a trip without deleting its data.
+- Restore archived trips from the **Archived** filter.
+- Permanently delete a trip only after explicit confirmation.
 
-- Desktop sidebar changed from fixed positioning to a sticky CSS-grid item.
-- Main content explicitly occupies the flexible grid column.
-- Tablet/mobile breakpoint moved to `960px` for a reliable drawer experience.
-- Drawer overlay and body-scroll locking added.
-- Width constraints, `min-width: 0` protections and fluid page padding added.
-- Settings, cards, forms and workspace panels hardened for small screens.
+### Detailed editing
 
-## Main new files
+- Edit an existing itinerary activity.
+- Move an edited activity to another date.
+- Edit reservations while retaining their original creation date.
+- Edit documents while retaining their original creation date.
+- Confirm deletion of activities, reservations and documents.
 
-- `src/config/localization.config.js`
-- `src/i18n/translations.js`
-- `src/contexts/LocalizationContext.jsx`
-- `src/hooks/useI18n.js`
+### Interface
 
-## Main modified areas
+- French and English labels for all new controls and messages.
+- Responsive management controls on trip cards.
+- Responsive edit controls in itinerary, reservation and document cards.
+- Success notices after trip-level actions.
 
-- Application provider composition in `src/main.jsx`.
-- Application shell and navigation components.
-- All route pages and trip-workspace panels.
-- Locale-sensitive utility functions.
-- `src/styles/layout.css`, `global.css` and `pages.css`.
-- Project, service-worker and documentation versions.
+## Data migration
 
-## Data impact
+Schema 5 adds:
 
-- No trip-schema migration.
-- No automatic reset of existing trips.
-- The interface language is stored under the application LocalStorage namespace.
-- User-created content is never automatically translated.
+```json
+{
+  "archivedAt": null
+}
+```
+
+Existing trips are migrated automatically. No collection is reset or removed.
 
 ## Verification performed
 
-- 69 JavaScript/JSX files parsed by TypeScript with no syntax diagnostics.
-- All relative imports resolved.
-- All named/default relative imports matched exported symbols.
-- 373 statically referenced translation keys found in both French and English dictionaries.
-- JSON files parsed successfully.
-- CSS block delimiters checked.
-- Visible JSX text reviewed for untranslated application copy.
-- Archive integrity and checksums regenerated after final changes.
+- JavaScript and JSX parsed with TypeScript `--noCheck`.
+- Relative imports resolved.
+- 524 translation keys compared between French and English.
+- Static translation references checked.
+- TripService create, update, duplicate, archive and restore flows executed with a mocked browser store.
+- JSON files parsed.
+- ZIP archive integrity checked.
 
-A complete npm build could not run in the generation environment because its internal package registry does not contain the Vite React plugin version used by the project. GitHub Actions performs the actual dependency installation and production build after upload.
+## Environment limitation
+
+The complete Vite build could not run in the generation environment because its internal npm mirror does not expose `@vitejs/plugin-react`. GitHub Actions will install packages from its configured npm registry and perform the production build.

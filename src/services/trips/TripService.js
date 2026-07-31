@@ -6,14 +6,14 @@ import { normalizeExternalUrl } from '../../utils/url.js';
 import { localStorageService } from '../storage/LocalStorageService.js';
 
 const STORAGE_KEY = 'trips';
-const CURRENT_TRIP_SCHEMA_VERSION = 4;
+const CURRENT_TRIP_SCHEMA_VERSION = 5;
 
 /**
  * Trip repository façade.
  *
- * All persistence, migrations and normalization rules are centralized here.
- * React pages operate on stable domain objects and remain independent from the
- * current LocalStorage implementation.
+ * All persistence, migrations, cloning and normalization rules are centralized
+ * here. React pages operate on stable domain objects and remain independent
+ * from the current LocalStorage implementation.
  */
 class TripService {
   getAll() {
@@ -41,11 +41,13 @@ class TripService {
 
   create(payload) {
     const trips = this.getAll();
+    const now = new Date().toISOString();
     const newTrip = this.#normalize({
       ...payload,
       id: createId('trip'),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
+      archivedAt: null,
       itinerary: [],
       expenses: [],
       checklist: [],
@@ -77,6 +79,48 @@ class TripService {
     return updatedTrip;
   }
 
+  duplicate(id, name) {
+    const sourceTrip = this.getById(id);
+    if (!sourceTrip) return null;
+
+    const now = new Date().toISOString();
+    const duplicateTrip = this.#normalize({
+      ...structuredClone(sourceTrip),
+      id: createId('trip'),
+      name: String(name || `${sourceTrip.name} copy`).trim(),
+      createdAt: now,
+      updatedAt: now,
+      archivedAt: null,
+      itinerary: sourceTrip.itinerary.map((day) => ({
+        ...day,
+        id: createId('day'),
+        items: day.items.map((item) => ({ ...item, id: createId('activity') })),
+      })),
+      expenses: sourceTrip.expenses.map((expense) => ({ ...expense, id: createId('expense') })),
+      checklist: sourceTrip.checklist.map((item) => ({ ...item, id: createId('check') })),
+      reservations: sourceTrip.reservations.map((reservation) => ({
+        ...reservation,
+        id: createId('reservation'),
+        createdAt: now,
+      })),
+      documents: sourceTrip.documents.map((document) => ({
+        ...document,
+        id: createId('document'),
+        createdAt: now,
+      })),
+    });
+
+    localStorageService.set(STORAGE_KEY, [...this.getAll(), duplicateTrip]);
+    return duplicateTrip;
+  }
+
+  archive(id) {
+    return this.update(id, { archivedAt: new Date().toISOString() });
+  }
+
+  restore(id) {
+    return this.update(id, { archivedAt: null });
+  }
 
   replaceAll(trips) {
     if (!Array.isArray(trips)) {
@@ -106,10 +150,15 @@ class TripService {
    */
   #migrateLegacyTrip(trip) {
     const demoTrip = DEMO_TRIPS.find((item) => item.id === trip.id);
-    if (!demoTrip) return trip;
+    const migratedTrip = {
+      ...trip,
+      archivedAt: Object.hasOwn(trip, 'archivedAt') ? trip.archivedAt : null,
+    };
+
+    if (!demoTrip) return migratedTrip;
 
     return {
-      ...trip,
+      ...migratedTrip,
       itinerary: Object.hasOwn(trip, 'itinerary') ? trip.itinerary : demoTrip.itinerary,
       expenses: Object.hasOwn(trip, 'expenses') ? trip.expenses : demoTrip.expenses,
       checklist: Object.hasOwn(trip, 'checklist') ? trip.checklist : demoTrip.checklist,
@@ -157,7 +206,7 @@ class TripService {
       checklistTotal: checklist.length > 0
         ? checklist.length
         : Math.max(0, Number(trip.checklistTotal) || 0),
-      accent: trip.accent || 'violet',
+      accent: ['violet', 'aqua', 'coral'].includes(trip.accent) ? trip.accent : 'violet',
       summary: String(trip.summary || '').trim(),
       notes: String(trip.notes || ''),
       itinerary,
@@ -165,6 +214,7 @@ class TripService {
       checklist,
       reservations,
       documents,
+      archivedAt: trip.archivedAt || null,
       createdAt: trip.createdAt || new Date().toISOString(),
       updatedAt: trip.updatedAt || new Date().toISOString(),
     };

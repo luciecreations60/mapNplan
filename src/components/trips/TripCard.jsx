@@ -11,6 +11,7 @@ const STATUS_KEYS = {
   ongoing: 'trips.statusOngoing',
   past: 'trips.statusPast',
   draft: 'trips.statusDraft',
+  archived: 'trips.statusArchived',
 };
 
 const STATUS_TONES = {
@@ -18,15 +19,23 @@ const STATUS_TONES = {
   ongoing: 'success',
   past: 'neutral',
   draft: 'warning',
+  archived: 'neutral',
 };
 
-export function TripCard({ trip, onDelete }) {
+export function TripCard({
+  trip,
+  onEdit,
+  onDuplicate,
+  onArchive,
+  onRestore,
+  onDelete,
+}) {
   const { locale, t } = useI18n();
-  const status = getTripStatus(trip);
+  const status = trip.archivedAt ? 'archived' : getTripStatus(trip);
   const budgetProgress = trip.budget > 0 ? (trip.spent / trip.budget) * 100 : 0;
 
   return (
-    <article className={`trip-card trip-card--${trip.accent}`}>
+    <article className={`trip-card trip-card--${trip.accent}${trip.archivedAt ? ' trip-card--archived' : ''}`}>
       <div className="trip-card__visual">
         <div className="trip-card__visual-grid" />
         <span className="trip-card__country">{trip.countryCode || '✦'}</span>
@@ -39,14 +48,30 @@ export function TripCard({ trip, onDelete }) {
             <p className="trip-card__destination"><Icon name="pin" size={15} /> {trip.destination}</p>
             <h3>{trip.name}</h3>
           </div>
-          <button
-            className="icon-button icon-button--small"
-            type="button"
-            aria-label={`${t('common.delete')} ${trip.name}`}
-            onClick={() => onDelete(trip.id)}
-          >
-            <Icon name="trash" size={17} />
-          </button>
+          {(onEdit || onDuplicate) && <div className="trip-card__quick-actions">
+            {!trip.archivedAt && onEdit && (
+              <button
+                className="icon-button icon-button--small"
+                type="button"
+                aria-label={`${t('common.edit')} ${trip.name}`}
+                title={t('common.edit')}
+                onClick={() => onEdit(trip)}
+              >
+                <Icon name="edit" size={16} />
+              </button>
+            )}
+            {onDuplicate && (
+              <button
+                className="icon-button icon-button--small"
+                type="button"
+                aria-label={`${t('trips.duplicate')} ${trip.name}`}
+                title={t('trips.duplicate')}
+                onClick={() => onDuplicate(trip)}
+              >
+                <Icon name="copy" size={16} />
+              </button>
+            )}
+          </div>}
         </div>
 
         <p className="trip-card__dates">
@@ -68,10 +93,32 @@ export function TripCard({ trip, onDelete }) {
             <Icon name="users" size={16} />
             {t(trip.travelers === 1 ? 'trips.traveller' : 'trips.travellers', { count: trip.travelers })}
           </span>
-          <Link className="text-link" to={`/trips/${trip.id}`}>
-            {t('trips.openPlanner')} <Icon name="arrowRight" size={16} />
-          </Link>
+          {!trip.archivedAt && (
+            <Link className="text-link" to={`/trips/${trip.id}`}>
+              {t('trips.openPlanner')} <Icon name="arrowRight" size={16} />
+            </Link>
+          )}
         </footer>
+
+        {(onArchive || onRestore || onDelete) && (
+          <div className="trip-card__management">
+            {trip.archivedAt && onRestore && (
+              <button className="trip-card__management-button" type="button" onClick={() => onRestore(trip)}>
+                <Icon name="restore" size={15} /> {t('trips.restore')}
+              </button>
+            )}
+            {!trip.archivedAt && onArchive && (
+              <button className="trip-card__management-button" type="button" onClick={() => onArchive(trip)}>
+                <Icon name="archive" size={15} /> {t('trips.archive')}
+              </button>
+            )}
+            {onDelete && (
+              <button className="trip-card__management-button trip-card__management-button--danger" type="button" onClick={() => onDelete(trip)}>
+                <Icon name="trash" size={15} /> {t('common.delete')}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </article>
   );

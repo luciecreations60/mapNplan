@@ -368,3 +368,21 @@
 .inline-notice--danger > span { color: var(--color-danger); background: color-mix(in srgb, var(--color-danger) 12%, transparent); }
 .inline-notice--warning { border-color: color-mix(in srgb, var(--color-warning) 35%, var(--color-border)); background: var(--color-warning-soft); }
 .inline-notice--warning > span { color: var(--color-warning); background: color-mix(in srgb, var(--color-warning) 13%, transparent); }
+
+/* ========================================================================== */
+/* V0.1.5 — Confirmation and shared trip form refinements                     */
+/* ========================================================================== */
+
+.modal__footer--standalone {
+  padding-top: 0;
+}
+
+.trip-form__full {
+  grid-column: 1 / -1;
+}
+
+.trip-form textarea.field__input {
+  min-height: 92px;
+  padding: 12px 13px;
+  resize: vertical;
+}

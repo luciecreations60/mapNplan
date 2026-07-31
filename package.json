@@ -1,7 +1,7 @@
 {
   "name": "travel-planner",
   "private": true,
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "description": "A modern, extensible travel planning application.",
   "scripts": {
@@ -14,14 +14,14 @@
     "node": ">=22.12.0"
   },
   "dependencies": {
-    "lucide-react": "1.28.0",
-    "react": "19.2.7",
-    "react-dom": "19.2.7",
+    "lucide-react": "1.27.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
     "react-router-dom": "7.18.1",
     "leaflet": "1.9.4"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "6.0.5",
+    "@vitejs/plugin-react": "6.0.4",
     "vite": "8.1.5"
   }
 }

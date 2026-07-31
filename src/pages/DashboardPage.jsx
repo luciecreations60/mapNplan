@@ -29,7 +29,7 @@ export function DashboardPage() {
       : t('dashboard.goodEvening');
 
   const upcomingTrips = useMemo(
-    () => sortTripsByStartDate(trips.filter((trip) => ['upcoming', 'ongoing'].includes(getTripStatus(trip)))),
+    () => sortTripsByStartDate(trips.filter((trip) => !trip.archivedAt && ['upcoming', 'ongoing'].includes(getTripStatus(trip)))),
     [trips],
   );
   const nextTrip = upcomingTrips[0] || null;
@@ -39,9 +39,8 @@ export function DashboardPage() {
   const checklistDone = upcomingTrips.reduce((sum, trip) => sum + trip.checklistCompleted, 0);
   const checklistPercent = checklistTotal ? Math.round((checklistDone / checklistTotal) * 100) : 0;
 
-  function handleDelete(id) {
-    const trip = trips.find((item) => item.id === id);
-    if (trip && window.confirm(t('trips.deleteConfirm', { name: trip.name }))) deleteTrip(id);
+  function handleDelete(trip) {
+    if (trip && window.confirm(t('trips.deleteConfirm', { name: trip.name }))) deleteTrip(trip.id);
   }
 
   return (
@@ -58,10 +57,10 @@ export function DashboardPage() {
       <UpcomingTripCard trip={nextTrip} />
 
       <section className="stats-grid" aria-label={t('dashboard.overviewAria')}>
-        <StatCard icon="trips" label={t('dashboard.activeTrips')} value={upcomingTrips.length} detail={t('dashboard.totalJourneys', { count: trips.length })} tone="violet" />
+        <StatCard icon="trips" label={t('dashboard.activeTrips')} value={upcomingTrips.length} detail={t('dashboard.totalJourneys', { count: trips.filter((trip) => !trip.archivedAt).length })} tone="violet" />
         <StatCard icon="wallet" label={t('dashboard.plannedBudget')} value={formatCurrency(totalBudget, 'EUR', locale)} detail={t('dashboard.alreadyAllocated', { amount: formatCurrency(totalSpent, 'EUR', locale) })} tone="aqua" />
         <StatCard icon="check" label={t('dashboard.readyToLeave')} value={`${checklistPercent}%`} detail={t('dashboard.checklistComplete', { count: checklistDone })} tone="green" />
-        <StatCard icon="globe" label={t('dashboard.countries')} value={new Set(trips.map((trip) => trip.country).filter(Boolean)).size} detail={t('dashboard.personalMap')} tone="coral" />
+        <StatCard icon="globe" label={t('dashboard.countries')} value={new Set(trips.filter((trip) => !trip.archivedAt).map((trip) => trip.country).filter(Boolean)).size} detail={t('dashboard.personalMap')} tone="coral" />
       </section>
 
       <div className="dashboard-grid">

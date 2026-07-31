@@ -10,6 +10,8 @@ import { OverviewPanel } from '../components/tripWorkspace/OverviewPanel.jsx';
 import { ReservationsPanel } from '../components/tripWorkspace/ReservationsPanel.jsx';
 import { TravelToolsPanel } from '../components/tripWorkspace/TravelToolsPanel.jsx';
 import { TripHero } from '../components/tripWorkspace/TripHero.jsx';
+import { EditTripDialog } from '../components/trips/EditTripDialog.jsx';
+import { InlineNotice } from '../components/feedback/InlineNotice.jsx';
 import { TripTabs } from '../components/tripWorkspace/TripTabs.jsx';
 import { useI18n } from '../hooks/useI18n.js';
 import { useTrips } from '../hooks/useTrips.js';
@@ -20,6 +22,8 @@ export function TripWorkspacePage() {
   const { t } = useI18n();
   const { getTripById, updateTrip } = useTrips();
   const [activeTab, setActiveTab] = useState('overview');
+  const [isEditOpen, setEditOpen] = useState(false);
+  const [notice, setNotice] = useState(null);
   const trip = getTripById(tripId);
 
   useEffect(() => {
@@ -45,7 +49,12 @@ export function TripWorkspacePage() {
 
   return (
     <div className="trip-workspace">
-      <TripHero trip={trip} />
+      {notice && (
+        <InlineNotice tone="success" title={notice.title} className="page-notice">
+          {notice.message}
+        </InlineNotice>
+      )}
+      <TripHero trip={trip} onEdit={() => setEditOpen(true)} />
       <TripTabs activeTab={activeTab} onChange={setActiveTab} />
 
       <div className="trip-workspace__content">
@@ -59,6 +68,20 @@ export function TripWorkspacePage() {
         {activeTab === 'documents' && <DocumentsPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'notes' && <NotesPanel trip={trip} onUpdate={handleUpdate} />}
       </div>
+
+      <EditTripDialog
+        isOpen={isEditOpen}
+        trip={trip}
+        onClose={() => setEditOpen(false)}
+        onSaved={(updatedTrip) => {
+          if (updatedTrip) {
+            setNotice({
+              title: t('editTrip.savedTitle'),
+              message: t('editTrip.savedMessage', { name: updatedTrip.name }),
+            });
+          }
+        }}
+      />
     </div>
   );
 }

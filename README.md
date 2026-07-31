@@ -2,7 +2,7 @@
 
 > Every journey starts here.
 
-TripFlow is the temporary code name for a modern travel-planning application. Version `0.1.4` provides a complete local workspace with itinerary, map, reservations, budget, checklist, documents, notes and practical travel tools. The interface is responsive and available in French and English.
+TripFlow is the temporary code name for a modern travel-planning application. Version `0.1.5` provides a complete local workspace with itinerary, map, reservations, budget, checklist, documents, notes and practical travel tools. The interface is responsive and available in French and English.
 
 ## Included
 
@@ -21,7 +21,7 @@ TripFlow is the temporary code name for a modern travel-planning application. Ve
 ### Trip management
 
 - Dashboard and trip library
-- Trip creation and deletion
+- Trip creation, edition, duplication, archiving, restoration and deletion
 - Browser persistence hidden behind repository services
 - Stable, versioned trip data schema with migrations
 - Dedicated workspace for each trip
@@ -30,12 +30,12 @@ TripFlow is the temporary code name for a modern travel-planning application. Ve
 ### Planning workspace
 
 - Trip overview and countdown
-- Day-by-day itinerary
+- Day-by-day itinerary with activity edition
 - Interactive Leaflet/OpenStreetMap map
-- Flight, accommodation, transport and activity reservations
+- Editable flight, accommodation, transport and activity reservations
 - Paid and planned expense tracking
 - Preparation checklist
-- Document references and safe external links
+- Editable document references and safe external links
 - Persistent travel notes
 - Destination weather, local time and currency converter
 
@@ -86,7 +86,7 @@ A manual selection in **Settings → Language** is stored locally and takes prio
 6. Commit directly to `main`.
 7. Open **Actions** and wait for the Pages deployment to complete.
 
-Existing browser data is migrated automatically. This release does not reset trips or change the trip schema.
+Existing browser data is migrated automatically from schema 4 to schema 5. No saved trip is reset; the migration only adds the archive lifecycle field.
 
 ## Local development
 

@@ -1,12 +1,9 @@
 {
-  "projectVersion": "0.1.4",
-  "delivery": "V0.1 Part 5",
-  "fileCount": 90,
-  "verification": {
-    "javascriptFilesParsed": 69,
-    "translationKeysChecked": 417,
-    "errors": 0
-  },
+  "release": "0.1.5",
+  "tripSchemaVersion": 5,
+  "generatedAt": "2026-07-31T17:04:44.503844+00:00",
+  "fileCountExcludingInventory": 93,
+  "totalBytesExcludingInventory": 342964,
   "files": [
     {
       "path": ".env.example",
@@ -25,33 +22,33 @@
     },
     {
       "path": "ARCHITECTURE.md",
-      "sizeBytes": 4670,
-      "sha256": "3a4c989d41ff8fe7cde113bc4dd02baa77c9d879d5073b0bce0850a1242c1927"
+      "sizeBytes": 5398,
+      "sha256": "fb2181e7b0435b8ee9e9e3dd9dd4fe07aaf7e3c2129882bddbd5a5f4441f8a4d"
     },
     {
       "path": "CHANGELOG.md",
-      "sizeBytes": 1969,
-      "sha256": "2ea614c390569080d5108963e0d5fdbd1f5f42276c90ce1c45e4a2de94262020"
+      "sizeBytes": 2978,
+      "sha256": "711989ecb2254d5da2545c8d661af7bbaaeec70bf237636ef6ff023acfa97bef"
     },
     {
       "path": "DELIVERY_NOTES.md",
-      "sizeBytes": 2349,
-      "sha256": "e6d8d575cdd8d1e1a103f53b55ff282717bc64855baf2f155f4ab96aa0c212c8"
+      "sizeBytes": 2013,
+      "sha256": "b807a90ca57ec1e37138fef95291e0a6bf0c832b9b9bd99fbdb35707d4251035"
     },
     {
       "path": "README.md",
-      "sizeBytes": 3300,
-      "sha256": "f225d0209112f8118b1d5d59a48afb6e3db0f2b8f8a6f7d62b501214622cd413"
+      "sizeBytes": 3428,
+      "sha256": "f15c76aac40c5144041214f99408705b68cfa4c672abc2799c4a9be85709719c"
     },
     {
       "path": "ROADMAP.md",
-      "sizeBytes": 2668,
-      "sha256": "cb567a1148a589ced98116c9e024fd3a73e01530a5e6dc387cb01150e7892b07"
+      "sizeBytes": 2819,
+      "sha256": "40891e3218372998674d66fe2f290b0337e407cc7207d92ed3379c4107008774"
     },
     {
       "path": "UPLOAD_TO_GITHUB.md",
-      "sizeBytes": 1236,
-      "sha256": "b9dff25913300836bf369a8deba26d20486f98b069415551a41f27d978c04588"
+      "sizeBytes": 950,
+      "sha256": "a9810a040082b2b481ca3414d3ab434d308f7752fa3f82ae9492bd6efdd070fd"
     },
     {
       "path": "index.html",
@@ -61,12 +58,12 @@
     {
       "path": "package.json",
       "sizeBytes": 576,
-      "sha256": "433877f0fdb32beed5e52e734fe5d08cd810aefafe7d40fcee918e226a90cbf9"
+      "sha256": "107970bc460e7cdefa0a7fb7f96b684e1f1cd1fa722ab78d46b5df25191bfcc6"
     },
     {
       "path": "project.config.js",
       "sizeBytes": 440,
-      "sha256": "f80ceffd6f943d3cbf3630e47f22862388d54914c7f1143fdc14de62915a859b"
+      "sha256": "d5eed4bd076a8b155da6765b6a4472892d86443e081c92836140cb6d4486a521"
     },
     {
       "path": "public/favicon.svg",
@@ -76,7 +73,7 @@
     {
       "path": "public/service-worker.js",
       "sizeBytes": 1418,
-      "sha256": "ac9c8afcb444838eed27606c8fc7497a912ba0042e55f158c06cbfcb843b7a0c"
+      "sha256": "5497778e3ece4cd18aac5a4e82481fbed0337a43e2cc94fa94ff7f8b0090adaa"
     },
     {
       "path": "public/site.webmanifest",
@@ -109,9 +106,14 @@
       "sha256": "e92ebf171653bb43c3b1d872f4619401f30e8853cd577cd7c01f9268cab9b260"
     },
     {
+      "path": "src/components/common/ConfirmDialog.jsx",
+      "sizeBytes": 777,
+      "sha256": "70f00195c9a8e2c8adfc5ea3026acafe51fa082dd7da5d7ff039d0e28a9a3384"
+    },
+    {
       "path": "src/components/common/Icon.jsx",
-      "sizeBytes": 2230,
-      "sha256": "88ca63e802e653115946b2c7ebef0400b91c4a8a259160808c2d073cc4d6299d"
+      "sizeBytes": 2328,
+      "sha256": "8bb63098be2b013ecd78c58a9415a8fcd8d8df4e71f4afc164f9222017ec293d"
     },
     {
       "path": "src/components/common/Modal.jsx",
@@ -170,13 +172,13 @@
     },
     {
       "path": "src/components/tripWorkspace/DocumentsPanel.jsx",
-      "sizeBytes": 6597,
-      "sha256": "b82c89ab1e6c97b71aea9f02d4dcba9fd94f87b319e733b4837f56d8f97e02d3"
+      "sizeBytes": 8233,
+      "sha256": "b5308362f0e2eac48af5e85a910461c2ebd7b7f51a2b40a16fab95faa48f0f4a"
     },
     {
       "path": "src/components/tripWorkspace/ItineraryPanel.jsx",
-      "sizeBytes": 8973,
-      "sha256": "407c710131dc7addf35ef056f07e96b9767eb2d96b0168c05feed839461c65e4"
+      "sizeBytes": 11085,
+      "sha256": "124d3eae7bbc7d42da3df268d7cbf7ac0166368f5c8d2585e4156fdcccbd3142"
     },
     {
       "path": "src/components/tripWorkspace/MapPanel.jsx",
@@ -195,8 +197,8 @@
     },
     {
       "path": "src/components/tripWorkspace/ReservationsPanel.jsx",
-      "sizeBytes": 10833,
-      "sha256": "00c8d855d6e528c3f231ea281e8020b424473af59c5715e6dbef9c5e05a90d32"
+      "sizeBytes": 12840,
+      "sha256": "d2700704ca765814a0f24e36f162fbd742d89db21cfea751c29274874117cbee"
     },
     {
       "path": "src/components/tripWorkspace/TravelToolsPanel.jsx",
@@ -205,8 +207,8 @@
     },
     {
       "path": "src/components/tripWorkspace/TripHero.jsx",
-      "sizeBytes": 2859,
-      "sha256": "0e33b6ab488463faa6bd2ab334b5a5ee47c49d09a761f7e66d97a0624f22abd9"
+      "sizeBytes": 3045,
+      "sha256": "25e80593a937e788169eb53257d3f701ab6696fc0e3975da46c93c9abb1c0006"
     },
     {
       "path": "src/components/tripWorkspace/TripMap.jsx",
@@ -235,13 +237,23 @@
     },
     {
       "path": "src/components/trips/CreateTripDialog.jsx",
-      "sizeBytes": 4898,
-      "sha256": "ee2433e38a8b871e75aab568d083f97ffabd523dc4c217fb7c6e8708f5169367"
+      "sizeBytes": 687,
+      "sha256": "744273d8a6f6be4e26c690dedce8da4633d8c2db6348ed244f9aa3fe713c7dee"
+    },
+    {
+      "path": "src/components/trips/EditTripDialog.jsx",
+      "sizeBytes": 569,
+      "sha256": "1e3cff59fecaa29833ff1266843fceb78d93a5ff699f2b394498e4743a2b2a0d"
     },
     {
       "path": "src/components/trips/TripCard.jsx",
-      "sizeBytes": 2830,
-      "sha256": "af20ac883b142be655c9826cc4afc17a5d655e9d0830800d4f65cb4b95da3ed6"
+      "sizeBytes": 4652,
+      "sha256": "f0a6e84ca51771e7b86619bf6b0a82c1a17543d4f37473d6b93c1dc1d56d0a45"
+    },
+    {
+      "path": "src/components/trips/TripFormDialog.jsx",
+      "sizeBytes": 7245,
+      "sha256": "7d803bc25c2d2afbe22e7560f3d11acb241931992e4699a5f499a360d9f1d5c5"
     },
     {
       "path": "src/config/app.config.js",
@@ -280,8 +292,8 @@
     },
     {
       "path": "src/contexts/TripContext.jsx",
-      "sizeBytes": 2377,
-      "sha256": "3bdd93e463df76cf6e3c6ccac451a82cd09bd20341e52ad8318c14bda28c2a4e"
+      "sizeBytes": 3068,
+      "sha256": "28fe0bd2bd523c2334bbc24999ccee21962f7de4c8175116578844938a0a24a9"
     },
     {
       "path": "src/data/demoTrips.js",
@@ -305,8 +317,8 @@
     },
     {
       "path": "src/i18n/translations.js",
-      "sizeBytes": 38908,
-      "sha256": "69c45f0235ef0b9b300a64fffd120c070914ebfa12e8f75a8c425588707fbc7d"
+      "sizeBytes": 43777,
+      "sha256": "88e8d26aaf1f51e6687807463ffd0976d2f700c8398c955d22661f00d1f6a553"
     },
     {
       "path": "src/layouts/AppLayout.jsx",
@@ -320,8 +332,8 @@
     },
     {
       "path": "src/pages/DashboardPage.jsx",
-      "sizeBytes": 5503,
-      "sha256": "5b76d146c75edb56e3a12e5c880ef6951103cbdbded42b622ab725115b345b44"
+      "sizeBytes": 5545,
+      "sha256": "ba70b08d65e0ce397f61733293ccd68627acbf756bc268c667d7fdbfde32d9b4"
     },
     {
       "path": "src/pages/ExplorePage.jsx",
@@ -340,13 +352,13 @@
     },
     {
       "path": "src/pages/TripWorkspacePage.jsx",
-      "sizeBytes": 2945,
-      "sha256": "b35b1cd447db7247766fe00e75777955a5342090d510a6b77872ffcf9f4ec93e"
+      "sizeBytes": 3761,
+      "sha256": "e707f81fb6d856825c904506ab4df5318396ce9abdc1ac49493bccbebc419524"
     },
     {
       "path": "src/pages/TripsPage.jsx",
-      "sizeBytes": 2844,
-      "sha256": "ae26ad27583b3fea7c4eecf94b72821b9e57501c726e85db5f4647b9fbe3e542"
+      "sizeBytes": 6656,
+      "sha256": "7b94db0782f05581bdb5d493a3a0d7d0d057710eb189be89ecf892cdcfabd79e"
     },
     {
       "path": "src/services/currency/CurrencyService.js",
@@ -380,8 +392,8 @@
     },
     {
       "path": "src/services/trips/TripService.js",
-      "sizeBytes": 10158,
-      "sha256": "8099ed8b008adc7a62fe0fd08e77c5d15f36010e660e6275dadb52c22492564f"
+      "sizeBytes": 11781,
+      "sha256": "20d7c7fedb20c9d13a5cd7af9f185163707974c7278984e44c47e7d98501fcee"
     },
     {
       "path": "src/services/weather/WeatherService.js",
@@ -390,8 +402,8 @@
     },
     {
       "path": "src/styles/components.css",
-      "sizeBytes": 9207,
-      "sha256": "b5a564e0fc68ac0a2079f2055c4119a574885b12092927fb432148d5fa3db435"
+      "sizeBytes": 9648,
+      "sha256": "f5d525e1fafdedad6a60840af47683a0baa254281e74d187006ef3cf69a82f1e"
     },
     {
       "path": "src/styles/global.css",
@@ -405,8 +417,8 @@
     },
     {
       "path": "src/styles/pages.css",
-      "sizeBytes": 55604,
-      "sha256": "37c0baf587e2df6dd9050339186163e4e19818c5a46ec890671c03082258e2fb"
+      "sizeBytes": 58680,
+      "sha256": "1c7bdefb461f511c69fc06fe06df6145c3882e6d600164f3145a7206c96ee738"
     },
     {
       "path": "src/styles/tokens.css",

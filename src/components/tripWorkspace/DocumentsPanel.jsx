@@ -7,14 +7,15 @@ import { Button } from '../common/Button.jsx';
 import { Card } from '../common/Card.jsx';
 import { Icon } from '../common/Icon.jsx';
 
-const EMPTY_FORM = {
+const EMPTY_FORM = Object.freeze({
   type: 'booking', title: '', reference: '', url: '', expiryDate: '', notes: '',
-};
+});
 
 export function DocumentsPanel({ trip, onUpdate }) {
   const { locale, t } = useI18n();
-  const [form, setForm] = useState(EMPTY_FORM);
+  const [form, setForm] = useState({ ...EMPTY_FORM });
   const [isFormOpen, setFormOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const documents = useMemo(
     () => [...trip.documents].sort((left, right) => left.title.localeCompare(right.title)),
     [trip.documents],
@@ -25,27 +26,58 @@ export function DocumentsPanel({ trip, onUpdate }) {
     setForm((current) => ({ ...current, [name]: value }));
   }
 
-  function submitDocument(event) {
-    event.preventDefault();
-    if (!form.title.trim()) return;
-    onUpdate({
-      documents: [...trip.documents, {
-        id: createId('document'),
-        type: form.type,
-        title: form.title.trim(),
-        reference: form.reference.trim(),
-        url: normalizeExternalUrl(form.url),
-        expiryDate: form.expiryDate,
-        notes: form.notes.trim(),
-        createdAt: new Date().toISOString(),
-      }],
+  function openCreateForm() {
+    setEditingId(null);
+    setForm({ ...EMPTY_FORM });
+    setFormOpen(true);
+  }
+
+  function openEditForm(document) {
+    setEditingId(document.id);
+    setForm({
+      type: document.type || 'other',
+      title: document.title || '',
+      reference: document.reference || '',
+      url: document.url || '',
+      expiryDate: document.expiryDate || '',
+      notes: document.notes || '',
     });
-    setForm(EMPTY_FORM);
+    setFormOpen(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function closeForm() {
+    setEditingId(null);
     setFormOpen(false);
   }
 
-  function removeDocument(documentId) {
-    onUpdate({ documents: trip.documents.filter((document) => document.id !== documentId) });
+  function submitDocument(event) {
+    event.preventDefault();
+    if (!form.title.trim()) return;
+
+    const previousDocument = trip.documents.find((document) => document.id === editingId);
+    const document = {
+      id: editingId || createId('document'),
+      type: form.type,
+      title: form.title.trim(),
+      reference: form.reference.trim(),
+      url: normalizeExternalUrl(form.url),
+      expiryDate: form.expiryDate,
+      notes: form.notes.trim(),
+      createdAt: previousDocument?.createdAt || new Date().toISOString(),
+    };
+
+    const nextDocuments = editingId
+      ? trip.documents.map((item) => item.id === editingId ? document : item)
+      : [...trip.documents, document];
+
+    onUpdate({ documents: nextDocuments });
+    closeForm();
+  }
+
+  function removeDocument(document) {
+    if (!window.confirm(t('documents.deleteConfirm', { name: document.title }))) return;
+    onUpdate({ documents: trip.documents.filter((item) => item.id !== document.id) });
   }
 
   return (
@@ -56,7 +88,7 @@ export function DocumentsPanel({ trip, onUpdate }) {
           <h2>{t('documents.title')}</h2>
           <p>{t('documents.intro')}</p>
         </div>
-        <Button icon={isFormOpen ? 'close' : 'plus'} onClick={() => setFormOpen((value) => !value)}>
+        <Button icon={isFormOpen ? 'close' : 'plus'} onClick={() => (isFormOpen ? closeForm() : openCreateForm())}>
           {isFormOpen ? t('common.close') : t('documents.add')}
         </Button>
       </section>
@@ -64,6 +96,12 @@ export function DocumentsPanel({ trip, onUpdate }) {
       {isFormOpen && (
         <Card className="workspace-form-card">
           <form className="workspace-form" onSubmit={submitDocument}>
+            <div className="workspace-form__title-row">
+              <div>
+                <p className="eyebrow">{t(editingId ? 'documents.editEyebrow' : 'documents.newEyebrow')}</p>
+                <h3>{t(editingId ? 'documents.editTitle' : 'documents.newTitle')}</h3>
+              </div>
+            </div>
             <div className="workspace-form__grid">
               <Field label={t('documents.type')}>
                 <select name="type" value={form.type} onChange={updateField}>
@@ -87,8 +125,10 @@ export function DocumentsPanel({ trip, onUpdate }) {
               </Field>
             </div>
             <div className="workspace-form__actions">
-              <Button variant="ghost" onClick={() => setFormOpen(false)}>{t('common.cancel')}</Button>
-              <Button type="submit" icon="plus">{t('documents.save')}</Button>
+              <Button variant="ghost" onClick={closeForm}>{t('common.cancel')}</Button>
+              <Button type="submit" icon={editingId ? 'save' : 'plus'}>
+                {t(editingId ? 'documents.saveChanges' : 'documents.save')}
+              </Button>
             </div>
           </form>
         </Card>
@@ -114,7 +154,10 @@ export function DocumentsPanel({ trip, onUpdate }) {
                       <Icon name="externalLink" size={16} />
                     </a>
                   )}
-                  <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.delete')} ${document.title}`} onClick={() => removeDocument(document.id)}>
+                  <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.edit')} ${document.title}`} onClick={() => openEditForm(document)}>
+                    <Icon name="edit" size={16} />
+                  </button>
+                  <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.delete')} ${document.title}`} onClick={() => removeDocument(document)}>
                     <Icon name="trash" size={16} />
                   </button>
                 </div>
@@ -127,7 +170,7 @@ export function DocumentsPanel({ trip, onUpdate }) {
           <span><Icon name="folder" size={28} /></span>
           <h3>{t('documents.emptyTitle')}</h3>
           <p>{t('documents.emptyText')}</p>
-          <Button icon="plus" onClick={() => setFormOpen(true)}>{t('documents.addFirst')}</Button>
+          <Button icon="plus" onClick={openCreateForm}>{t('documents.addFirst')}</Button>
         </section>
       )}
     </div>

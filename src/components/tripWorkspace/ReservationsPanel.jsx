@@ -9,16 +9,17 @@ import { Button } from '../common/Button.jsx';
 import { Card } from '../common/Card.jsx';
 import { Icon } from '../common/Icon.jsx';
 
-const EMPTY_FORM = {
+const EMPTY_FORM = Object.freeze({
   type: 'flight', title: '', provider: '', confirmationNumber: '', startDate: '', startTime: '',
   endDate: '', endTime: '', location: '', status: 'confirmed', amount: 0, url: '',
   latitude: '', longitude: '', notes: '',
-};
+});
 
 export function ReservationsPanel({ trip, onUpdate }) {
   const { locale, t } = useI18n();
   const [form, setForm] = useState(() => ({ ...EMPTY_FORM, startDate: trip.startDate || '' }));
   const [isFormOpen, setFormOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const reservations = useMemo(() => [...trip.reservations].sort(compareReservations), [trip.reservations]);
 
   function updateField(event) {
@@ -26,12 +27,47 @@ export function ReservationsPanel({ trip, onUpdate }) {
     setForm((current) => ({ ...current, [name]: value }));
   }
 
+  function openCreateForm() {
+    setEditingId(null);
+    setForm({ ...EMPTY_FORM, startDate: trip.startDate || '' });
+    setFormOpen(true);
+  }
+
+  function openEditForm(reservation) {
+    setEditingId(reservation.id);
+    setForm({
+      type: reservation.type || 'flight',
+      title: reservation.title || '',
+      provider: reservation.provider || '',
+      confirmationNumber: reservation.confirmationNumber || '',
+      startDate: reservation.startDate || '',
+      startTime: reservation.startTime || '',
+      endDate: reservation.endDate || '',
+      endTime: reservation.endTime || '',
+      location: reservation.location || '',
+      status: reservation.status || 'pending',
+      amount: reservation.amount || 0,
+      url: reservation.url || '',
+      latitude: reservation.latitude ?? '',
+      longitude: reservation.longitude ?? '',
+      notes: reservation.notes || '',
+    });
+    setFormOpen(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function closeForm() {
+    setEditingId(null);
+    setFormOpen(false);
+  }
+
   function submitReservation(event) {
     event.preventDefault();
     if (!form.title.trim()) return;
 
+    const previousReservation = trip.reservations.find((reservation) => reservation.id === editingId);
     const reservation = {
-      id: createId('reservation'),
+      id: editingId || createId('reservation'),
       ...form,
       title: form.title.trim(),
       provider: form.provider.trim(),
@@ -42,20 +78,24 @@ export function ReservationsPanel({ trip, onUpdate }) {
       latitude: form.latitude === '' ? null : Number(form.latitude),
       longitude: form.longitude === '' ? null : Number(form.longitude),
       notes: form.notes.trim(),
-      createdAt: new Date().toISOString(),
+      createdAt: previousReservation?.createdAt || new Date().toISOString(),
     };
 
-    onUpdate({ reservations: [...trip.reservations, reservation] });
-    setForm((current) => ({ ...EMPTY_FORM, startDate: current.startDate || trip.startDate || '', type: current.type }));
-    setFormOpen(false);
+    const nextReservations = editingId
+      ? trip.reservations.map((item) => item.id === editingId ? reservation : item)
+      : [...trip.reservations, reservation];
+
+    onUpdate({ reservations: nextReservations });
+    closeForm();
   }
 
   function updateStatus(reservationId, status) {
     onUpdate({ reservations: trip.reservations.map((reservation) => reservation.id === reservationId ? { ...reservation, status } : reservation) });
   }
 
-  function removeReservation(reservationId) {
-    onUpdate({ reservations: trip.reservations.filter((reservation) => reservation.id !== reservationId) });
+  function removeReservation(reservation) {
+    if (!window.confirm(t('reservations.deleteConfirm', { name: reservation.title }))) return;
+    onUpdate({ reservations: trip.reservations.filter((item) => item.id !== reservation.id) });
   }
 
   return (
@@ -66,7 +106,7 @@ export function ReservationsPanel({ trip, onUpdate }) {
           <h2>{t('reservations.title')}</h2>
           <p>{t('reservations.intro')}</p>
         </div>
-        <Button icon={isFormOpen ? 'close' : 'plus'} onClick={() => setFormOpen((value) => !value)}>
+        <Button icon={isFormOpen ? 'close' : 'plus'} onClick={() => (isFormOpen ? closeForm() : openCreateForm())}>
           {isFormOpen ? t('common.close') : t('reservations.add')}
         </Button>
       </section>
@@ -74,6 +114,12 @@ export function ReservationsPanel({ trip, onUpdate }) {
       {isFormOpen && (
         <Card className="workspace-form-card">
           <form className="workspace-form" onSubmit={submitReservation}>
+            <div className="workspace-form__title-row">
+              <div>
+                <p className="eyebrow">{t(editingId ? 'reservations.editEyebrow' : 'reservations.newEyebrow')}</p>
+                <h3>{t(editingId ? 'reservations.editTitle' : 'reservations.newTitle')}</h3>
+              </div>
+            </div>
             <div className="workspace-form__grid">
               <Field label={t('reservations.type')}>
                 <select name="type" value={form.type} onChange={updateField}>
@@ -100,8 +146,10 @@ export function ReservationsPanel({ trip, onUpdate }) {
               <Field label={t('common.notes')} className="workspace-form__full"><textarea name="notes" rows="3" value={form.notes} onChange={updateField} placeholder={t('reservations.notesPlaceholder')} /></Field>
             </div>
             <div className="workspace-form__actions">
-              <Button variant="ghost" onClick={() => setFormOpen(false)}>{t('common.cancel')}</Button>
-              <Button type="submit" icon="plus">{t('reservations.save')}</Button>
+              <Button variant="ghost" onClick={closeForm}>{t('common.cancel')}</Button>
+              <Button type="submit" icon={editingId ? 'save' : 'plus'}>
+                {t(editingId ? 'reservations.saveChanges' : 'reservations.save')}
+              </Button>
             </div>
           </form>
         </Card>
@@ -135,7 +183,8 @@ export function ReservationsPanel({ trip, onUpdate }) {
                       </select>
                     </label>
                     {safeUrl && <a className="text-link" href={safeUrl} target="_blank" rel="noreferrer">{t('reservations.openBooking')} <Icon name="externalLink" size={15} /></a>}
-                    <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.delete')} ${reservation.title}`} onClick={() => removeReservation(reservation.id)}><Icon name="trash" size={16} /></button>
+                    <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.edit')} ${reservation.title}`} onClick={() => openEditForm(reservation)}><Icon name="edit" size={16} /></button>
+                    <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.delete')} ${reservation.title}`} onClick={() => removeReservation(reservation)}><Icon name="trash" size={16} /></button>
                   </div>
                 </div>
               </Card>
@@ -147,7 +196,7 @@ export function ReservationsPanel({ trip, onUpdate }) {
           <span><Icon name="ticket" size={28} /></span>
           <h3>{t('reservations.emptyTitle')}</h3>
           <p>{t('reservations.emptyText')}</p>
-          <Button icon="plus" onClick={() => setFormOpen(true)}>{t('reservations.addFirst')}</Button>
+          <Button icon="plus" onClick={openCreateForm}>{t('reservations.addFirst')}</Button>
         </section>
       )}
     </div>

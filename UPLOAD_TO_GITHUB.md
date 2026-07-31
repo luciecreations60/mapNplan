@@ -1,30 +1,25 @@
-# Envoyer la V0.1 Partie 5 sur GitHub
+# Upload V0.1 Part 6 to GitHub
 
-Cette archive contient le projet complet et remplace la Partie 4.
-
-1. Décompresser `travel-planner-v0.1-part5.zip`.
-2. Ouvrir le dépôt `luciecreations60/travel-planner`.
-3. Cliquer sur **Add file → Upload files**.
-4. Déposer tout le contenu du dossier décompressé.
-5. Accepter le remplacement des fichiers portant le même chemin.
-6. Saisir le message de commit :
+1. Extract `travel-planner-v0.1-part6.zip`.
+2. Open the GitHub repository `luciecreations60/travel-planner`.
+3. Select **Add file → Upload files**.
+4. Drag every file and folder contained inside the extracted directory.
+5. Allow GitHub to replace files with identical paths.
+6. Commit directly to `main` with:
 
 ```text
-feat: add v0.1.4 responsive bilingual interface
+feat: add v0.1.5 editing and trip lifecycle
 ```
 
-7. Sélectionner **Commit directly to the main branch**.
-8. Valider le commit.
-9. Ouvrir l’onglet **Actions**.
-10. Attendre la coche verte du déploiement GitHub Pages.
+7. Open **Actions** and wait for the deployment workflow to display a green check.
+8. Open the deployed website and refresh Chrome with `Ctrl + F5` if the previous cache is still visible.
 
-Aucun changement n’est nécessaire dans **Settings → Pages**.
+No change is required in **Settings → Pages**.
 
-## Après le déploiement
+## Recommended checks after deployment
 
-1. Dans Chrome, effectuer une actualisation forcée avec `Ctrl + F5`.
-2. Vérifier que le contenu utilise toute la largeur disponible.
-3. Réduire la fenêtre sous 960 px et vérifier l’ouverture du menu en tiroir.
-4. Ouvrir **Paramètres → Langue** pour choisir Français ou English.
-
-Au premier chargement sans préférence déjà enregistrée, un navigateur configuré en français ouvre automatiquement l’interface française. Toute autre langue non prise en charge utilise l’anglais.
+- **My trips → edit icon**: update a trip.
+- **My trips → duplicate icon**: create a copy.
+- **My trips → Archive**: move a trip to **Archived**.
+- **Archived → Restore**: return it to active trips.
+- Open a trip and edit an activity, reservation and document.

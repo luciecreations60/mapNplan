@@ -36,12 +36,29 @@ export function TripProvider({ children }) {
     return updatedTrip;
   }, []);
 
+  const duplicateTrip = useCallback((id, name) => {
+    const duplicatedTrip = tripService.duplicate(id, name);
+    if (duplicatedTrip) setTrips(tripService.getAll());
+    return duplicatedTrip;
+  }, []);
+
+  const archiveTrip = useCallback((id) => {
+    const archivedTrip = tripService.archive(id);
+    if (archivedTrip) setTrips(tripService.getAll());
+    return archivedTrip;
+  }, []);
+
+  const restoreTrip = useCallback((id) => {
+    const restoredTrip = tripService.restore(id);
+    if (restoredTrip) setTrips(tripService.getAll());
+    return restoredTrip;
+  }, []);
+
   const deleteTrip = useCallback((id) => {
     const deleted = tripService.remove(id);
     if (deleted) setTrips(tripService.getAll());
     return deleted;
   }, []);
-
 
   const exportBackup = useCallback(() => {
     dataPortabilityService.downloadBackup(tripService.getAll());
@@ -65,6 +82,9 @@ export function TripProvider({ children }) {
       getTripById,
       createTrip,
       updateTrip,
+      duplicateTrip,
+      archiveTrip,
+      restoreTrip,
       deleteTrip,
       resetDemoData,
       exportBackup,
@@ -76,6 +96,9 @@ export function TripProvider({ children }) {
       getTripById,
       createTrip,
       updateTrip,
+      duplicateTrip,
+      archiveTrip,
+      restoreTrip,
       deleteTrip,
       resetDemoData,
       exportBackup,

@@ -7,7 +7,7 @@
 export const TRANSLATIONS = Object.freeze({
   en: Object.freeze({
     common: {
-      add: 'Add', cancel: 'Cancel', close: 'Close', delete: 'Delete', save: 'Save',
+      add: 'Add', cancel: 'Cancel', close: 'Close', delete: 'Delete', edit: 'Edit', save: 'Save',
       manage: 'Manage', details: 'Details', refresh: 'Refresh', loading: 'Loading…',
       other: 'Other', none: 'None', open: 'Open', retry: 'Try again', destination: 'Destination',
       date: 'Date', time: 'Time', title: 'Title', notes: 'Notes', location: 'Location',
@@ -65,12 +65,21 @@ export const TRANSLATIONS = Object.freeze({
     trips: {
       eyebrow: 'Travel library', title: 'My trips',
       intro: 'Plan future adventures and keep completed journeys close.', create: 'Create a trip',
-      filtersAria: 'Trip filters', all: 'All trips', upcoming: 'Upcoming', past: 'Past',
+      filtersAria: 'Trip filters', all: 'All trips', upcoming: 'Upcoming', past: 'Past', archived: 'Archived',
       emptyTitle: 'No journeys here yet', emptyText: 'Create a trip and start turning ideas into a clear plan.',
-      deleteConfirm: 'Delete “{{name}}”?', openPlanner: 'Open planner', spent: '{{amount}} spent',
+      archivedEmptyTitle: 'No archived trips', archivedEmptyText: 'Archived journeys will stay here until you restore or delete them.',
+      deleteTitle: 'Delete trip permanently', deleteConfirm: 'Delete “{{name}}” permanently? This action cannot be undone.',
+      duplicate: 'Duplicate', duplicateTitle: 'Duplicate trip', duplicateConfirm: 'Create a complete copy of “{{name}}”?',
+      archive: 'Archive', archiveTitle: 'Archive trip', archiveConfirm: 'Archive “{{name}}”? Its data will be kept and can be restored later.',
+      restore: 'Restore', restoreTitle: 'Restore trip', restoreConfirm: 'Restore “{{name}}” to your active trips?',
+      copyName: '{{name}} — Copy', openPlanner: 'Open planner', spent: '{{amount}} spent',
       budgetAria: 'Budget used for {{name}}', traveller: '{{count}} traveller', travellers: '{{count}} travellers',
-      statusUpcoming: 'Upcoming', statusOngoing: 'In progress', statusPast: 'Completed', statusDraft: 'Draft',
+      statusUpcoming: 'Upcoming', statusOngoing: 'In progress', statusPast: 'Completed', statusDraft: 'Draft', statusArchived: 'Archived',
       datesTbc: 'Dates to be confirmed', newSummary: 'A new journey ready to be planned.',
+      duplicatedTitle: 'Trip duplicated', duplicatedMessage: 'A complete copy of “{{name}}” has been created.',
+      archivedTitle: 'Trip archived', archivedMessage: '“{{name}}” is now available in the Archived tab.',
+      restoredTitle: 'Trip restored', restoredMessage: '“{{name}}” is active again.',
+      deletedTitle: 'Trip deleted', deletedMessage: '“{{name}}” has been permanently deleted.',
     },
     createTrip: {
       title: 'Create a trip', description: 'Start with the essentials. Every detail can be refined later.',
@@ -81,6 +90,13 @@ export const TRANSLATIONS = Object.freeze({
       nameRequired: 'Give this trip a name.', destinationRequired: 'Add at least one destination.',
       departureRequired: 'Choose a departure date.', returnRequired: 'Choose a return date.',
       dateOrder: 'The return date must be after departure.',
+    },
+    editTrip: {
+      action: 'Edit trip', title: 'Edit trip', description: 'Update the main information without affecting the detailed planning.',
+      submit: 'Save changes', savedTitle: 'Trip updated', savedMessage: 'Changes to “{{name}}” have been saved.',
+      countryCode: 'Country code', accent: 'Card colour', summary: 'Short description',
+      summaryPlaceholder: 'Describe the spirit and purpose of this journey.',
+      accents: { violet: 'Violet', aqua: 'Aqua', coral: 'Coral' },
     },
     explore: {
       eyebrow: 'Inspiration', title: 'Where will you go next?',
@@ -137,6 +153,7 @@ export const TRANSLATIONS = Object.freeze({
       location: 'Location', locationPlaceholder: 'Address or place name', duration: 'Duration (minutes)',
       notes: 'Notes', notesPlaceholder: 'Booking details, reminders or useful context', addActivity: 'Add activity', add: 'Add to itinerary', estimatedCost: 'Estimated cost', day: 'Day {{count}}', plannedItem: '{{count}} planned item', plannedItems: '{{count}} planned items', dateToDefine: 'Date to define', firstActivity: 'Add first activity', emptyCopy: 'Start with the arrival, accommodation and one memorable activity.', minutes: '{{count}} min',
       emptyTitle: 'Your itinerary is ready to be built', emptyText: 'Add your first activity to start shaping each travel day.',
+      editEyebrow: 'Update the plan', newEyebrow: 'New itinerary item', editTitle: 'Edit activity', newTitle: 'Add an activity', saveChanges: 'Save changes', deleteConfirm: 'Delete “{{name}}” from the itinerary?',
       deleteAria: 'Delete activity', latitudeHelp: 'Decimal latitude, for example 48.8566', longitudeHelp: 'Decimal longitude, for example 2.3522',
     },
     budget: {
@@ -166,7 +183,7 @@ export const TRANSLATIONS = Object.freeze({
       providerPlaceholder: 'Air France, Booking…', confirmationNumber: 'Confirmation number', optionalReference: 'Optional reference',
       startDate: 'Start date', startTime: 'Start time', endDate: 'End date', endTime: 'End time',
       locationPlaceholder: 'Airport, hotel address or meeting point', bookingLink: 'Booking link', linkPlaceholder: 'https://…',
-      notesPlaceholder: 'Cancellation rules, luggage allowance, check-in instructions…', deleteAria: 'Delete reservation',
+      notesPlaceholder: 'Cancellation rules, luggage allowance, check-in instructions…', editEyebrow: 'Update booking', newEyebrow: 'New booking', editTitle: 'Edit reservation', newTitle: 'Add a reservation', saveChanges: 'Save changes', deleteConfirm: 'Delete the reservation “{{name}}”?', deleteAria: 'Delete reservation',
     },
     documents: {
       eyebrow: 'Travel wallet', title: 'Documents',
@@ -175,7 +192,7 @@ export const TRANSLATIONS = Object.freeze({
       emptyText: 'Save useful document links and references before departure.', addFirst: 'Add first document',
       type: 'Document type', titleLabel: 'Title', titlePlaceholder: 'Travel insurance, boarding pass…',
       referencePlaceholder: 'Optional number or identifier', expiry: 'Expiry date', secureLink: 'Secure link',
-      linkPlaceholder: 'https://…', notesPlaceholder: 'Where the original is stored, emergency contact…', deleteAria: 'Delete document',
+      linkPlaceholder: 'https://…', notesPlaceholder: 'Where the original is stored, emergency contact…', editEyebrow: 'Update document', newEyebrow: 'New document', editTitle: 'Edit document', newTitle: 'Add a document', saveChanges: 'Save changes', deleteConfirm: 'Delete the document “{{name}}”?', deleteAria: 'Delete document',
     },
     map: {
       eyebrow: 'Visual planning', title: 'Trip map', intro: 'See itinerary stops and geolocated reservations in one place.',
@@ -220,7 +237,7 @@ export const TRANSLATIONS = Object.freeze({
   }),
   fr: Object.freeze({
     common: {
-      add: 'Ajouter', cancel: 'Annuler', close: 'Fermer', delete: 'Supprimer', save: 'Enregistrer',
+      add: 'Ajouter', cancel: 'Annuler', close: 'Fermer', delete: 'Supprimer', edit: 'Modifier', save: 'Enregistrer',
       manage: 'Gérer', details: 'Détails', refresh: 'Actualiser', loading: 'Chargement…',
       other: 'Autre', none: 'Aucun', open: 'Ouvrir', retry: 'Réessayer', destination: 'Destination',
       date: 'Date', time: 'Heure', title: 'Titre', notes: 'Notes', location: 'Lieu',
@@ -278,12 +295,21 @@ export const TRANSLATIONS = Object.freeze({
     trips: {
       eyebrow: 'Bibliothèque de voyages', title: 'Mes voyages',
       intro: 'Planifiez vos prochaines aventures et conservez vos voyages terminés.', create: 'Créer un voyage',
-      filtersAria: 'Filtres des voyages', all: 'Tous les voyages', upcoming: 'À venir', past: 'Terminés',
+      filtersAria: 'Filtres des voyages', all: 'Tous les voyages', upcoming: 'À venir', past: 'Terminés', archived: 'Archivés',
       emptyTitle: 'Aucun voyage pour le moment', emptyText: 'Créez un voyage et transformez vos idées en planning clair.',
-      deleteConfirm: 'Supprimer « {{name}} » ?', openPlanner: 'Ouvrir le planning', spent: '{{amount}} dépensés',
+      archivedEmptyTitle: 'Aucun voyage archivé', archivedEmptyText: 'Les voyages archivés resteront ici jusqu’à leur restauration ou suppression.',
+      deleteTitle: 'Supprimer définitivement le voyage', deleteConfirm: 'Supprimer définitivement « {{name}} » ? Cette action est irréversible.',
+      duplicate: 'Dupliquer', duplicateTitle: 'Dupliquer le voyage', duplicateConfirm: 'Créer une copie complète de « {{name}} » ?',
+      archive: 'Archiver', archiveTitle: 'Archiver le voyage', archiveConfirm: 'Archiver « {{name}} » ? Ses données seront conservées et pourront être restaurées.',
+      restore: 'Restaurer', restoreTitle: 'Restaurer le voyage', restoreConfirm: 'Restaurer « {{name}} » dans les voyages actifs ?',
+      copyName: '{{name}} — Copie', openPlanner: 'Ouvrir le planning', spent: '{{amount}} dépensés',
       budgetAria: 'Budget utilisé pour {{name}}', traveller: '{{count}} voyageur', travellers: '{{count}} voyageurs',
-      statusUpcoming: 'À venir', statusOngoing: 'En cours', statusPast: 'Terminé', statusDraft: 'Brouillon',
+      statusUpcoming: 'À venir', statusOngoing: 'En cours', statusPast: 'Terminé', statusDraft: 'Brouillon', statusArchived: 'Archivé',
       datesTbc: 'Dates à confirmer', newSummary: 'Un nouveau voyage prêt à être organisé.',
+      duplicatedTitle: 'Voyage dupliqué', duplicatedMessage: 'Une copie complète de « {{name}} » a été créée.',
+      archivedTitle: 'Voyage archivé', archivedMessage: '« {{name}} » est maintenant disponible dans l’onglet Archivés.',
+      restoredTitle: 'Voyage restauré', restoredMessage: '« {{name}} » est de nouveau actif.',
+      deletedTitle: 'Voyage supprimé', deletedMessage: '« {{name}} » a été définitivement supprimé.',
     },
     createTrip: {
       title: 'Créer un voyage', description: 'Commencez par l’essentiel. Chaque détail pourra être précisé ensuite.',
@@ -294,6 +320,13 @@ export const TRANSLATIONS = Object.freeze({
       nameRequired: 'Donnez un nom à ce voyage.', destinationRequired: 'Ajoutez au moins une destination.',
       departureRequired: 'Choisissez une date de départ.', returnRequired: 'Choisissez une date de retour.',
       dateOrder: 'La date de retour doit être postérieure au départ.',
+    },
+    editTrip: {
+      action: 'Modifier le voyage', title: 'Modifier le voyage', description: 'Mettez à jour les informations principales sans affecter le planning détaillé.',
+      submit: 'Enregistrer les modifications', savedTitle: 'Voyage mis à jour', savedMessage: 'Les modifications de « {{name}} » ont été enregistrées.',
+      countryCode: 'Code pays', accent: 'Couleur de la carte', summary: 'Description courte',
+      summaryPlaceholder: 'Décrivez l’esprit et l’objectif de ce voyage.',
+      accents: { violet: 'Violet', aqua: 'Turquoise', coral: 'Corail' },
     },
     explore: {
       eyebrow: 'Inspiration', title: 'Où partirez-vous ensuite ?',
@@ -350,6 +383,7 @@ export const TRANSLATIONS = Object.freeze({
       location: 'Lieu', locationPlaceholder: 'Adresse ou nom du lieu', duration: 'Durée (minutes)',
       notes: 'Notes', notesPlaceholder: 'Réservation, rappel ou contexte utile', addActivity: 'Ajouter une activité', add: 'Ajouter à l’itinéraire', estimatedCost: 'Coût estimé', day: 'Jour {{count}}', plannedItem: '{{count}} élément prévu', plannedItems: '{{count}} éléments prévus', dateToDefine: 'Date à définir', firstActivity: 'Ajouter une première activité', emptyCopy: 'Commencez par l’arrivée, l’hébergement et une activité mémorable.', minutes: '{{count}} min',
       emptyTitle: 'Votre itinéraire est prêt à être construit', emptyText: 'Ajoutez une première activité pour commencer à organiser les journées.',
+      editEyebrow: 'Modifier le planning', newEyebrow: 'Nouvelle étape', editTitle: 'Modifier l’activité', newTitle: 'Ajouter une activité', saveChanges: 'Enregistrer les modifications', deleteConfirm: 'Supprimer « {{name}} » de l’itinéraire ?',
       deleteAria: 'Supprimer l’activité', latitudeHelp: 'Latitude décimale, par exemple 48.8566', longitudeHelp: 'Longitude décimale, par exemple 2.3522',
     },
     budget: {
@@ -379,7 +413,7 @@ export const TRANSLATIONS = Object.freeze({
       providerPlaceholder: 'Air France, Booking…', confirmationNumber: 'Numéro de confirmation', optionalReference: 'Référence facultative',
       startDate: 'Date de début', startTime: 'Heure de début', endDate: 'Date de fin', endTime: 'Heure de fin',
       locationPlaceholder: 'Aéroport, adresse de l’hôtel ou point de rendez-vous', bookingLink: 'Lien de réservation', linkPlaceholder: 'https://…',
-      notesPlaceholder: 'Conditions d’annulation, bagages, consignes d’arrivée…', deleteAria: 'Supprimer la réservation',
+      notesPlaceholder: 'Conditions d’annulation, bagages, consignes d’arrivée…', editEyebrow: 'Modifier la réservation', newEyebrow: 'Nouvelle réservation', editTitle: 'Modifier la réservation', newTitle: 'Ajouter une réservation', saveChanges: 'Enregistrer les modifications', deleteConfirm: 'Supprimer la réservation « {{name}} » ?', deleteAria: 'Supprimer la réservation',
     },
     documents: {
       eyebrow: 'Portefeuille de voyage', title: 'Documents',
@@ -388,7 +422,7 @@ export const TRANSLATIONS = Object.freeze({
       emptyText: 'Enregistrez les liens et références utiles avant le départ.', addFirst: 'Ajouter un premier document',
       type: 'Type de document', titleLabel: 'Titre', titlePlaceholder: 'Assurance voyage, carte d’embarquement…',
       referencePlaceholder: 'Numéro ou identifiant facultatif', expiry: 'Date d’expiration', secureLink: 'Lien sécurisé',
-      linkPlaceholder: 'https://…', notesPlaceholder: 'Emplacement de l’original, contact d’urgence…', deleteAria: 'Supprimer le document',
+      linkPlaceholder: 'https://…', notesPlaceholder: 'Emplacement de l’original, contact d’urgence…', editEyebrow: 'Modifier le document', newEyebrow: 'Nouveau document', editTitle: 'Modifier le document', newTitle: 'Ajouter un document', saveChanges: 'Enregistrer les modifications', deleteConfirm: 'Supprimer le document « {{name}} » ?', deleteAria: 'Supprimer le document',
     },
     map: {
       eyebrow: 'Planification visuelle', title: 'Carte du voyage', intro: 'Visualisez les étapes et réservations géolocalisées au même endroit.',

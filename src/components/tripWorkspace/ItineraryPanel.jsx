@@ -6,15 +6,16 @@ import { Button } from '../common/Button.jsx';
 import { Card } from '../common/Card.jsx';
 import { Icon } from '../common/Icon.jsx';
 
-const EMPTY_FORM = {
+const EMPTY_FORM = Object.freeze({
   date: '', time: '09:00', type: 'map', title: '', location: '', latitude: '', longitude: '',
   durationMinutes: 60, estimatedCost: 0, notes: '',
-};
+});
 
 export function ItineraryPanel({ trip, onUpdate }) {
   const { locale, t } = useI18n();
   const [form, setForm] = useState(() => ({ ...EMPTY_FORM, date: trip.startDate || '' }));
   const [isFormOpen, setFormOpen] = useState(false);
+  const [editingActivity, setEditingActivity] = useState(null);
   const itinerary = useMemo(
     () => [...trip.itinerary].sort((left, right) => left.date.localeCompare(right.date)),
     [trip.itinerary],
@@ -25,12 +26,41 @@ export function ItineraryPanel({ trip, onUpdate }) {
     setForm((current) => ({ ...current, [name]: value }));
   }
 
+  function openCreateForm() {
+    setEditingActivity(null);
+    setForm({ ...EMPTY_FORM, date: trip.startDate || '' });
+    setFormOpen(true);
+  }
+
+  function openEditForm(day, activity) {
+    setEditingActivity({ dayId: day.id, activityId: activity.id });
+    setForm({
+      date: day.date,
+      time: activity.time || '',
+      type: activity.type || 'map',
+      title: activity.title || '',
+      location: activity.location || '',
+      latitude: activity.latitude ?? '',
+      longitude: activity.longitude ?? '',
+      durationMinutes: activity.durationMinutes || 0,
+      estimatedCost: activity.estimatedCost || 0,
+      notes: activity.notes || '',
+    });
+    setFormOpen(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function closeForm() {
+    setFormOpen(false);
+    setEditingActivity(null);
+  }
+
   function submitActivity(event) {
     event.preventDefault();
     if (!form.date || !form.title.trim()) return;
 
-    const newActivity = {
-      id: createId('activity'),
+    const activity = {
+      id: editingActivity?.activityId || createId('activity'),
       time: form.time,
       type: form.type,
       title: form.title.trim(),
@@ -42,21 +72,33 @@ export function ItineraryPanel({ trip, onUpdate }) {
       notes: form.notes.trim(),
     };
 
-    const existingDay = trip.itinerary.find((day) => day.date === form.date);
-    const nextItinerary = existingDay
-      ? trip.itinerary.map((day) => day.id === existingDay.id
-        ? { ...day, items: [...day.items, newActivity].sort((left, right) => left.time.localeCompare(right.time)) }
-        : day)
-      : [...trip.itinerary, { id: createId('day'), date: form.date, title: '', items: [newActivity] }];
+    let nextItinerary = trip.itinerary.map((day) => ({ ...day, items: [...day.items] }));
+
+    if (editingActivity) {
+      nextItinerary = nextItinerary
+        .map((day) => day.id === editingActivity.dayId
+          ? { ...day, items: day.items.filter((item) => item.id !== editingActivity.activityId) }
+          : day)
+        .filter((day) => day.items.length > 0);
+    }
+
+    const destinationDay = nextItinerary.find((day) => day.date === form.date);
+    if (destinationDay) {
+      nextItinerary = nextItinerary.map((day) => day.id === destinationDay.id
+        ? { ...day, items: [...day.items, activity].sort((left, right) => left.time.localeCompare(right.time)) }
+        : day);
+    } else {
+      nextItinerary = [...nextItinerary, { id: createId('day'), date: form.date, title: '', items: [activity] }];
+    }
 
     onUpdate({ itinerary: nextItinerary });
-    setForm((current) => ({ ...EMPTY_FORM, date: current.date, time: current.time }));
-    setFormOpen(false);
+    closeForm();
   }
 
-  function removeActivity(dayId, activityId) {
+  function removeActivity(dayId, activity) {
+    if (!window.confirm(t('itinerary.deleteConfirm', { name: activity.title }))) return;
     const nextItinerary = trip.itinerary
-      .map((day) => day.id === dayId ? { ...day, items: day.items.filter((item) => item.id !== activityId) } : day)
+      .map((day) => day.id === dayId ? { ...day, items: day.items.filter((item) => item.id !== activity.id) } : day)
       .filter((day) => day.items.length > 0);
     onUpdate({ itinerary: nextItinerary });
   }
@@ -69,7 +111,7 @@ export function ItineraryPanel({ trip, onUpdate }) {
           <h2>{t('itinerary.title')}</h2>
           <p>{t('itinerary.intro')}</p>
         </div>
-        <Button icon={isFormOpen ? 'close' : 'plus'} onClick={() => setFormOpen((value) => !value)}>
+        <Button icon={isFormOpen ? 'close' : 'plus'} onClick={() => (isFormOpen ? closeForm() : openCreateForm())}>
           {isFormOpen ? t('common.close') : t('itinerary.addActivity')}
         </Button>
       </section>
@@ -77,6 +119,12 @@ export function ItineraryPanel({ trip, onUpdate }) {
       {isFormOpen && (
         <Card className="workspace-form-card">
           <form className="workspace-form" onSubmit={submitActivity}>
+            <div className="workspace-form__title-row">
+              <div>
+                <p className="eyebrow">{t(editingActivity ? 'itinerary.editEyebrow' : 'itinerary.newEyebrow')}</p>
+                <h3>{t(editingActivity ? 'itinerary.editTitle' : 'itinerary.newTitle')}</h3>
+              </div>
+            </div>
             <div className="workspace-form__grid">
               <Field label={t('itinerary.date')}><input name="date" type="date" min={trip.startDate} max={trip.endDate} value={form.date} onChange={updateField} required /></Field>
               <Field label={t('itinerary.time')}><input name="time" type="time" value={form.time} onChange={updateField} /></Field>
@@ -94,8 +142,10 @@ export function ItineraryPanel({ trip, onUpdate }) {
               <Field label={t('itinerary.notes')} className="workspace-form__full"><textarea name="notes" rows="3" value={form.notes} onChange={updateField} placeholder={t('itinerary.notesPlaceholder')} /></Field>
             </div>
             <div className="workspace-form__actions">
-              <Button variant="ghost" onClick={() => setFormOpen(false)}>{t('common.cancel')}</Button>
-              <Button type="submit" icon="plus">{t('itinerary.add')}</Button>
+              <Button variant="ghost" onClick={closeForm}>{t('common.cancel')}</Button>
+              <Button type="submit" icon={editingActivity ? 'save' : 'plus'}>
+                {t(editingActivity ? 'itinerary.saveChanges' : 'itinerary.add')}
+              </Button>
             </div>
           </form>
         </Card>
@@ -133,9 +183,14 @@ export function ItineraryPanel({ trip, onUpdate }) {
                       )}
                       {item.notes && <em>{item.notes}</em>}
                     </div>
-                    <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.delete')} ${item.title}`} onClick={() => removeActivity(day.id, item.id)}>
-                      <Icon name="trash" size={16} />
-                    </button>
+                    <div className="item-actions">
+                      <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.edit')} ${item.title}`} onClick={() => openEditForm(day, item)}>
+                        <Icon name="edit" size={16} />
+                      </button>
+                      <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.delete')} ${item.title}`} onClick={() => removeActivity(day.id, item)}>
+                        <Icon name="trash" size={16} />
+                      </button>
+                    </div>
                   </article>
                 ))}
               </div>
@@ -143,7 +198,7 @@ export function ItineraryPanel({ trip, onUpdate }) {
           ))}
         </div>
       ) : (
-        <WorkspaceEmpty icon="calendarDays" title={t('itinerary.emptyTitle')} copy={t('itinerary.emptyCopy')} action={t('itinerary.firstActivity')} onAction={() => setFormOpen(true)} />
+        <WorkspaceEmpty icon="calendarDays" title={t('itinerary.emptyTitle')} copy={t('itinerary.emptyCopy')} action={t('itinerary.firstActivity')} onAction={openCreateForm} />
       )}
     </div>
   );
