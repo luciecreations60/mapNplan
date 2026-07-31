@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
 import { createId } from '../../utils/id.js';
 import { DOCUMENT_TYPES, getCategoryLabel } from '../../utils/tripWorkspace.js';
@@ -16,6 +16,7 @@ export function DocumentsPanel({ trip, onUpdate }) {
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [isFormOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const formAnchorRef = useRef(null);
   const documents = useMemo(
     () => [...trip.documents].sort((left, right) => left.title.localeCompare(right.title)),
     [trip.documents],
@@ -43,7 +44,7 @@ export function DocumentsPanel({ trip, onUpdate }) {
       notes: document.notes || '',
     });
     setFormOpen(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.requestAnimationFrame(() => formAnchorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   }
 
   function closeForm() {
@@ -94,7 +95,9 @@ export function DocumentsPanel({ trip, onUpdate }) {
       </section>
 
       {isFormOpen && (
-        <Card className="workspace-form-card">
+        <>
+          <div ref={formAnchorRef} className="workspace-form-anchor" />
+          <Card className="workspace-form-card">
           <form className="workspace-form" onSubmit={submitDocument}>
             <div className="workspace-form__title-row">
               <div>
@@ -131,7 +134,8 @@ export function DocumentsPanel({ trip, onUpdate }) {
               </Button>
             </div>
           </form>
-        </Card>
+          </Card>
+        </>
       )}
 
       {documents.length > 0 ? (

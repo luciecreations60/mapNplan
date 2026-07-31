@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
 import { formatCurrency } from '../../utils/currency.js';
 import { createId } from '../../utils/id.js';
@@ -23,6 +23,7 @@ export function ReservationsPanel({ trip, onUpdate }) {
   const [form, setForm] = useState(() => ({ ...EMPTY_FORM, startDate: trip.startDate || '' }));
   const [isFormOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const formAnchorRef = useRef(null);
   const reservations = useMemo(() => [...trip.reservations].sort(compareReservations), [trip.reservations]);
 
   function updateField(event) {
@@ -56,7 +57,7 @@ export function ReservationsPanel({ trip, onUpdate }) {
       notes: reservation.notes || '',
     });
     setFormOpen(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.requestAnimationFrame(() => formAnchorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   }
 
   function closeForm() {
@@ -133,7 +134,9 @@ export function ReservationsPanel({ trip, onUpdate }) {
       </section>
 
       {isFormOpen && (
-        <Card className="workspace-form-card">
+        <>
+          <div ref={formAnchorRef} className="workspace-form-anchor" />
+          <Card className="workspace-form-card">
           <form className="workspace-form" onSubmit={submitReservation}>
             <div className="workspace-form__title-row">
               <div>
@@ -194,7 +197,8 @@ export function ReservationsPanel({ trip, onUpdate }) {
               </Button>
             </div>
           </form>
-        </Card>
+          </Card>
+        </>
       )}
 
       {reservations.length > 0 ? (

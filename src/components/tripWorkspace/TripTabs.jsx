@@ -3,6 +3,7 @@ import { Icon } from '../common/Icon.jsx';
 
 export const TRIP_TABS = Object.freeze([
   { id: 'overview', labelKey: 'workspace.overview', icon: 'dashboard' },
+  { id: 'today', labelKey: 'workspace.today', icon: 'activity' },
   { id: 'itinerary', labelKey: 'workspace.itinerary', icon: 'calendarDays' },
   { id: 'route', labelKey: 'workspace.route', icon: 'route' },
   { id: 'calendar', labelKey: 'workspace.calendar', icon: 'calendarRange' },
@@ -18,11 +19,11 @@ export const TRIP_TABS = Object.freeze([
   { id: 'collaboration', labelKey: 'workspace.collaboration', icon: 'users' },
 ]);
 
-export function TripTabs({ activeTab, onChange }) {
+export function TripTabs({ navRef, activeTab, onChange }) {
   const { t } = useI18n();
 
   return (
-    <nav className="trip-tabs" aria-label={t('workspace.aria')}>
+    <nav ref={navRef} className="trip-tabs" aria-label={t('workspace.aria')}>
       {TRIP_TABS.map((tab) => (
         <button
           key={tab.id}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { CollaborationPanel } from '../components/tripWorkspace/CollaborationPanel.jsx';
 import { CalendarPanel } from '../components/tripWorkspace/CalendarPanel.jsx';
@@ -15,6 +15,7 @@ import { SharedExpensesPanel } from '../components/tripWorkspace/SharedExpensesP
 import { StatisticsPanel } from '../components/tripWorkspace/StatisticsPanel.jsx';
 import { TravelToolsPanel } from '../components/tripWorkspace/TravelToolsPanel.jsx';
 import { TripHero } from '../components/tripWorkspace/TripHero.jsx';
+import { TodayPanel } from '../components/tripWorkspace/TodayPanel.jsx';
 import { EditTripDialog } from '../components/trips/EditTripDialog.jsx';
 import { InlineNotice } from '../components/feedback/InlineNotice.jsx';
 import { TRIP_TABS, TripTabs } from '../components/tripWorkspace/TripTabs.jsx';
@@ -32,15 +33,33 @@ export function TripWorkspacePage() {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [isEditOpen, setEditOpen] = useState(false);
   const [notice, setNotice] = useState(null);
+  const tabsRef = useRef(null);
+  const shouldFocusTabsRef = useRef(false);
   const trip = getTripById(tripId);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [activeTab, tripId]);
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [tripId]);
+
+  useEffect(() => {
+    if (!shouldFocusTabsRef.current) return;
+    shouldFocusTabsRef.current = false;
+    window.requestAnimationFrame(() => {
+      tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      tabsRef.current?.querySelector('[aria-current="page"]')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
+      });
+    });
+  }, [activeTab]);
 
   useEffect(() => {
     const tab = searchParams.get('tab');
-    if (TRIP_TABS.some((item) => item.id === tab) && tab !== activeTab) setActiveTab(tab);
+    if (TRIP_TABS.some((item) => item.id === tab) && tab !== activeTab) {
+      shouldFocusTabsRef.current = true;
+      setActiveTab(tab);
+    }
   }, [activeTab, searchParams]);
 
   if (!trip) {
@@ -61,6 +80,7 @@ export function TripWorkspacePage() {
   }
 
   function handleTabChange(tab) {
+    shouldFocusTabsRef.current = true;
     setActiveTab(tab);
     if (tab === 'overview') setSearchParams({}, { replace: true });
     else setSearchParams({ tab }, { replace: true });
@@ -74,10 +94,11 @@ export function TripWorkspacePage() {
         </InlineNotice>
       )}
       <TripHero trip={trip} onEdit={() => setEditOpen(true)} />
-      <TripTabs activeTab={activeTab} onChange={handleTabChange} />
+      <TripTabs navRef={tabsRef} activeTab={activeTab} onChange={handleTabChange} />
 
       <div className="trip-workspace__content">
         {activeTab === 'overview' && <OverviewPanel trip={trip} onOpenTab={handleTabChange} />}
+        {activeTab === 'today' && <TodayPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} />}
         {activeTab === 'itinerary' && <ItineraryPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'route' && <RouteOptimizerPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} />}
         {activeTab === 'calendar' && <CalendarPanel trip={trip} onOpenTab={handleTabChange} />}

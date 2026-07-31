@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
 import { createId } from '../../utils/id.js';
 import { routePlanningService } from '../../services/routing/RoutePlanningService.js';
@@ -6,6 +6,7 @@ import { invalidateDayRoutePlan } from '../../utils/routeOptimization.js';
 import { ACTIVITY_TYPES, getCategoryLabel } from '../../utils/tripWorkspace.js';
 import { appendActivityEntry, createActivityEntry, getCurrentActorName } from '../../utils/collaboration.js';
 import { DiscussionThread } from '../collaboration/DiscussionThread.jsx';
+import { Badge } from '../common/Badge.jsx';
 import { Button } from '../common/Button.jsx';
 import { Card } from '../common/Card.jsx';
 import { Icon } from '../common/Icon.jsx';
@@ -21,6 +22,7 @@ export function ItineraryPanel({ trip, onUpdate }) {
   const [form, setForm] = useState(() => ({ ...EMPTY_FORM, date: trip.startDate || '' }));
   const [isFormOpen, setFormOpen] = useState(false);
   const [editingActivity, setEditingActivity] = useState(null);
+  const formAnchorRef = useRef(null);
   const itinerary = useMemo(
     () => [...trip.itinerary].sort((left, right) => left.date.localeCompare(right.date)),
     [trip.itinerary],
@@ -52,7 +54,7 @@ export function ItineraryPanel({ trip, onUpdate }) {
       notes: activity.notes || '',
     });
     setFormOpen(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.requestAnimationFrame(() => formAnchorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   }
 
   function closeForm() {
@@ -75,6 +77,9 @@ export function ItineraryPanel({ trip, onUpdate }) {
       durationMinutes: Math.max(0, Number(form.durationMinutes) || 0),
       estimatedCost: Math.max(0, Number(form.estimatedCost) || 0),
       notes: form.notes.trim(),
+      completedAt: editingActivity
+        ? trip.itinerary.flatMap((day) => day.items).find((item) => item.id === editingActivity.activityId)?.completedAt || null
+        : null,
       comments: editingActivity
         ? trip.itinerary.flatMap((day) => day.items).find((item) => item.id === editingActivity.activityId)?.comments || []
         : [],
@@ -150,7 +155,9 @@ export function ItineraryPanel({ trip, onUpdate }) {
       </section>
 
       {isFormOpen && (
-        <Card className="workspace-form-card">
+        <>
+          <div ref={formAnchorRef} className="workspace-form-anchor" />
+          <Card className="workspace-form-card">
           <form className="workspace-form" onSubmit={submitActivity}>
             <div className="workspace-form__title-row">
               <div>
@@ -202,7 +209,8 @@ export function ItineraryPanel({ trip, onUpdate }) {
               </Button>
             </div>
           </form>
-        </Card>
+          </Card>
+        </>
       )}
 
       {itinerary.length > 0 ? (
@@ -236,6 +244,7 @@ export function ItineraryPanel({ trip, onUpdate }) {
                         </small>
                       )}
                       {item.notes && <em>{item.notes}</em>}
+                      {item.completedAt && <Badge tone="success" className="itinerary-item__completed">{t('companion.markDone')}</Badge>}
                       <DiscussionThread
                         comments={item.comments}
                         currentUserName={getCurrentActorName(trip)}
