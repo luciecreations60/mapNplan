@@ -34,6 +34,7 @@ export const APP_CONFIG = Object.freeze({
     itineraryOptimization: true,
     sharedExpenses: true,
     travelDayCompanion: true,
+    localFileVault: true,
     affiliateLinks: false,
     aiAssistant: false,
   }),

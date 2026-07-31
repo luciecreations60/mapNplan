@@ -6,6 +6,7 @@ export function normalizeSearchValue(value) {
   return String(value ?? '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
     .toLocaleLowerCase()
     .trim();
 }
@@ -57,6 +58,7 @@ export function tripMatchesQuery(trip, rawQuery) {
     document.reference,
     document.notes,
     document.type,
+    ...(document.attachments || []).map((attachment) => attachment.name),
   ], query));
 }
 
@@ -119,7 +121,12 @@ export function searchTripContent(trips, rawQuery, limit = 12) {
     }
 
     for (const document of trip.documents || []) {
-      if (!includesQuery([document.title, document.reference, document.notes], query)) continue;
+      if (!includesQuery([
+        document.title,
+        document.reference,
+        document.notes,
+        ...(document.attachments || []).map((attachment) => attachment.name),
+      ], query)) continue;
       push({
         id: `document-${trip.id}-${document.id}`,
         type: 'document',

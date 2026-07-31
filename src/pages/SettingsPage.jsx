@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '../components/common/Button.jsx';
 import { Card } from '../components/common/Card.jsx';
 import { Icon } from '../components/common/Icon.jsx';
@@ -7,6 +7,7 @@ import { APP_CONFIG } from '../config/app.config.js';
 import { useI18n } from '../hooks/useI18n.js';
 import { useTheme } from '../hooks/useTheme.js';
 import { useTrips } from '../hooks/useTrips.js';
+import { attachmentStorageService } from '../services/storage/AttachmentStorageService.js';
 
 export function SettingsPage() {
   const { language, locale, setLanguage, supportedLanguages, t } = useI18n();
@@ -15,12 +16,27 @@ export function SettingsPage() {
   const fileInputRef = useRef(null);
   const [feedback, setFeedback] = useState(null);
   const [isImporting, setIsImporting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+  const [storageUsage, setStorageUsage] = useState(null);
 
   const themes = [
     { id: 'light', label: t('theme.light'), icon: 'sun', description: t('theme.lightDescription') },
     { id: 'dark', label: t('theme.dark'), icon: 'moon', description: t('theme.darkDescription') },
     { id: 'system', label: t('theme.system'), icon: 'monitor', description: t('theme.systemDescription') },
   ];
+
+  const refreshStorageUsage = useCallback(async () => {
+    try {
+      setStorageUsage(await attachmentStorageService.getUsage());
+    } catch {
+      setStorageUsage({ supported: false, attachmentCount: 0, attachmentBytes: 0, originUsage: 0, quota: 0 });
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshStorageUsage();
+  }, [refreshStorageUsage, trips]);
 
   function showFeedback(tone, title, message) {
     setFeedback({ tone, title, message });
@@ -38,21 +54,38 @@ export function SettingsPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function handleReset() {
+  async function handleReset() {
     const confirmed = window.confirm(t('settings.resetConfirm'));
     if (!confirmed) return;
-    resetDemoData();
-    showFeedback('success', t('settings.resetSuccessTitle'), t('settings.resetSuccessText'));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setIsResetting(true);
+    try {
+      await resetDemoData();
+      showFeedback('success', t('settings.resetSuccessTitle'), t('settings.resetSuccessText'));
+      await refreshStorageUsage();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error) {
+      showFeedback('danger', t('settings.resetFailedTitle'), error.message || t('settings.resetFailedText'));
+    } finally {
+      setIsResetting(false);
+    }
   }
 
-  function handleExport() {
-    exportBackup();
-    showFeedback(
-      'success',
-      t('settings.exportSuccessTitle'),
-      t(trips.length === 1 ? 'settings.exportSuccessOne' : 'settings.exportSuccessMany', { count: trips.length }),
-    );
+  async function handleExport() {
+    setIsExporting(true);
+    setFeedback(null);
+    try {
+      const backup = await exportBackup();
+      const attachmentCount = backup.attachments?.length || 0;
+      showFeedback(
+        'success',
+        t('settings.exportSuccessTitle'),
+        t('settings.exportSuccessWithFiles', { count: trips.length, files: attachmentCount }),
+      );
+    } catch (error) {
+      showFeedback('danger', t('settings.exportFailedTitle'), error.message || t('settings.exportFailedText'));
+    } finally {
+      setIsExporting(false);
+    }
   }
 
   async function handleImport(event) {
@@ -69,12 +102,13 @@ export function SettingsPage() {
     setFeedback(null);
 
     try {
-      const importedTrips = await importBackup(file);
+      const result = await importBackup(file);
       showFeedback(
         'success',
         t('settings.importSuccessTitle'),
-        t(importedTrips.length === 1 ? 'settings.importSuccessOne' : 'settings.importSuccessMany', { count: importedTrips.length }),
+        t('settings.importSuccessWithFiles', { count: result.trips.length, files: result.attachmentCount }),
       );
+      await refreshStorageUsage();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       showFeedback('danger', t('settings.importFailed'), error.message || t('settings.importFailedText'));
@@ -161,8 +195,34 @@ export function SettingsPage() {
           <div><dt>{t('settings.version')}</dt><dd>{APP_CONFIG.version}</dd></div>
           <div><dt>{t('settings.defaultCurrency')}</dt><dd>{APP_CONFIG.defaultCurrency}</dd></div>
           <div><dt>{t('language.title')}</dt><dd>{locale}</dd></div>
-          <div><dt>{t('settings.storage')}</dt><dd>{t('settings.localStorage')}</dd></div>
+          <div><dt>{t('settings.storage')}</dt><dd>{t('settings.hybridStorage')}</dd></div>
         </dl>
+      </Card>
+
+      <Card className="settings-card">
+        <header>
+          <span className="settings-card__icon"><Icon name="hardDrive" /></span>
+          <div>
+            <h2>{t('settings.fileStorageTitle')}</h2>
+            <p>{t('settings.fileStorageText')}</p>
+          </div>
+        </header>
+
+        {storageUsage?.supported ? (
+          <div className="storage-overview">
+            <div><span>{t('settings.localFiles')}</span><strong>{storageUsage.attachmentCount}</strong></div>
+            <div><span>{t('settings.fileStorageUsed')}</span><strong>{formatBytes(storageUsage.attachmentBytes, locale)}</strong></div>
+            <div><span>{t('settings.originStorageUsed')}</span><strong>{formatBytes(storageUsage.originUsage, locale)}</strong></div>
+            <div><span>{t('settings.availableQuota')}</span><strong>{storageUsage.quota ? formatBytes(storageUsage.quota, locale) : '—'}</strong></div>
+          </div>
+        ) : (
+          <InlineNotice tone="warning" title={t('settings.storageUnavailableTitle')}>
+            {t('settings.storageUnavailableText')}
+          </InlineNotice>
+        )}
+
+        <p className="settings-helper"><Icon name="info" size={16} /> {t('settings.localFilesPrivate')}</p>
+        <Button variant="secondary" icon="refresh" onClick={refreshStorageUsage}>{t('settings.refreshStorage')}</Button>
       </Card>
 
       <Card className="settings-card">
@@ -177,15 +237,17 @@ export function SettingsPage() {
         <div className="settings-actions">
           <div>
             <strong>{t('settings.exportTitle')}</strong>
-            <p>{t('settings.exportText')}</p>
+            <p>{t('settings.exportTextWithFiles')}</p>
           </div>
-          <Button variant="secondary" icon="download" onClick={handleExport}>{t('settings.exportButton')}</Button>
+          <Button variant="secondary" icon="download" disabled={isExporting} onClick={handleExport}>
+            {isExporting ? t('settings.exporting') : t('settings.exportButton')}
+          </Button>
         </div>
 
         <div className="settings-actions">
           <div>
             <strong>{t('settings.importTitle')}</strong>
-            <p>{t('settings.importText')}</p>
+            <p>{t('settings.importTextWithFiles')}</p>
           </div>
           <Button variant="secondary" icon="upload" disabled={isImporting} onClick={() => fileInputRef.current?.click()}>
             {isImporting ? t('settings.importing') : t('settings.importButton')}
@@ -199,11 +261,26 @@ export function SettingsPage() {
           <span className="settings-card__icon"><Icon name="trash" /></span>
           <div>
             <h2>{t('settings.reset')}</h2>
-            <p>{t('settings.resetText')}</p>
+            <p>{t('settings.resetTextWithFiles')}</p>
           </div>
         </header>
-        <Button variant="danger" icon="trash" onClick={handleReset}>{t('settings.reset')}</Button>
+        <Button variant="danger" icon="trash" disabled={isResetting} onClick={handleReset}>
+          {isResetting ? t('settings.resetting') : t('settings.reset')}
+        </Button>
       </Card>
     </div>
   );
+}
+
+function formatBytes(bytes, locale) {
+  const value = Math.max(0, Number(bytes) || 0);
+  if (value < 1024) return `${value} B`;
+  const units = ['KB', 'MB', 'GB', 'TB'];
+  let size = value / 1024;
+  let unitIndex = 0;
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024;
+    unitIndex += 1;
+  }
+  return `${new Intl.NumberFormat(locale, { maximumFractionDigits: size >= 10 ? 1 : 2 }).format(size)} ${units[unitIndex]}`;
 }

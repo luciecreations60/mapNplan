@@ -7,7 +7,7 @@ import { normalizeCompanionSettings } from '../../utils/travelCompanion.js';
 import { localStorageService } from '../storage/LocalStorageService.js';
 
 const STORAGE_KEY = 'trips';
-const CURRENT_TRIP_SCHEMA_VERSION = 11;
+const CURRENT_TRIP_SCHEMA_VERSION = 12;
 
 /**
  * Trip repository façade.
@@ -140,6 +140,7 @@ class TripService {
       documents: sourceTrip.documents.map((document) => ({
         ...document,
         id: createId('document'),
+        attachments: [],
         createdAt: now,
       })),
       companion: {
@@ -255,7 +256,7 @@ class TripService {
     const checklist = this.#normalizeChecklist(trip.checklist);
     const itinerary = this.#normalizeItinerary(trip.itinerary);
     const reservations = this.#normalizeReservations(trip.reservations);
-    const documents = this.#normalizeDocuments(trip.documents);
+    const documents = this.#normalizeDocuments(trip.documents, reservations);
     const companion = normalizeCompanionSettings(trip.companion);
     const calculatedSpent = expenses
       .reduce((sum, expense) => sum + expense.paidAmount, 0);
@@ -527,8 +528,9 @@ class TripService {
     }));
   }
 
-  #normalizeDocuments(documents) {
+  #normalizeDocuments(documents, reservations = []) {
     if (!Array.isArray(documents)) return [];
+    const reservationIds = new Set(reservations.map((reservation) => reservation.id));
 
     return documents.map((document) => ({
       id: document.id || createId('document'),
@@ -540,6 +542,20 @@ class TripService {
       url: normalizeExternalUrl(document.url),
       expiryDate: document.expiryDate || '',
       notes: String(document.notes || '').trim(),
+      linkedReservationId: reservationIds.has(String(document.linkedReservationId || ''))
+        ? String(document.linkedReservationId)
+        : null,
+      attachments: Array.isArray(document.attachments)
+        ? document.attachments.map((attachment) => ({
+            id: String(attachment.id || createId('attachment')),
+            name: String(attachment.name || 'attachment').trim(),
+            type: String(attachment.type || 'application/octet-stream').trim(),
+            size: Math.max(0, Number(attachment.size) || 0),
+            lastModified: Math.max(0, Number(attachment.lastModified) || 0),
+            createdAt: attachment.createdAt || new Date().toISOString(),
+            updatedAt: attachment.updatedAt || attachment.createdAt || new Date().toISOString(),
+          }))
+        : [],
       createdAt: document.createdAt || new Date().toISOString(),
     }));
   }
