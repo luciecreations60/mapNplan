@@ -55,3 +55,29 @@ Planned boundaries:
 - `AuthService` → user authentication.
 - `TripRepository` → Supabase or another backend.
 - `AIService` → itinerary generation provider.
+
+
+## V0.1.1 trip workspace
+
+The workspace is organised around a stable aggregate:
+
+```text
+Trip
+├── itinerary[]
+│   └── day.items[]
+├── expenses[]
+├── checklist[]
+└── notes
+```
+
+Each nested entity owns a stable identifier. The current LocalStorage repository stores the aggregate as one document for simplicity, while the shape is intentionally compatible with future relational or document-based persistence.
+
+`TripWorkspacePage` coordinates module navigation only. It delegates each business area to an isolated component:
+
+- `OverviewPanel`
+- `ItineraryPanel`
+- `BudgetPanel`
+- `ChecklistPanel`
+- `NotesPanel`
+
+Detailed totals are derived in `TripService`; presentation components do not duplicate persistence or normalisation rules. Every saved trip includes a `schemaVersion`, enabling explicit migrations as the domain evolves.

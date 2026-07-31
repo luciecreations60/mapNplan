@@ -1,6 +1,6 @@
+import { Link } from 'react-router-dom';
 import { Card } from '../common/Card.jsx';
 import { Badge } from '../common/Badge.jsx';
-import { Button } from '../common/Button.jsx';
 import { Icon } from '../common/Icon.jsx';
 import { ProgressBar } from '../common/ProgressBar.jsx';
 import { formatCurrency } from '../../utils/currency.js';
@@ -45,7 +45,10 @@ export function UpcomingTripCard({ trip }) {
           </div>
         </div>
 
-        <Button variant="light" icon="arrowRight" iconPosition="end">Continue planning</Button>
+        <Link className="button button--light button--medium" to={`/trips/${trip.id}`}>
+          <span>Continue planning</span>
+          <Icon name="arrowRight" size={18} />
+        </Link>
       </div>
 
       <div className="upcoming-card__art" aria-hidden="true">

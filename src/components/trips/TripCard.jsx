@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Badge } from '../common/Badge.jsx';
 import { Icon } from '../common/Icon.jsx';
 import { ProgressBar } from '../common/ProgressBar.jsx';
@@ -36,7 +37,12 @@ export function TripCard({ trip, onDelete }) {
             <p className="trip-card__destination"><Icon name="pin" size={15} /> {trip.destination}</p>
             <h3>{trip.name}</h3>
           </div>
-          <button className="icon-button icon-button--small" type="button" aria-label={`Delete ${trip.name}`} onClick={() => onDelete(trip.id)}>
+          <button
+            className="icon-button icon-button--small"
+            type="button"
+            aria-label={`Delete ${trip.name}`}
+            onClick={() => onDelete(trip.id)}
+          >
             <Icon name="trash" size={17} />
           </button>
         </div>
@@ -54,7 +60,9 @@ export function TripCard({ trip, onDelete }) {
 
         <footer className="trip-card__footer">
           <span><Icon name="users" size={16} /> {trip.travelers} traveller{trip.travelers > 1 ? 's' : ''}</span>
-          <button className="text-link" type="button">Open planner <Icon name="arrowRight" size={16} /></button>
+          <Link className="text-link" to={`/trips/${trip.id}`}>
+            Open planner <Icon name="arrowRight" size={16} />
+          </Link>
         </footer>
       </div>
     </article>
