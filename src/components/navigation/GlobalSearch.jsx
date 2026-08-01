@@ -6,21 +6,18 @@ import { searchTripContent } from '../../utils/tripSearch.js';
 import { Icon } from '../common/Icon.jsx';
 
 const RESULT_ICONS = {
-  trip: 'trips',
-  activity: 'calendarDays',
-  reservation: 'ticket',
-  document: 'file',
-  notes: 'notebook',
-  savedPlace: 'pin',
-  bookingOption: 'externalLink',
+  trip: 'trips', activity: 'calendarDays', reservation: 'ticket', document: 'file',
+  notes: 'notebook', savedPlace: 'pin', bookingOption: 'externalLink',
 };
 
 export function GlobalSearch() {
   const [isOpen, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [activeIndex, setActiveIndex] = useState(-1);
   const navigate = useNavigate();
   const rootRef = useRef(null);
   const inputRef = useRef(null);
+  const triggerRef = useRef(null);
   const { trips } = useTrips();
   const { t } = useI18n();
   const results = useMemo(() => searchTripContent(trips, query), [query, trips]);
@@ -32,7 +29,10 @@ export function GlobalSearch() {
         event.preventDefault();
         setOpen(true);
       }
-      if (event.key === 'Escape') setOpen(false);
+      if (event.key === 'Escape' && isOpen) {
+        setOpen(false);
+        triggerRef.current?.focus({ preventScroll: true });
+      }
     }
 
     function handlePointerDown(event) {
@@ -45,24 +45,52 @@ export function GlobalSearch() {
       document.removeEventListener('keydown', handleShortcut);
       document.removeEventListener('pointerdown', handlePointerDown);
     };
-  }, []);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
     window.requestAnimationFrame(() => inputRef.current?.focus());
   }, [isOpen]);
 
-  function openResult(result) {
+  useEffect(() => {
+    setActiveIndex(results.length ? 0 : -1);
+  }, [query, results.length]);
+
+  function closeSearch({ restoreFocus = false } = {}) {
     setOpen(false);
+    setActiveIndex(-1);
+    if (restoreFocus) window.requestAnimationFrame(() => triggerRef.current?.focus({ preventScroll: true }));
+  }
+
+  function openResult(result) {
+    closeSearch();
     setQuery('');
     navigate(`/trips/${result.tripId}?tab=${result.tab}`);
+  }
+
+  function handleInputKeyDown(event) {
+    if (event.key === 'ArrowDown' && results.length) {
+      event.preventDefault();
+      setActiveIndex((current) => (current + 1) % results.length);
+    } else if (event.key === 'ArrowUp' && results.length) {
+      event.preventDefault();
+      setActiveIndex((current) => (current - 1 + results.length) % results.length);
+    } else if (event.key === 'Enter' && activeIndex >= 0 && results[activeIndex]) {
+      event.preventDefault();
+      openResult(results[activeIndex]);
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      closeSearch({ restoreFocus: true });
+    }
   }
 
   return (
     <div className="global-search" ref={rootRef}>
       <button
+        ref={triggerRef}
         className="topbar__search"
         type="button"
+        aria-controls="global-search-panel"
         aria-expanded={isOpen}
         aria-haspopup="dialog"
         aria-label={t('nav.search')}
@@ -74,16 +102,23 @@ export function GlobalSearch() {
       </button>
 
       {isOpen && (
-        <section className="global-search__panel" role="dialog" aria-label={t('search.title')}>
+        <section id="global-search-panel" className="global-search__panel" role="dialog" aria-label={t('search.title')}>
           <div className="global-search__field">
             <Icon name="search" size={19} />
             <input
               ref={inputRef}
+              id="global-search-input"
               type="search"
+              role="combobox"
               value={query}
               placeholder={t('search.placeholder')}
+              aria-activedescendant={activeIndex >= 0 ? `global-search-result-${activeIndex}` : undefined}
+              aria-autocomplete="list"
+              aria-controls="global-search-results"
+              aria-expanded={results.length > 0}
               aria-label={t('search.placeholder')}
               onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={handleInputKeyDown}
             />
             {query && (
               <button type="button" aria-label={t('search.clear')} onClick={() => setQuery('')}>
@@ -92,48 +127,35 @@ export function GlobalSearch() {
             )}
           </div>
 
-          <div className="global-search__results" role="listbox">
+          <div id="global-search-results" className="global-search__results" role="listbox" aria-label={t('search.results')}>
+            <p className="sr-only" role="status" aria-live="polite">
+              {query.trim().length >= 2 ? t('search.resultCount', { count: results.length }) : ''}
+            </p>
             {query.trim().length < 2 && (
-              <div className="global-search__empty">
-                <Icon name="sparkles" size={22} />
-                <p>{t('search.hint')}</p>
-              </div>
+              <div className="global-search__empty"><Icon name="sparkles" size={22} /><p>{t('search.hint')}</p></div>
             )}
-
             {query.trim().length >= 2 && results.length === 0 && (
-              <div className="global-search__empty">
-                <Icon name="search" size={22} />
-                <strong>{t('search.noResults')}</strong>
-                <p>{t('search.noResultsText')}</p>
-              </div>
+              <div className="global-search__empty"><Icon name="search" size={22} /><strong>{t('search.noResults')}</strong><p>{t('search.noResultsText')}</p></div>
             )}
-
-            {results.map((result) => (
+            {results.map((result, index) => (
               <button
                 key={result.id}
-                className="global-search__result"
+                id={`global-search-result-${index}`}
+                className={`global-search__result ${activeIndex === index ? 'global-search__result--active' : ''}`}
                 type="button"
                 role="option"
-                aria-selected="false"
+                aria-selected={activeIndex === index}
+                onMouseEnter={() => setActiveIndex(index)}
                 onClick={() => openResult(result)}
               >
-                <span className="global-search__result-icon">
-                  <Icon name={RESULT_ICONS[result.type]} size={18} />
-                </span>
-                <span className="global-search__result-copy">
-                  <strong>{result.title}</strong>
-                  <small>{result.subtitle}</small>
-                </span>
+                <span className="global-search__result-icon"><Icon name={RESULT_ICONS[result.type]} size={18} /></span>
+                <span className="global-search__result-copy"><strong>{result.title}</strong><small>{result.subtitle}</small></span>
                 <span className="global-search__result-type">{t(`search.types.${result.type}`)}</span>
                 <Icon name="arrowRight" size={16} />
               </button>
             ))}
           </div>
-
-          <footer className="global-search__footer">
-            <span>{t('search.footer')}</span>
-            <kbd>Esc</kbd>
-          </footer>
+          <footer className="global-search__footer"><span>{t('search.footer')}</span><kbd>Esc</kbd></footer>
         </section>
       )}
     </div>

@@ -9,7 +9,7 @@ import { NotificationCenter } from './NotificationCenter.jsx';
 
 const ALL_NAVIGATION = [...PRIMARY_NAVIGATION, ...SECONDARY_NAVIGATION];
 
-export function TopBar({ onOpenMenu }) {
+export function TopBar({ menuButtonRef, onOpenMenu }) {
   const location = useLocation();
   const { t } = useI18n();
   const { resolvedTheme, setTheme } = useTheme();
@@ -18,7 +18,7 @@ export function TopBar({ onOpenMenu }) {
   return (
     <header className="topbar">
       <div className="topbar__mobile-brand">
-        <button className="icon-button" type="button" aria-label={t('nav.openMenu')} onClick={onOpenMenu}>
+        <button ref={menuButtonRef} className="icon-button" type="button" aria-controls="application-navigation" aria-label={t('nav.openMenu')} onClick={onOpenMenu}>
           <Icon name="menu" />
         </button>
         <Brand compact />

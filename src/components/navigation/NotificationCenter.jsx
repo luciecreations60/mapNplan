@@ -1,5 +1,5 @@
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '../../hooks/useI18n.js';
 import { useTrips } from '../../hooks/useTrips.js';
@@ -19,11 +19,35 @@ export function NotificationCenter() {
   const [isOpen, setOpen] = useState(false);
   const [lastReadAt, setLastReadAt] = useState(() => localStorageService.get(LAST_READ_STORAGE_KEY, ''));
   const panelRef = useRef(null);
+  const triggerRef = useRef(null);
   const notifications = useMemo(() => trips
     .flatMap((trip) => (trip.collaboration?.activityLog || []).map((entry) => ({ ...entry, tripId: trip.id, tripName: trip.name })))
     .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
     .slice(0, 20), [trips]);
   const unreadCount = notifications.filter((entry) => !lastReadAt || entry.createdAt > lastReadAt).length;
+
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    function handlePointerDown(event) {
+      if (!panelRef.current?.contains(event.target)) setOpen(false);
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') {
+        setOpen(false);
+        triggerRef.current?.focus({ preventScroll: true });
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
 
   function togglePanel() {
     setOpen((current) => {
@@ -38,13 +62,13 @@ export function NotificationCenter() {
 
   return (
     <div className="notification-center" ref={panelRef}>
-      <button className="icon-button" type="button" aria-label={t('nav.notifications')} aria-expanded={isOpen} onClick={togglePanel}>
+      <button ref={triggerRef} className="icon-button" type="button" aria-controls="notification-panel" aria-haspopup="dialog" aria-label={t('nav.notifications')} aria-expanded={isOpen} onClick={togglePanel}>
         <Icon name="bell" />
         {unreadCount > 0 && <span className="notification-count">{Math.min(unreadCount, 9)}{unreadCount > 9 ? '+' : ''}</span>}
       </button>
 
       {isOpen && (
-        <div className="notification-panel">
+        <div id="notification-panel" className="notification-panel" role="dialog" aria-label={t('notifications.title')}>
           <header>
             <div><p className="eyebrow">{t('notifications.eyebrow')}</p><h2>{t('notifications.title')}</h2></div>
             <button className="icon-button icon-button--small" type="button" aria-label={t('common.close')} onClick={() => setOpen(false)}><Icon name="close" size={16} /></button>

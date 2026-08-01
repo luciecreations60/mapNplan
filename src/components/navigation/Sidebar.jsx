@@ -1,6 +1,8 @@
+import { useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import { APP_CONFIG } from '../../config/app.config.js';
 import { PRIMARY_NAVIGATION, SECONDARY_NAVIGATION } from '../../config/navigation.config.js';
+import { useFocusTrap } from '../../hooks/useFocusTrap.js';
 import { useI18n } from '../../hooks/useI18n.js';
 import { Brand } from '../common/Brand.jsx';
 import { Icon } from '../common/Icon.jsx';
@@ -17,7 +19,7 @@ function NavigationGroup({ items, onNavigate }) {
           to={item.path}
           onClick={onNavigate}
         >
-          <Icon name={item.icon} size={19} />
+          <Icon name={item.icon} size={19} aria-hidden="true" />
           <span>{t(item.labelKey)}</span>
         </NavLink>
       ))}
@@ -25,15 +27,32 @@ function NavigationGroup({ items, onNavigate }) {
   );
 }
 
-export function Sidebar({ isOpen, onClose }) {
+export function Sidebar({ isOpen, isMobile, onClose }) {
   const { t } = useI18n();
+  const sidebarRef = useRef(null);
+  const closeButtonRef = useRef(null);
+
+  useFocusTrap({
+    active: Boolean(isMobile && isOpen),
+    containerRef: sidebarRef,
+    initialFocusRef: closeButtonRef,
+  });
 
   return (
     <>
-      <aside className={`sidebar ${isOpen ? 'sidebar--open' : ''}`} aria-hidden={!isOpen && undefined}>
+      <aside
+        ref={sidebarRef}
+        id="application-navigation"
+        className={`sidebar ${isOpen ? 'sidebar--open' : ''}`}
+        role={isMobile ? 'dialog' : undefined}
+        aria-modal={isMobile && isOpen ? 'true' : undefined}
+        aria-label={isMobile ? t('nav.mobileNavigation') : undefined}
+        aria-hidden={isMobile && !isOpen ? 'true' : undefined}
+        tabIndex={isMobile ? -1 : undefined}
+      >
         <div className="sidebar__brand-row">
           <Brand />
-          <button className="icon-button sidebar__close" type="button" aria-label={t('nav.closeMenu')} onClick={onClose}>
+          <button ref={closeButtonRef} className="icon-button sidebar__close" type="button" aria-label={t('nav.closeMenu')} onClick={onClose}>
             <Icon name="close" />
           </button>
         </div>
@@ -53,7 +72,7 @@ export function Sidebar({ isOpen, onClose }) {
           <div className="sidebar__version">v{APP_CONFIG.version} · {t('nav.foundation')}</div>
         </div>
       </aside>
-      {isOpen && <button className="sidebar-overlay" type="button" aria-label={t('nav.closeMenu')} onClick={onClose} />}
+      {isMobile && isOpen && <button className="sidebar-overlay" type="button" aria-label={t('nav.closeMenu')} onClick={onClose} />}
     </>
   );
 }

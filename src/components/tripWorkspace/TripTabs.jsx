@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
 import { Icon } from '../common/Icon.jsx';
 
@@ -23,21 +24,53 @@ export const TRIP_TABS = Object.freeze([
 
 export function TripTabs({ navRef, activeTab, onChange }) {
   const { t } = useI18n();
+  const buttonRefs = useRef([]);
+
+  function activateAt(index) {
+    const nextTab = TRIP_TABS[index];
+    if (!nextTab) return;
+    onChange(nextTab.id);
+    window.requestAnimationFrame(() => buttonRefs.current[index]?.focus({ preventScroll: true }));
+  }
+
+  function handleKeyDown(event, index) {
+    const keyActions = {
+      ArrowRight: () => activateAt((index + 1) % TRIP_TABS.length),
+      ArrowLeft: () => activateAt((index - 1 + TRIP_TABS.length) % TRIP_TABS.length),
+      Home: () => activateAt(0),
+      End: () => activateAt(TRIP_TABS.length - 1),
+    };
+
+    const action = keyActions[event.key];
+    if (!action) return;
+    event.preventDefault();
+    action();
+  }
 
   return (
-    <nav ref={navRef} className="trip-tabs" aria-label={t('workspace.aria')}>
-      {TRIP_TABS.map((tab) => (
-        <button
-          key={tab.id}
-          type="button"
-          className={activeTab === tab.id ? 'trip-tabs__button trip-tabs__button--active' : 'trip-tabs__button'}
-          aria-current={activeTab === tab.id ? 'page' : undefined}
-          onClick={() => onChange(tab.id)}
-        >
-          <Icon name={tab.icon} size={18} />
-          <span>{t(tab.labelKey)}</span>
-        </button>
-      ))}
+    <nav ref={navRef} className="trip-tabs" role="tablist" aria-label={t('workspace.aria')}>
+      {TRIP_TABS.map((tab, index) => {
+        const isActive = activeTab === tab.id;
+        return (
+          <button
+            key={tab.id}
+            ref={(element) => { buttonRefs.current[index] = element; }}
+            id={`trip-tab-${tab.id}`}
+            type="button"
+            role="tab"
+            className={isActive ? 'trip-tabs__button trip-tabs__button--active' : 'trip-tabs__button'}
+            aria-controls={`trip-panel-${tab.id}`}
+            aria-current={isActive ? 'page' : undefined}
+            aria-selected={isActive}
+            tabIndex={isActive ? 0 : -1}
+            onClick={() => onChange(tab.id)}
+            onKeyDown={(event) => handleKeyDown(event, index)}
+          >
+            <Icon name={tab.icon} size={18} />
+            <span>{t(tab.labelKey)}</span>
+          </button>
+        );
+      })}
     </nav>
   );
 }
