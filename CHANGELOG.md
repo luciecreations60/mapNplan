@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.1.16] - 2026-08-01
+
+### Added
+
+- Per-trip booking option comparison.
+- Six booking and travel-service categories.
+- Central partner settings with every provider disabled by default.
+- URL templates using destination, dates, travellers, currency and locale.
+- Optional affiliate tracking parameter injection.
+- Local click and declared-booking analytics.
+- Global search results for booking options.
+
+### Changed
+
+- Trip schema upgraded from 15 to 16.
+- Demonstration Japan trip now includes sample comparison options.
+- Service-worker cache updated to `tripflow-v0.1.16`.
+
 ## [0.1.15] - 2026-08-01
 
 ### Added

@@ -1,4 +1,4 @@
-# TripFlow — V0.1.15
+# TripFlow — V0.1.16
 
 > Every journey starts here.
 
@@ -6,19 +6,23 @@ TripFlow is a responsive, bilingual travel-planning application built with
 React and Vite. It currently runs without a paid backend and stores user data
 locally in the browser.
 
-## Saved places and inspiration
+## Booking comparison and affiliate preparation
 
-Part 16 introduces a planning layer between discovering a place and assigning
-it to a specific day:
+Part 17 adds a safe commercial-preparation layer without pretending that a
+partner agreement already exists:
 
-- save real places from the Photon/OpenStreetMap search;
-- organise ideas into reusable custom lists;
-- classify places by category, priority and planning status;
-- add a saved place to the itinerary with its coordinates;
-- display saved places on the trip map;
-- search them from the global search palette;
-- import and export a trip's saved-place library as JSON;
-- browse every trip's saved places from the Explore page.
+- compare hotels, flights, activities, rental cars, eSIMs and insurance;
+- save prices, links, notes and booking status inside each trip;
+- prepare provider cards for Booking.com, Skyscanner, Google Flights,
+  GetYourGuide, DiscoverCars, Airalo and Heymondo;
+- keep every provider disabled until it has been reviewed in Settings;
+- build provider URLs from central templates and trip variables;
+- add an affiliate tracking parameter only when both its name and value exist;
+- record local clicks and user-declared bookings for future analytics;
+- search saved booking options from the global search palette.
+
+No provider activation creates a commercial agreement, enrols the project in
+an affiliate programme or guarantees a commission.
 
 ## Run locally
 

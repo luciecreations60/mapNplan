@@ -13,10 +13,11 @@
 - Part 14: reusable trip templates, checklist presets and day-plan library.
 - Part 15: calendar export/import, provider links, reminders and conflict checks.
 - Part 16: saved places, custom inspiration lists and itinerary insertion.
+- Part 17: booking comparison, provider configuration and affiliate preparation.
 
 ## Next planned milestones
 
-### Part 17 — Backend-ready data layer
+### Part 18 — Backend-ready data layer
 
 - formal repository interfaces for local and remote persistence;
 - account and authentication boundary;
@@ -25,13 +26,13 @@
 - conflict resolution rules;
 - remote object-storage adapter contract for documents.
 
-### Part 18 — Commercial preparation
+### Part 19 — SEO and legal commercial preparation
 
-- affiliate-provider configuration;
-- non-intrusive reservation calls to action;
-- click-attribution boundary;
 - SEO destination-page structure;
-- consent, privacy and legal preparation.
+- editorial destination guides;
+- consent, privacy and legal preparation;
+- commercial disclosure pages;
+- verified conversion reporting adapter.
 
 ## Later milestones
 

@@ -1,34 +1,46 @@
-# V0.1 — Part 16 delivery notes
+# V0.1 — Part 17 delivery notes
 
 ## Versions
 
-- Application: `0.1.15`
-- Trip schema: `15`
-- Service-worker cache: `tripflow-v0.1.15`
+- Application: `0.1.16`
+- Trip schema: `16`
+- Affiliate settings schema: `1`
+- Service-worker cache: `tripflow-v0.1.16`
 
 ## Main additions
 
-- Per-trip saved-place library.
-- Photon/OpenStreetMap place selection with coordinates.
-- Custom lists, categories, priorities, tags and statuses.
-- Direct insertion into an itinerary date and time.
-- Saved-place markers on the existing trip map.
-- Cross-trip inspiration library on Explore.
-- Global search results for saved places.
-- Versioned JSON import and export.
+- New **Book & compare / Réserver et comparer** trip tab.
+- Manual offer comparison across six commercial categories.
+- Saved, shortlisted, booked and rejected option states.
+- Provider configuration in Settings.
+- Central URL templates with trip variables.
+- Optional affiliate parameter injection.
+- Local click and declared-conversion analytics.
+- Search results for saved booking options.
+- Sample comparison data in the Japan demonstration trip.
+
+## Safety rules
+
+- Every provider is disabled by default.
+- No tracking identifier is shipped in source code.
+- Enabling a provider only enables its configured URL.
+- Local analytics are not presented as verified commission reports.
+- Public share snapshots still exclude comparison and commercial data.
 
 ## Migration
 
-Existing trips are preserved. Migration adds an empty `savedPlaces` collection
-when none exists. No current itinerary, reservation, expense, document or file
-is modified.
+Existing trips are preserved. Migration adds an empty `bookingOptions`
+collection when none exists. No itinerary, reservation, expense, document,
+attachment or saved place is modified.
 
 ## Suggested checks
 
-1. Open Japan Discovery and select **Saved places**.
-2. Add a place through autocomplete.
-3. Add it to an itinerary date.
-4. Confirm it appears in Itinerary and Map.
-5. Search its name with Ctrl/Cmd + K.
-6. Open Explore and check the cross-trip library.
-7. Export and re-import the places JSON file.
+1. Open Japan Discovery and select **Book & compare**.
+2. Review the demonstration options.
+3. Add and edit a manual hotel option.
+4. Mark it shortlisted, then booked.
+5. Search its title with Ctrl/Cmd + K.
+6. Open Settings and find **Partners and affiliation**.
+7. Confirm every provider starts disabled.
+8. Configure a harmless test URL template, enable it and open the provider.
+9. Confirm the local click counter changes.

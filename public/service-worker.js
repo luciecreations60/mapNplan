@@ -3,7 +3,7 @@
  * Uses a network-first strategy for pages and a cache-first strategy for
  * static assets. Increase CACHE_VERSION after changing the caching strategy.
  */
-const CACHE_VERSION = 'tripflow-v0.1.15';
+const CACHE_VERSION = 'tripflow-v0.1.16';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 
 self.addEventListener('install', () => {
