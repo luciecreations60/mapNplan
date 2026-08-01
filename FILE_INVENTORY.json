@@ -1,11 +1,11 @@
 {
-  "version": "0.1.19",
+  "version": "0.1.20",
   "tripSchemaVersion": 16,
-  "seoContentSchemaVersion": 2,
-  "publicIndexingEnabled": false,
-  "generatedFor": "V0.1 Part 20",
-  "automatedTests": 12,
-  "fileCount": 166,
+  "stabilizationPart": 21,
+  "automatedTests": 20,
+  "translationKeysPerLocale": 1514,
+  "generatedFor": "V0.1 Part 21",
+  "fileCount": 170,
   "files": [
     {
       "path": ".env.example",
@@ -24,33 +24,38 @@
     },
     {
       "path": "ARCHITECTURE.md",
-      "size": 1068,
-      "sha256": "221b49659f866b543d8e3f0266a573d857726985bd12e090809fa254a182e147"
+      "size": 1643,
+      "sha256": "c00dc2ea5e66ce22478a78ad92c2857bff19aa8766137688bea12a0ce222d86f"
+    },
+    {
+      "path": "BROWSER_ACCESSIBILITY_TESTING.md",
+      "size": 2383,
+      "sha256": "38c375b02889bce6f5c75c30b2d918a533d38cde55299856c7a82d165fd92daf"
     },
     {
       "path": "CHANGELOG.md",
-      "size": 10773,
-      "sha256": "a06671bc00b1d2f001fade1bebcd1b0469b969f0e6eefbfe77eb108e06a70b2f"
+      "size": 11195,
+      "sha256": "a4adeb030d3537af25e76ffeb39d4b83b79fb22141f8256952a0b5a177c1036e"
     },
     {
       "path": "DELIVERY_NOTES.md",
-      "size": 901,
-      "sha256": "88eb213b98dbbd2ea9ac400541c0dc8871546bf24f50be33b8002c28dd94c5f3"
+      "size": 688,
+      "sha256": "a9860db4c5bdcc38479296f6589d09e3262527c9fe67644567e201a2f97d1e96"
     },
     {
       "path": "QUALITY_REPORT.md",
-      "size": 880,
-      "sha256": "2cbceab0ff2feadd3d450d3be4092ba87912b9e7f62889c39f05868cca0155f4"
+      "size": 1214,
+      "sha256": "5e20ac880331bf8c2f9f8e66d8b07696b927fc7954f2faf5f2f254e42f9bbf4f"
     },
     {
       "path": "README.md",
-      "size": 582,
-      "sha256": "e3660497cbbf3776db4dfbf8791560efba591a8173a824821c8ac688fa36f5c4"
+      "size": 615,
+      "sha256": "175247fc929e310f27920d86863eac2ada95bb13202bcf01cdbc923eefc60dd8"
     },
     {
       "path": "ROADMAP.md",
-      "size": 730,
-      "sha256": "9269b57c95532dfbf50435752d4cd26d5fcdb7e9605be319ed1d55832768e0b9"
+      "size": 856,
+      "sha256": "665cfe3fc040f5e32f10bca1406a58113413ccb4c0c8d93924dbe48b48a7c245"
     },
     {
       "path": "SEO_GUIDE.md",
@@ -59,13 +64,13 @@
     },
     {
       "path": "TESTING.md",
-      "size": 781,
-      "sha256": "fa7dc0de783a85cee03f4b752277e6060bb0090366df125eab2d4f9782747941"
+      "size": 1154,
+      "sha256": "f497b874a2a082e03b48d3b1081df5cee9a1fa6c030bc3a2cf630340c0409e03"
     },
     {
       "path": "UPLOAD_TO_GITHUB.md",
-      "size": 529,
-      "sha256": "d868c716c652186b940edbad61ddbafbcda2236eb119dbf2192cebd9def9ac2c"
+      "size": 570,
+      "sha256": "295245ced33c3a680898ca08d1c683fa0ad2bcdb4220dbbeed4a64c0f9c9746c"
     },
     {
       "path": "content/seo-pages.json",
@@ -80,12 +85,12 @@
     {
       "path": "package.json",
       "size": 875,
-      "sha256": "10b119c56a8092496d64c35d2e3bc0adc25c0a725f402a6360ca70c8866535f6"
+      "sha256": "aa01f9287ead743686ba5da632bf639bcffe555442c53d23f9c75bdc3d6c04d9"
     },
     {
       "path": "project.config.js",
       "size": 709,
-      "sha256": "beb8a3b968d6fb9c9ce07e10cdc2986f9e10aad8a195b39abd6b1347359fcd6f"
+      "sha256": "337280ae98a0de3a7700a97c069451056acb7dad923f701fdc22fc153c94aa04"
     },
     {
       "path": "public/favicon.svg",
@@ -115,7 +120,7 @@
     {
       "path": "public/service-worker.js",
       "size": 1419,
-      "sha256": "4274048c426b62266cbe111f9008d029c017095a8fe99974eb3cd7cd4df17121"
+      "sha256": "8a05cd665889a37fd51bdda3c23a8c71413f281f74b3cbe02b1361f39990704c"
     },
     {
       "path": "public/site.webmanifest",
@@ -194,8 +199,8 @@
     },
     {
       "path": "src/components/common/Modal.jsx",
-      "size": 1545,
-      "sha256": "3c88d4c7d3c18999f5988610240f46bbb86acf2d5fa3279156f5529f9c213183"
+      "size": 1944,
+      "sha256": "16cdb54369fe2f9527bcd856765e67cb413e777ca45ab8ed0b54b2b5b80e1ae7"
     },
     {
       "path": "src/components/common/ProgressBar.jsx",
@@ -229,23 +234,23 @@
     },
     {
       "path": "src/components/navigation/GlobalSearch.jsx",
-      "size": 4739,
-      "sha256": "fbf2b39921fbbb349c56ed77fcf30765cb367cba6b46796e6a02e8835f1d90c8"
+      "size": 6522,
+      "sha256": "cc6277a13da921881babe462826e1679719287ba1e4a317de4be9a8eb609e5a8"
     },
     {
       "path": "src/components/navigation/NotificationCenter.jsx",
-      "size": 3870,
-      "sha256": "410d25166b2b231e52b5d4579b44e02dfdb3323321d1d038cfd88e63c88fa104"
+      "size": 4708,
+      "sha256": "34c6613cf6c8b81630dada6282585c0c18743b09ab27d22517dd13f8311a3113"
     },
     {
       "path": "src/components/navigation/Sidebar.jsx",
-      "size": 2082,
-      "sha256": "1ff9571f718afd592816081f0c2444842f1ad1a7b9eddea9c22bb4b9fafa163e"
+      "size": 2769,
+      "sha256": "27209d0184185dec95d2b850b8be4016dd14487c9e2eaaec05366d1759842ba1"
     },
     {
       "path": "src/components/navigation/TopBar.jsx",
-      "size": 1742,
-      "sha256": "c97718b0dbdb88a5690285132a626bc4a06360745619c11a0f2e0d9bac999076"
+      "size": 1816,
+      "sha256": "d5a0dbac1ec3f20f1287179d96b072cb36cfe9ce586d520f44bc62b4d064758a"
     },
     {
       "path": "src/components/settings/AffiliateSettingsCard.jsx",
@@ -349,8 +354,8 @@
     },
     {
       "path": "src/components/tripWorkspace/TripTabs.jsx",
-      "size": 1980,
-      "sha256": "005962e92a216d538641868eabb82a7d89e0556be8e7464678b099b9dec17546"
+      "size": 3114,
+      "sha256": "b65892bbe8e4689a633383ef64b687a0d210a0b370bef9df55bfa83393ca1071"
     },
     {
       "path": "src/components/tripWorkspace/tools/CurrencyConverter.jsx",
@@ -483,6 +488,11 @@
       "sha256": "f63cbd91df65663b19b8e560545b148090e9e6785336df69dcbea017226a373b"
     },
     {
+      "path": "src/hooks/useFocusTrap.js",
+      "size": 2249,
+      "sha256": "590a6b57f18062368a6c3afaff494dc12449e0c7666485577284df3a3da0f223"
+    },
+    {
       "path": "src/hooks/useI18n.js",
       "size": 297,
       "sha256": "435a084061f4fa809776b763a90bdbbdd3ba01b7ccf1ece090694c1600e8f1c1"
@@ -504,13 +514,13 @@
     },
     {
       "path": "src/i18n/translations.js",
-      "size": 144019,
-      "sha256": "27cbf073b2c7cc4a9aee3df636a3f149633fc1f49e5b380d746bc63bfb7fab83"
+      "size": 144343,
+      "sha256": "eaf94c1b14ceedde22c191713a52c318be87d1fc8babb1c99eb345372aaa2732"
     },
     {
       "path": "src/layouts/AppLayout.jsx",
-      "size": 1217,
-      "sha256": "a58b656e4ab293a465bff590f17aa9468933a6fe2748f9e40a8b9b8b34cda8cc"
+      "size": 1998,
+      "sha256": "c123d4c0d10e8fc262d8e7f5a00164031915c3708367ad133105e3960b88829a"
     },
     {
       "path": "src/main.jsx",
@@ -564,8 +574,8 @@
     },
     {
       "path": "src/pages/TripWorkspacePage.jsx",
-      "size": 6492,
-      "sha256": "bec23079dd961bc79c0fd408b388902cf411c99a6180faa28fbccce47a0c4db8"
+      "size": 6641,
+      "sha256": "7dd2719cd6c4aa4c15217d60259cf5530e0377b15b6f6b3b0a7651a844dc3cfa"
     },
     {
       "path": "src/pages/TripsPage.jsx",
@@ -664,23 +674,23 @@
     },
     {
       "path": "src/styles/components.css",
-      "size": 19415,
-      "sha256": "4a0d1541c795c2b6a3703d1a2837c249eeccfbfcf3efa329eb7044a94e234858"
+      "size": 20443,
+      "sha256": "d51224c0ee00873351c838cdc664a5173f76db8d5688c840f50d03a2d2bcac8b"
     },
     {
       "path": "src/styles/global.css",
-      "size": 1842,
-      "sha256": "4efca975ee6d1b7899a1d80e4c83e1cfc0822445cd4696b02f4fd07ee717666d"
+      "size": 3441,
+      "sha256": "75161348f53d32e483205aae856b055c8b95f6a13c7e89a3411e216476d35ba9"
     },
     {
       "path": "src/styles/layout.css",
-      "size": 10444,
-      "sha256": "9279482fec44f1c22bb0453cf79b667e1ebb11515c9487fa69c3fa0e2a3c214d"
+      "size": 11505,
+      "sha256": "0b1a4d48c6c10fde175e9bc1938066a899355840fb20a807250f7b0287e03b66"
     },
     {
       "path": "src/styles/pages.css",
-      "size": 153014,
-      "sha256": "c59b78270382cac3ef1a8e7c123237efc826c9bbce447651b0419e9848e4e773"
+      "size": 154797,
+      "sha256": "e57f2ec660a9f94c168d5bedc8f757c5c191407ceb0a772abf1aeae0b3b39f44"
     },
     {
       "path": "src/styles/print.css",
@@ -788,6 +798,11 @@
       "sha256": "44a88e25b4aa4173526e55809e11a642ef72ba18ca650f6be217db51eb5f5fd3"
     },
     {
+      "path": "tests/accessibility-contract.test.mjs",
+      "size": 1557,
+      "sha256": "67c78ab1f3fe6825357e663da82b1c0a1f7bea61f2dfa923f5c76bf9c79107ff"
+    },
+    {
       "path": "tests/calendar-interop.test.mjs",
       "size": 627,
       "sha256": "364b80be990b9a67c072209d062738c822e5db69d12c2ce87b70bc26afbcf0c6"
@@ -806,6 +821,11 @@
       "path": "tests/local-storage.test.mjs",
       "size": 668,
       "sha256": "8feeca281fba48c8ef68758a2e56d12350c5eec257e577701d2cc6a5186370ea"
+    },
+    {
+      "path": "tests/responsive-contract.test.mjs",
+      "size": 1242,
+      "sha256": "a230a10a32e9dbbf9869bf5cfcf0adff8be27b46142b7e8c58f302dffee6c987"
     },
     {
       "path": "tests/route-optimization.test.mjs",

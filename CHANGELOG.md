@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.20 — Browser and accessibility stabilization
+
+- Added skip navigation and focusable main landmark.
+- Added focus trapping/restoration for modals and mobile navigation.
+- Implemented accessible keyboard tabs and global search.
+- Hardened responsive overflow, activity actions and touch targets.
+- Added reduced-motion, forced-colour and fallback visual rules.
+- Added accessibility and responsive contract tests.
+
 ## 0.1.19 — Reliability and test gates
 
 - Locked public indexing until branding and domain are finalized.

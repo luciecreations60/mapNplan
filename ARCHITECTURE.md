@@ -1,4 +1,4 @@
-# Architecture — V0.1.19 stabilization baseline
+# Architecture — V0.1.20 stabilization baseline
 
 ## Reliability layers
 
@@ -15,3 +15,10 @@
 ## Test strategy
 
 The suite uses the Node 22 built-in test runner, avoiding an additional test framework. Browser compatibility and visual accessibility are handled in Part 21.
+
+
+## V0.1.20 accessibility layer
+
+Temporary surfaces use `useFocusTrap` to contain keyboard focus and restore it to the opener. The application shell exposes a skip link and a focusable `<main>` landmark. Workspace navigation follows the WAI-ARIA tab pattern and global search uses combobox/listbox semantics.
+
+Responsive safety rules are additive and live at the end of the CSS layers. They guarantee container `min-width: 0`, page overflow containment, coarse-pointer target sizes, reduced-motion behaviour and forced-colour fallbacks without changing business components.

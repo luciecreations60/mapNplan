@@ -1,10 +1,10 @@
-# Travel planner — V0.1.19
+# Travel planner — V0.1.20
 
 A responsive, bilingual travel-planning application built with React and Vite and hosted on GitHub Pages.
 
 ## Stabilization status
 
-The feature set is frozen. Part 20 adds automated reliability gates, safer imports, storage recovery diagnostics and an explicit search-indexing lock while the final company name and domain are undecided.
+The feature set is frozen. Part 21 adds cross-browser responsive containment, keyboard navigation, focus management and accessibility contracts. Public search indexing remains locked while the final company name and domain are undecided.
 
 ## Commands
 

@@ -1,20 +1,23 @@
-# V0.1 — Part 20 delivery notes
+# Delivery notes — V0.1 Part 21
 
-## Goal
+Version: `0.1.20`
 
-Freeze features and introduce the first reliability gate before the release candidate.
+## Purpose
 
-## Included
+Cross-browser, responsive and accessibility stabilization. No new business feature was introduced.
 
-- Public search indexing locked with `noindex` while brand and domain remain provisional.
-- Empty sitemap and no Search Console sitemap declaration during stabilization.
-- Node built-in automated tests for migrations, route optimization, group expenses, ICS and imports.
-- Central validation of backup and shared-trip payloads.
-- Corrupted LocalStorage values copied to a small recovery quarantine before normalization overwrites them.
-- Global error diagnostics stored only in the current browser session.
-- GitHub Actions quality gate: checks, tests and production build must pass before deployment.
-- Project version aligned at `0.1.19`.
+## Key changes
 
-## Intentionally excluded
+- keyboard skip navigation;
+- focus trap and focus restoration for modals and the mobile drawer;
+- semantic and keyboard-operable trip tabs;
+- keyboard-operable global search;
+- improved notification popover dismissal;
+- robust mobile/desktop overflow containment;
+- larger coarse-pointer targets;
+- reduced motion and forced-colour support;
+- static accessibility and responsive test contracts.
 
-No new travel feature, no public SEO launch, no analytics and no affiliate activation.
+## Existing data
+
+No data migration is required. User trips, files, templates and preferences are preserved.

@@ -1,20 +1,33 @@
-# Quality report — V0.1.19
+# Quality report — V0.1 Part 21
 
-## Completed checks
+## Scope
 
-- Project quality script: passed
-- Translation parity: 1,510 keys in English and 1,510 keys in French
-- Automated tests: 12 passed, 0 failed
-- JavaScript/JSX/MJS syntax parsing: passed
-- Relative import resolution: passed
-- JSON parsing: passed
-- Static guide generation: passed
-- SEO content audit: passed
-- Root page and generated guides: `noindex`
-- Generated sitemap: empty while indexing is locked
-- Generated robots file: no sitemap declaration while indexing is locked
-- ZIP integrity: checked during packaging
+This release contains no new travel feature. It consolidates cross-browser layout, responsive containment, keyboard navigation and accessibility semantics.
 
-## Build status
+## Automated gates
 
-The Vite production build could not be executed inside the generation environment because its internal npm mirror does not provide `@vitejs/plugin-react`. The GitHub Actions workflow performs the real dependency installation and build before deployment; deployment is blocked if either fails.
+- existing business and migration tests;
+- accessibility source contracts;
+- responsive CSS contracts;
+- translation parity;
+- relative import validation;
+- JSON validation;
+- production build in GitHub Actions.
+
+## Main corrections
+
+- skip link and focusable main landmark;
+- modal and mobile-drawer focus containment;
+- focus restoration after temporary surfaces close;
+- accessible tablist with arrow, Home and End keys;
+- accessible global-search combobox navigation;
+- notification panel Escape/outside-click handling;
+- 44 px touch targets for coarse pointers;
+- reduced-motion and forced-colour support;
+- Chrome-safe activity action grid;
+- full-width scrollable trip tabs;
+- fallback styling when backdrop filters are unavailable.
+
+## Validation boundary
+
+Static and unit tests can prove structural contracts, not rendering in every browser engine. The manual browser matrix is documented in `BROWSER_ACCESSIBILITY_TESTING.md` and will be executed during the release-candidate pass.

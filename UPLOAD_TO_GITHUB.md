@@ -1,16 +1,20 @@
-# Upload V0.1 Part 20 to GitHub
+# Upload V0.1 Part 21 to GitHub
 
-1. Extract `travel-planner-v0.1-part20.zip`.
-2. Open the `travel-planner` repository.
-3. Choose **Add file → Upload files**.
-4. Upload all extracted files and replace existing versions.
-5. Commit to `main` with:
+1. Extract `travel-planner-v0.1-part21.zip`.
+2. In the repository choose **Add file → Upload files**.
+3. Upload the complete extracted content and replace existing files.
+4. Commit directly to `main` with:
 
 ```text
-chore: add v0.1.19 reliability and test gates
+chore: add v0.1.20 browser and accessibility stabilization
 ```
 
-6. Open **Actions**. Quality checks, automated tests and the production build must all pass before deployment.
-7. Reload Chrome with `Ctrl + F5` or Safari with `Cmd + Option + R`.
+5. Open **Actions** and verify that quality checks, automated tests and the production build are green.
+6. Hard refresh after deployment:
 
-Public search indexing remains disabled.
+```text
+Chrome / Edge / Firefox: Ctrl + F5
+Safari: Cmd + Option + R
+```
+
+No GitHub Pages setting change is required.

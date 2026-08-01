@@ -1,4 +1,4 @@
-# Automated testing — V0.1.19
+# Automated testing — V0.1.20
 
 The test suite uses the Node.js built-in test runner and does not add another test framework dependency.
 
@@ -25,3 +25,10 @@ npm run check
 ```
 
 The GitHub Actions deployment executes quality checks, tests and the production build. A failure stops deployment.
+
+
+## Part 21 contracts
+
+`accessibility-contract.test.mjs` verifies the skip link, modal focus trap, tab pattern and search combobox semantics. `responsive-contract.test.mjs` verifies reduced motion, forced colours, coarse-pointer targets, mobile drawer isolation and Chrome-safe action layouts.
+
+Manual rendering checks are described in `BROWSER_ACCESSIBILITY_TESTING.md`.
