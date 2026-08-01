@@ -14,7 +14,7 @@ class WeatherService {
     const config = EXTERNAL_SERVICES_CONFIG.weather;
     const roundedLatitude = Number(latitude).toFixed(3);
     const roundedLongitude = Number(longitude).toFixed(3);
-    const cacheKey = `weather:${roundedLatitude}:${roundedLongitude}`;
+    const cacheKey = `weather:${roundedLatitude}:${roundedLongitude}:${config.forecastDays}`;
 
     if (!forceRefresh) {
       const cached = responseCacheService.get(cacheKey, config.cacheTtlMs);

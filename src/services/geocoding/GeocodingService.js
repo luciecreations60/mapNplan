@@ -57,6 +57,19 @@ class GeocodingService {
     return responseCacheService.set(cacheKey, places);
   }
 
+  async reverse(latitude, longitude, { language = 'en', signal = null } = {}) {
+    const lat = Number(latitude);
+    const lon = Number(longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+    const params = new URLSearchParams({ lat: lat.toFixed(6), lon: lon.toFixed(6), lang: String(language || 'en').slice(0, 2).toLowerCase() });
+    const cacheKey = `geocoding:reverse:${lat.toFixed(5)}:${lon.toFixed(5)}:${params.get('lang')}`;
+    const cached = responseCacheService.get(cacheKey, CONFIG.cacheTtlMs);
+    if (cached) return cached;
+    const payload = await httpService.getJson(`${CONFIG.reverseUrl}?${params.toString()}`, { timeoutMs: CONFIG.timeoutMs, signal });
+    const place = Array.isArray(payload?.features) ? payload.features.map(normalizeFeature).find(Boolean) || null : null;
+    return responseCacheService.set(cacheKey, place);
+  }
+
   #buildCacheKey(query, params) {
     return `geocoding:${query.toLowerCase()}:${params.toString()}`;
   }

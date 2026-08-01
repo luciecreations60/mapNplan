@@ -11,8 +11,11 @@ import { hasValidCoordinates } from './map.js';
 export const TRAVEL_MODES = Object.freeze([
   Object.freeze({ id: 'walking', icon: 'walk', speedKmh: 4.5, distanceFactor: 1.12, fixedMinutes: 1 }),
   Object.freeze({ id: 'cycling', icon: 'bike', speedKmh: 14, distanceFactor: 1.18, fixedMinutes: 2 }),
-  Object.freeze({ id: 'driving', icon: 'car', speedKmh: 32, distanceFactor: 1.28, fixedMinutes: 4 }),
-  Object.freeze({ id: 'transit', icon: 'bus', speedKmh: 22, distanceFactor: 1.24, fixedMinutes: 9 }),
+  Object.freeze({ id: 'driving', icon: 'car', speedKmh: 88, distanceFactor: 1.18, fixedMinutes: 12 }),
+  Object.freeze({ id: 'transit', icon: 'bus', speedKmh: 65, distanceFactor: 1.2, fixedMinutes: 20 }),
+  Object.freeze({ id: 'train', icon: 'train', speedKmh: 145, distanceFactor: 1.08, fixedMinutes: 35 }),
+  Object.freeze({ id: 'plane', icon: 'plane', speedKmh: 720, distanceFactor: 1.04, fixedMinutes: 150 }),
+  Object.freeze({ id: 'ferry', icon: 'ship', speedKmh: 32, distanceFactor: 1.08, fixedMinutes: 35 }),
 ]);
 
 const DEFAULT_MODE = 'walking';
@@ -47,9 +50,10 @@ export function haversineDistanceKm(from, to) {
 export function estimateRouteSegment(from, to, modeId = DEFAULT_MODE) {
   const mode = getTravelMode(modeId);
   const directDistanceKm = haversineDistanceKm(from, to);
-  const distanceKm = directDistanceKm * mode.distanceFactor;
+  const distanceKm = directDistanceKm * getDistanceFactor(mode.id, directDistanceKm, mode.distanceFactor);
+  const speedKmh = getAverageSpeedKmh(mode.id, directDistanceKm, mode.speedKmh);
   const durationMinutes = distanceKm > 0
-    ? Math.max(1, Math.round((distanceKm / mode.speedKmh) * 60 + mode.fixedMinutes))
+    ? Math.max(1, Math.round((distanceKm / speedKmh) * 60 + mode.fixedMinutes))
     : 0;
 
   return {
@@ -59,6 +63,7 @@ export function estimateRouteSegment(from, to, modeId = DEFAULT_MODE) {
     directDistanceKm,
     distanceKm,
     durationMinutes,
+    averageSpeedKmh: speedKmh,
     mode: mode.id,
   };
 }
@@ -305,6 +310,29 @@ function minutesToTime(minutes) {
 
 function normalizeTime(time) {
   return /^\d{2}:\d{2}$/.test(String(time || '')) ? String(time) : DEFAULT_START_TIME;
+}
+
+
+function getAverageSpeedKmh(modeId, directDistanceKm, fallback) {
+  if (modeId === 'driving') {
+    if (directDistanceKm < 8) return 28;
+    if (directDistanceKm < 60) return 58;
+    return 92;
+  }
+  if (modeId === 'transit') {
+    if (directDistanceKm < 12) return 24;
+    if (directDistanceKm < 80) return 48;
+    return 78;
+  }
+  if (modeId === 'train') return directDistanceKm < 80 ? 80 : 155;
+  if (modeId === 'plane') return directDistanceKm < 450 ? 520 : 720;
+  return fallback;
+}
+
+function getDistanceFactor(modeId, directDistanceKm, fallback) {
+  if (modeId === 'driving') return directDistanceKm < 30 ? 1.28 : directDistanceKm < 150 ? 1.22 : 1.16;
+  if (modeId === 'transit') return directDistanceKm < 30 ? 1.25 : 1.16;
+  return fallback;
 }
 
 function degreesToRadians(value) {

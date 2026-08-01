@@ -9,7 +9,7 @@ export const EXTERNAL_SERVICES_CONFIG = Object.freeze({
     baseUrl: 'https://api.open-meteo.com/v1/forecast',
     timeoutMs: 10000,
     cacheTtlMs: 15 * 60 * 1000,
-    forecastDays: 7,
+    forecastDays: 16,
   }),
   currency: Object.freeze({
     baseUrl: 'https://api.frankfurter.dev/v2',
@@ -19,6 +19,7 @@ export const EXTERNAL_SERVICES_CONFIG = Object.freeze({
   geocoding: Object.freeze({
     provider: 'photon',
     baseUrl: 'https://photon.komoot.io/api',
+    reverseUrl: 'https://photon.komoot.io/reverse',
     timeoutMs: 9000,
     cacheTtlMs: 24 * 60 * 60 * 1000,
     debounceMs: 500,

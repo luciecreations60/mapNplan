@@ -9,7 +9,7 @@ import { normalizeCompanionSettings } from '../../utils/travelCompanion.js';
 import { localStorageService } from '../storage/LocalStorageService.js';
 
 const STORAGE_KEY = 'trips';
-const CURRENT_TRIP_SCHEMA_VERSION = 16;
+const CURRENT_TRIP_SCHEMA_VERSION = 17;
 
 /**
  * Trip repository façade.
@@ -116,7 +116,7 @@ class TripService {
         ...day,
         id: createId('day'),
         routePlan: this.#normalizeRoutePlan(null),
-        items: day.items.map((item) => ({ ...item, id: createId('activity'), externalCalendarUid: '', completedAt: null, comments: [] })),
+        items: day.items.map((item) => ({ ...item, id: createId('activity'), linkedReservationId: null, externalCalendarUid: '', completedAt: null, comments: [] })),
       })),
       travelParty: duplicatedTravelParty,
       expenses: sourceTrip.expenses.map((expense) => ({
@@ -138,6 +138,7 @@ class TripService {
       reservations: sourceTrip.reservations.map((reservation) => ({
         ...reservation,
         id: createId('reservation'),
+        sourceActivityId: null,
         createdAt: now,
         comments: [],
         externalCalendarUid: '',
@@ -486,6 +487,12 @@ class TripService {
               location: String(item.location || '').trim(),
               latitude: this.#normalizeLatitude(item.latitude),
               longitude: this.#normalizeLongitude(item.longitude),
+              departureLocation: String(item.departureLocation || '').trim(),
+              departureLatitude: this.#normalizeLatitude(item.departureLatitude),
+              departureLongitude: this.#normalizeLongitude(item.departureLongitude),
+              transportMode: ['walking', 'cycling', 'driving', 'transit', 'train', 'plane', 'ferry'].includes(item.transportMode)
+                ? item.transportMode
+                : '',
               durationMinutes: Math.max(0, Number(item.durationMinutes) || 0),
               estimatedCost: Math.max(0, Number(item.estimatedCost) || 0),
               notes: String(item.notes || '').trim(),
@@ -493,6 +500,7 @@ class TripService {
               externalCalendarUid: String(item.externalCalendarUid || '').trim(),
               completedAt: item.completedAt || null,
               comments: this.#normalizeComments(item.comments),
+              linkedReservationId: item.linkedReservationId ? String(item.linkedReservationId) : null,
             }))
           : [],
       }))
@@ -509,7 +517,7 @@ class TripService {
       : {};
 
     return {
-      mode: ['walking', 'cycling', 'driving', 'transit'].includes(routePlan?.mode)
+      mode: ['walking', 'cycling', 'driving', 'transit', 'train', 'plane', 'ferry'].includes(routePlan?.mode)
         ? routePlan.mode
         : 'walking',
       startStrategy: routePlan?.startStrategy === 'destination' ? 'destination' : 'firstActivity',
@@ -560,6 +568,7 @@ class TripService {
       reminderMinutes: this.#normalizeReminderMinutes(reservation.reminderMinutes),
       externalCalendarUid: String(reservation.externalCalendarUid || '').trim(),
       comments: this.#normalizeComments(reservation.comments),
+      sourceActivityId: reservation.sourceActivityId ? String(reservation.sourceActivityId) : null,
       createdAt: reservation.createdAt || new Date().toISOString(),
     }));
   }

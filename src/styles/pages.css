@@ -4665,3 +4665,232 @@
 @media (max-width: 760px) { .storage-health-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 460px) { .storage-health-grid { grid-template-columns: 1fr; } .settings-card__button-row .button { width: 100%; } }
 @media (prefers-reduced-motion: reduce) { .route-loading__icon { animation: none; } }
+
+/* --------------------------------------------------------------------------
+ * V0.1.23 RC2 — itinerary usability, readable forms and responsive density
+ * -------------------------------------------------------------------------- */
+.workspace-field.location-autocomplete .location-autocomplete__control > input,
+.field.location-autocomplete .location-autocomplete__control > input,
+.location-autocomplete.workspace-form__wide .location-autocomplete__control > input {
+  min-height: 46px;
+  padding-inline: 44px 42px;
+  line-height: 1.35;
+}
+
+.workspace-field.location-autocomplete .location-autocomplete__leading-icon,
+.field.location-autocomplete .location-autocomplete__leading-icon {
+  left: 14px;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+}
+
+.workspace-field input,
+.workspace-field select,
+.workspace-field textarea,
+.shared-expense-filters select,
+.settlement-form input,
+.settlement-form select {
+  line-height: 1.35;
+}
+
+.workspace-section {
+  gap: 18px;
+  font-size: 1rem;
+}
+
+.workspace-section__heading h2,
+.workspace-panel__header h2,
+.workspace-panel__header h3 {
+  line-height: 1.22;
+}
+
+.workspace-section__heading p:last-child,
+.workspace-muted-copy,
+.workspace-field > span,
+.workspace-field > small {
+  line-height: 1.5;
+}
+
+.workspace-form-card,
+.workspace-panel {
+  padding: clamp(16px, 2vw, 22px);
+}
+
+.workspace-form__grid {
+  gap: 13px;
+}
+
+.itinerary-day__header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.itinerary-day__header .button {
+  justify-self: end;
+}
+
+.itinerary-day__empty-action {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  padding: 18px 21px 22px;
+  color: var(--color-text-muted);
+}
+
+.itinerary-bottom-action {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  padding: 18px;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.itinerary-bottom-action small {
+  color: var(--color-text-muted);
+}
+
+.duration-field__controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.duration-field__controls label {
+  display: grid;
+  gap: 5px;
+  color: var(--color-text-muted);
+  font-size: .78rem;
+}
+
+.itinerary-estimate-action {
+  align-content: end;
+}
+
+.itinerary-estimate-action .button {
+  min-height: 46px;
+}
+
+.itinerary-item__reservation-link {
+  margin-top: 8px;
+}
+
+.map-card--interactive .trip-map--selectable {
+  cursor: crosshair;
+}
+
+.map-add-form {
+  display: grid;
+  gap: 14px;
+}
+
+.map-add-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.map-add-form__coordinates {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.weather-forecast--extended {
+  grid-template-columns: repeat(16, minmax(94px, 1fr));
+  scroll-snap-type: x proximity;
+}
+
+.weather-forecast--extended article {
+  position: relative;
+  scroll-snap-align: start;
+}
+
+.weather-forecast__trip-day {
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary-soft) !important;
+}
+
+.weather-forecast__trip-day em {
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: var(--color-primary);
+  background: var(--color-surface);
+  font-size: .58rem;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.weather-coverage-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 14px;
+  color: var(--color-text-muted);
+  font-size: .78rem;
+  line-height: 1.45;
+}
+
+.overview-timeline__time {
+  display: grid;
+  gap: 2px;
+  line-height: 1.15;
+}
+
+.overview-timeline__time strong {
+  color: var(--color-text);
+  font-size: .72rem;
+}
+
+.overview-timeline__time small {
+  color: var(--color-text-muted);
+  font-size: .68rem;
+}
+
+.shared-expense-filters {
+  grid-template-columns: minmax(220px, 1fr) repeat(4, minmax(145px, auto));
+}
+
+@media (max-width: 1180px) {
+  .shared-expense-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .workspace-section__heading {
+    align-items: stretch;
+  }
+
+  .workspace-section__heading > .button,
+  .workspace-section__heading > div + .button {
+    width: 100%;
+  }
+
+  .itinerary-day__header {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .itinerary-day__header .button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .map-add-form__grid,
+  .duration-field__controls,
+  .shared-expense-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .overview-timeline__item {
+    grid-template-columns: 78px 38px minmax(0, 1fr);
+  }
+
+  .overview-timeline__item:not(:last-child)::after {
+    left: 96px;
+  }
+}
