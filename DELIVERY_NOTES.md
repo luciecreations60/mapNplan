@@ -1,23 +1,23 @@
-# Delivery notes — V0.1 Part 21
-
-Version: `0.1.20`
+# V0.1 — Part 22 delivery notes
 
 ## Purpose
 
-Cross-browser, responsive and accessibility stabilization. No new business feature was introduced.
+This release improves resilience and performance without changing the trip schema or adding a new business feature.
 
-## Key changes
+## Changes
 
-- keyboard skip navigation;
-- focus trap and focus restoration for modals and the mobile drawer;
-- semantic and keyboard-operable trip tabs;
-- keyboard-operable global search;
-- improved notification popover dismissal;
-- robust mobile/desktop overflow containment;
-- larger coarse-pointer targets;
-- reduced motion and forced-colour support;
-- static accessibility and responsive test contracts.
+- Added route-level React lazy loading and a small accessible loading fallback.
+- Added a browser-storage health service.
+- Added safe cleanup for orphaned attachments, stale response cache entries and old recovery snapshots.
+- Added optional persistent-storage requests where supported by the browser.
+- Added storage volume summaries without exposing private content.
+- Added a bounded same-origin service-worker cache and offline application-shell fallback.
+- Added Vite vendor chunks and a production bundle-size audit.
+- Added tests for storage maintenance and performance contracts.
+- Kept public indexing disabled.
 
-## Existing data
+## Data compatibility
 
-No data migration is required. User trips, files, templates and preferences are preserved.
+- Trip schema remains version 16.
+- Existing trips and attachments are preserved.
+- Cleanup only removes files whose trip/document parent no longer exists, old cache entries and excess recovery snapshots.

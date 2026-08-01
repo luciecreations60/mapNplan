@@ -1,13 +1,14 @@
 # Changelog
 
-## 0.1.20 — Browser and accessibility stabilization
+## 0.1.21 — Data resilience and performance
 
-- Added skip navigation and focusable main landmark.
-- Added focus trapping/restoration for modals and mobile navigation.
-- Implemented accessible keyboard tabs and global search.
-- Hardened responsive overflow, activity actions and touch targets.
-- Added reduced-motion, forced-colour and fallback visual rules.
-- Added accessibility and responsive contract tests.
+- Added browser-storage diagnostics and safe maintenance.
+- Added orphan attachment and stale cache cleanup.
+- Added optional persistent-storage requests.
+- Added route-level lazy loading and vendor chunk separation.
+- Hardened the offline service worker with bounded caches.
+- Added production bundle budgets and performance tests.
+- Kept the trip schema unchanged and public indexing disabled.
 
 ## 0.1.19 — Reliability and test gates
 

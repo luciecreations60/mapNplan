@@ -1,34 +1,37 @@
-# Automated testing — V0.1.20
+# Testing — V0.1.21
 
-The test suite uses the Node.js built-in test runner and does not add another test framework dependency.
-
-## Covered areas
-
-- Legacy trip migration and domain normalization
-- Trip duplication and private attachment removal
-- Shared-expense balances and settlement suggestions
-- Partial-payment and money-rounding rules
-- Route distance, optimization and restoration
-- ICS calendar export/import round trip
-- Backup format and attachment-data validation
-- Shared-trip payload validation
-- Corrupted LocalStorage quarantine
-- Public SEO indexing lock
-
-## Commands
+## Automated commands
 
 ```bash
 npm run quality
 npm run test
 npm run build
-npm run check
+npm run performance:audit
 ```
 
-The GitHub Actions deployment executes quality checks, tests and the production build. A failure stops deployment.
+## New tests
 
+- orphaned attachment detection;
+- content-neutral data-volume summaries;
+- LocalStorage namespace sizing;
+- recovery-snapshot pruning;
+- route-level lazy loading contract;
+- bounded same-origin service-worker cache;
+- production bundle-budget configuration.
 
-## Part 21 contracts
+## Manual storage test
 
-`accessibility-contract.test.mjs` verifies the skip link, modal focus trap, tab pattern and search combobox semantics. `responsive-contract.test.mjs` verifies reduced motion, forced colours, coarse-pointer targets, mobile drawer isolation and Chrome-safe action layouts.
+1. Open **Settings**.
+2. Find **Data health and maintenance** / **Santé et entretien des données**.
+3. Run the storage check.
+4. Confirm that the status is healthy or lists orphan files.
+5. Run safe cleanup.
+6. Confirm that trips and valid documents remain available.
+7. Export a JSON backup before testing a browser-storage reset.
 
-Manual rendering checks are described in `BROWSER_ACCESSIBILITY_TESTING.md`.
+## Manual offline test
+
+1. Open the deployed application once while online.
+2. Open browser developer tools and enable Offline mode.
+3. Reload the application.
+4. Confirm that the application shell and locally stored trip data remain readable.

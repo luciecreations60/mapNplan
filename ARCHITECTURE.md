@@ -1,24 +1,28 @@
-# Architecture — V0.1.20 stabilization baseline
+# Architecture — V0.1.21
 
-## Reliability layers
+## Persistence layers
 
-1. **Domain normalization** — `TripService` remains the migration and normalization façade.
-2. **Import validation** — `ImportValidationService` rejects incompatible versions, excessive collections, oversized text and malformed attachments.
-3. **Storage recovery** — `LocalStorageService` keeps up to five small quarantine snapshots when JSON parsing fails.
-4. **Runtime diagnostics** — `DiagnosticsService` captures React, window and promise errors in `sessionStorage`; nothing is transmitted.
-5. **Continuous validation** — GitHub Actions requires project checks, Node tests and a Vite production build before deployment.
+- `TripService` owns synchronous trip-domain persistence in LocalStorage.
+- `AttachmentStorageService` owns binary files in IndexedDB.
+- `ResponseCacheService` owns bounded public-API response caches.
+- `StorageHealthService` analyses and conservatively maintains these layers.
 
-## SEO release lock
+The health service never removes valid trip data. It only removes confirmed orphan attachments, stale response-cache entries and excess recovery snapshots.
 
-`PROJECT_CONFIG.release.publicIndexingEnabled` is the single public-indexing switch. It stays `false` until the final name and production domain are approved.
+## Performance boundaries
 
-## Test strategy
+Top-level pages are dynamically imported from `App.jsx`. Shared libraries are split into React, map and icon vendor chunks by Vite. GitHub Actions audits the generated bundle before deployment.
 
-The suite uses the Node 22 built-in test runner, avoiding an additional test framework. Browser compatibility and visual accessibility are handled in Part 21.
+## Offline strategy
 
+The service worker uses:
 
-## V0.1.20 accessibility layer
+- network-first for navigation;
+- the cached application shell as an offline fallback;
+- cache-first for same-origin versioned static assets;
+- a strict maximum of 80 runtime asset entries;
+- no caching of third-party API responses.
 
-Temporary surfaces use `useFocusTrap` to contain keyboard focus and restore it to the opener. The application shell exposes a skip link and a focusable `<main>` landmark. Workspace navigation follows the WAI-ARIA tab pattern and global search uses combobox/listbox semantics.
+## Compatibility
 
-Responsive safety rules are additive and live at the end of the CSS layers. They guarantee container `min-width: 0`, page overflow containment, coarse-pointer target sizes, reduced-motion behaviour and forced-colour fallbacks without changing business components.
+Trip schema remains version 16. No data migration is required for this release.

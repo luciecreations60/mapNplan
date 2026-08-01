@@ -13,3 +13,16 @@ test('corrupted JSON is quarantined before fallback data is used', () => {
   assert.equal(recovery[0].originalKey, 'trips');
   assert.equal(recovery[0].rawValue, '{broken');
 });
+
+test('namespace usage and recovery pruning stay bounded', () => {
+  localStorage.clear();
+  localStorageService.set('one', { value: 1 });
+  localStorage.setItem('tripflow:recovery:1', JSON.stringify({ originalKey: 'a' }));
+  localStorage.setItem('tripflow:recovery:2', JSON.stringify({ originalKey: 'b' }));
+  localStorage.setItem('tripflow:recovery:3', JSON.stringify({ originalKey: 'c' }));
+  const entries = localStorageService.listNamespaceEntries();
+  assert.ok(entries.length >= 4);
+  assert.ok(entries.every((entry) => entry.bytes > 0));
+  assert.equal(localStorageService.pruneRecoveryEntries(2), 1);
+  assert.equal(localStorageService.listRecoveryEntries().length, 2);
+});

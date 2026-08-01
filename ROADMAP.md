@@ -2,27 +2,22 @@
 
 ## Completed
 
-- Part 20 — reliability, import validation, recovery and build gates.
-- Part 21 — cross-browser responsive contracts, keyboard navigation and accessibility.
+- Part 20 — reliability, import validation, recovery and deployment gates.
+- Part 21 — browser compatibility, responsive contracts and accessibility.
+- Part 22 — storage resilience, offline hardening and performance budgets.
 
 ## Remaining before V1.0
 
-### Part 22 — data resilience and performance
+### Part 23 — Release Candidate
 
-- corrupted-data recovery workflow;
-- storage cleanup and quota handling;
-- lazy loading and initial bundle reduction;
-- service-worker and offline hardening;
-- performance budgets and Lighthouse-oriented checks.
-
-### Part 23 — release candidate
-
-- end-to-end manual user journeys;
-- Chrome, Safari, Firefox and Edge matrix;
-- desktop, tablet and phone verification;
-- regression fixes only;
-- final known-limitations and release checklist.
+- execute the complete end-to-end user journey;
+- verify Chrome, Safari, Firefox and Edge;
+- verify desktop, tablet and phone layouts;
+- fix regressions only;
+- review demo data and translations;
+- publish known limitations and the release checklist;
+- decide whether V1.0 is ready for external testers.
 
 ## Feature freeze
 
-No additional business functionality is planned before V1.0 unless it fixes a blocked journey or prevents data loss.
+No new business feature is planned before V1.0 unless it fixes a blocked journey, prevents data loss or resolves a critical usability issue.

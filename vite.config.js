@@ -46,6 +46,15 @@ export default defineConfig({
   build: {
     sourcemap: true,
     target: 'es2022',
-    chunkSizeWarningLimit: 900,
+    chunkSizeWarningLimit: 750,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'map-vendor': ['leaflet'],
+          'icons-vendor': ['lucide-react'],
+        },
+      },
+    },
   },
 });

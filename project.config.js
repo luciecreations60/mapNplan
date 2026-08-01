@@ -9,7 +9,7 @@ export const PROJECT_CONFIG = Object.freeze({
   codeName: 'TripFlow',
   brandName: 'TripFlow',
   tagline: 'Every journey starts here.',
-  version: '0.1.20',
+  version: '0.1.21',
   release: Object.freeze({
     stage: 'stabilization',
     brandFinalized: false,

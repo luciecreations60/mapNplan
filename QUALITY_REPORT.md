@@ -1,33 +1,31 @@
-# Quality report — V0.1 Part 21
+# Quality report — V0.1.21
 
-## Scope
+## Automated validation
 
-This release contains no new travel feature. It consolidates cross-browser layout, responsive containment, keyboard navigation and accessibility semantics.
+- 26 automated tests passed.
+- 0 automated test failures.
+- 1,544 translation keys are synchronized per locale.
+- 146 JavaScript/JSX/MJS files were parsed successfully with the TypeScript parser.
+- Relative imports and JSON files passed the project quality checker.
+- Public indexing remains locked.
 
-## Automated gates
+## Performance controls
 
-- existing business and migration tests;
-- accessibility source contracts;
-- responsive CSS contracts;
-- translation parity;
-- relative import validation;
-- JSON validation;
-- production build in GitHub Actions.
+- Top-level pages are loaded with `React.lazy`.
+- React, Leaflet and icons are emitted as separate vendor chunks.
+- A single JavaScript chunk may not exceed 750 KB.
+- Total JavaScript may not exceed 2.5 MB.
+- A CSS asset may not exceed 350 KB.
+- GitHub Actions runs the bundle audit after the production build.
 
-## Main corrections
+## Storage controls
 
-- skip link and focusable main landmark;
-- modal and mobile-drawer focus containment;
-- focus restoration after temporary surfaces close;
-- accessible tablist with arrow, Home and End keys;
-- accessible global-search combobox navigation;
-- notification panel Escape/outside-click handling;
-- 44 px touch targets for coarse pointers;
-- reduced-motion and forced-colour support;
-- Chrome-safe activity action grid;
-- full-width scrollable trip tabs;
-- fallback styling when backdrop filters are unavailable.
+- Orphan attachments can be detected and removed.
+- External-response caches are bounded and can be pruned.
+- Recovery snapshots remain bounded.
+- Browser storage persistence can be requested when supported.
+- Maintenance does not silently delete valid trips or documents.
 
-## Validation boundary
+## Limitation
 
-Static and unit tests can prove structural contracts, not rendering in every browser engine. The manual browser matrix is documented in `BROWSER_ACCESSIBILITY_TESTING.md` and will be executed during the release-candidate pass.
+The production Vite build could not be executed in the assistant environment because its internal npm mirror does not provide `@vitejs/plugin-react`. GitHub Actions remains the source of truth for the real production build and bundle audit.
