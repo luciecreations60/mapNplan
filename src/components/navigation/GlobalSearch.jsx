@@ -11,6 +11,7 @@ const RESULT_ICONS = {
   reservation: 'ticket',
   document: 'file',
   notes: 'notebook',
+  savedPlace: 'pin',
 };
 
 export function GlobalSearch() {

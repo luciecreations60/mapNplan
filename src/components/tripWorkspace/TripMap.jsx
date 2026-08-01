@@ -67,8 +67,8 @@ export function TripMap({ points }) {
       const marker = L.circleMarker(coordinates, {
         radius: 8,
         weight: 3,
-        color: point.source === 'reservation' ? '#1aa181' : point.source === 'destination' ? '#c96574' : '#5b5ce2',
-        fillColor: point.source === 'reservation' ? '#29bea0' : point.source === 'destination' ? '#f08b78' : '#7475ff',
+        color: point.source === 'reservation' ? '#1aa181' : point.source === 'destination' ? '#c96574' : point.source === 'savedPlace' ? '#a46a15' : '#5b5ce2',
+        fillColor: point.source === 'reservation' ? '#29bea0' : point.source === 'destination' ? '#f08b78' : point.source === 'savedPlace' ? '#e0a33b' : '#7475ff',
         fillOpacity: 0.92,
       });
 
@@ -109,7 +109,9 @@ function createPopupNode(point, t) {
     ? t('map.reservation')
     : point.source === 'destination'
       ? t('map.destination')
-      : t('map.itinerary');
+      : point.source === 'savedPlace'
+        ? t('map.savedPlace')
+        : t('map.itinerary');
 
   const title = document.createElement('strong');
   title.textContent = point.title;
