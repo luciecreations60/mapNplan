@@ -41,6 +41,7 @@ export function OverviewPanel({ trip, onOpenTab }) {
         <OverviewStat icon="wallet" tone="aqua" label={t('overview.paid')} value={formatCurrency(paidTotal, trip.currency, locale)} />
         <OverviewStat icon="checklist" tone="coral" label={t('overview.checklist')} value={`${Math.round(checklistProgress)}%`} />
         <OverviewStat icon="folder" tone="green" label={t('overview.documents')} value={trip.documents.length} />
+        <OverviewStat icon="externalLink" label={t('overview.bookingOptions')} value={trip.bookingOptions.length} />
       </section>
 
       <div className="trip-overview__grid">

@@ -12,6 +12,7 @@ const RESULT_ICONS = {
   document: 'file',
   notes: 'notebook',
   savedPlace: 'pin',
+  bookingOption: 'externalLink',
 };
 
 export function GlobalSearch() {
