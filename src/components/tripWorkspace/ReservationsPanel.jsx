@@ -82,6 +82,8 @@ export function ReservationsPanel({ trip, onUpdate }) {
       latitude: form.latitude === '' ? null : Number(form.latitude),
       longitude: form.longitude === '' ? null : Number(form.longitude),
       notes: form.notes.trim(),
+      reminderMinutes: previousReservation?.reminderMinutes ?? null,
+      externalCalendarUid: previousReservation?.externalCalendarUid || '',
       comments: previousReservation?.comments || [],
       createdAt: previousReservation?.createdAt || new Date().toISOString(),
     };

@@ -66,6 +66,9 @@ export function ItineraryPanel({ trip, onUpdate }) {
     event.preventDefault();
     if (!form.date || !form.title.trim()) return;
 
+    const previousActivity = editingActivity
+      ? trip.itinerary.flatMap((day) => day.items).find((item) => item.id === editingActivity.activityId)
+      : null;
     const activity = {
       id: editingActivity?.activityId || createId('activity'),
       time: form.time,
@@ -77,12 +80,10 @@ export function ItineraryPanel({ trip, onUpdate }) {
       durationMinutes: Math.max(0, Number(form.durationMinutes) || 0),
       estimatedCost: Math.max(0, Number(form.estimatedCost) || 0),
       notes: form.notes.trim(),
-      completedAt: editingActivity
-        ? trip.itinerary.flatMap((day) => day.items).find((item) => item.id === editingActivity.activityId)?.completedAt || null
-        : null,
-      comments: editingActivity
-        ? trip.itinerary.flatMap((day) => day.items).find((item) => item.id === editingActivity.activityId)?.comments || []
-        : [],
+      reminderMinutes: previousActivity?.reminderMinutes ?? null,
+      externalCalendarUid: previousActivity?.externalCalendarUid || '',
+      completedAt: previousActivity?.completedAt || null,
+      comments: previousActivity?.comments || [],
     };
 
     let nextItinerary = trip.itinerary.map((day) => ({ ...day, items: [...day.items] }));
