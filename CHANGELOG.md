@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.22 rc.1 — Release Candidate
+
+- Froze the product scope and changed the release stage to `release-candidate`.
+- Added complete local trip lifecycle regression coverage.
+- Added demo-data integrity, privacy and commercial-default tests.
+- Added source and built-artifact release auditing.
+- Added a mandatory release audit before GitHub Pages deployment.
+- Added acceptance, readiness, known-limitations and rollback documentation.
+- Kept trip schema 16 and public indexing disabled.
+
 ## 0.1.21 — Data resilience and performance
 
 - Added browser-storage diagnostics and safe maintenance.

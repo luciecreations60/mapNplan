@@ -1,7 +1,7 @@
 {
   "name": "travel-planner",
   "private": true,
-  "version": "0.1.21",
+  "version": "0.1.22",
   "type": "module",
   "description": "A modern, extensible travel planning application.",
   "scripts": {
@@ -13,8 +13,10 @@
     "prebuild": "npm run seo:generate && npm run seo:audit",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "npm run quality && npm run test && npm run build && npm run performance:audit",
-    "performance:audit": "node scripts/audit-build-size.mjs"
+    "check": "npm run quality && npm run test && npm run build && npm run performance:audit && npm run release:audit:ci",
+    "performance:audit": "node scripts/audit-build-size.mjs",
+    "release:audit": "node scripts/audit-release-candidate.mjs",
+    "release:audit:ci": "node scripts/audit-release-candidate.mjs --require-build"
   },
   "engines": {
     "node": ">=22.12.0"

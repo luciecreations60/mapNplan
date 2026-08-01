@@ -1,4 +1,4 @@
-# Testing — V0.1.21
+# Testing — V0.1.22 rc.1
 
 ## Automated commands
 
@@ -7,31 +7,41 @@ npm run quality
 npm run test
 npm run build
 npm run performance:audit
+npm run release:audit:ci
 ```
 
-## New tests
+`npm run check` executes the same complete gate in sequence.
 
-- orphaned attachment detection;
-- content-neutral data-volume summaries;
-- LocalStorage namespace sizing;
-- recovery-snapshot pruning;
-- route-level lazy loading contract;
-- bounded same-origin service-worker cache;
-- production bundle-budget configuration.
+## Automated coverage
 
-## Manual storage test
+The Release Candidate contains 32 tests covering:
 
-1. Open **Settings**.
-2. Find **Data health and maintenance** / **Santé et entretien des données**.
-3. Run the storage check.
-4. Confirm that the status is healthy or lists orphan files.
-5. Run safe cleanup.
-6. Confirm that trips and valid documents remain available.
-7. Export a JSON backup before testing a browser-storage reset.
+- accessibility and responsive contracts;
+- calendar ICS round trips;
+- import validation and unsupported formats;
+- LocalStorage quarantine and bounded recovery;
+- lazy loading, service-worker bounds and bundle budgets;
+- release identity, documentation and CI contract;
+- complete create/update/archive/restore/backup/share/duplicate/delete lifecycle;
+- normalized demonstration-data integrity;
+- affiliate providers disabled by default;
+- route optimisation restoration;
+- shared-expense calculations and rounding;
+- storage-maintenance safety;
+- trip migrations and private-file removal during duplication;
+- public-indexing lock.
 
-## Manual offline test
+## Manual acceptance
 
-1. Open the deployed application once while online.
-2. Open browser developer tools and enable Offline mode.
-3. Reload the application.
-4. Confirm that the application shell and locally stored trip data remain readable.
+Follow `RELEASE_CANDIDATE_TEST_PLAN.md`. The minimum V1.0 decision evidence is:
+
+1. green GitHub Actions for this version;
+2. complete core journey on the deployed site;
+3. Chrome and Safari acceptance;
+4. mobile layout acceptance;
+5. successful JSON backup restoration;
+6. zero blocker and data-loss defects.
+
+## Release status
+
+After deployment, `release-status.json` reports the source/build release audit. It is a technical signal only and does not replace manual browser acceptance.

@@ -1,31 +1,33 @@
-# Quality report — V0.1.21
+# Quality report — V0.1.22 rc.1
 
 ## Automated validation
 
-- 26 automated tests passed.
-- 0 automated test failures.
+- 32 automated tests pass with 0 failures.
 - 1,544 translation keys are synchronized per locale.
-- 146 JavaScript/JSX/MJS files were parsed successfully with the TypeScript parser.
-- Relative imports and JSON files passed the project quality checker.
+- JavaScript, JSX and MJS sources parse successfully through the project checker.
+- Relative imports and JSON files are validated.
+- Demonstration trips normalize without invalid dates or references.
+- The complete local trip lifecycle passes as a domain regression test.
+- Shared output excludes confirmation numbers, private document references, comments and disabled budget/notes.
+- Affiliate providers remain disabled by default.
 - Public indexing remains locked.
 
-## Performance controls
+## Continuous-delivery gate
 
-- Top-level pages are loaded with `React.lazy`.
-- React, Leaflet and icons are emitted as separate vendor chunks.
-- A single JavaScript chunk may not exceed 750 KB.
-- Total JavaScript may not exceed 2.5 MB.
-- A CSS asset may not exceed 350 KB.
-- GitHub Actions runs the bundle audit after the production build.
+Deployment now requires:
 
-## Storage controls
+- quality checks;
+- automated tests;
+- production build;
+- bundle-size audit;
+- release-candidate audit with `dist` required.
 
-- Orphan attachments can be detected and removed.
-- External-response caches are bounded and can be pruned.
-- Recovery snapshots remain bounded.
-- Browser storage persistence can be requested when supported.
-- Maintenance does not silently delete valid trips or documents.
+The final audit also rejects skipped or exclusive tests and writes the deployed `release-status.json` report.
 
-## Limitation
+## Stability assessment
 
-The production Vite build could not be executed in the assistant environment because its internal npm mirror does not provide `@vitejs/plugin-react`. GitHub Actions remains the source of truth for the real production build and bundle audit.
+The source is ready for controlled acceptance testing. It is not yet labelled V1.0 because the production build and the cross-browser matrix must be completed in GitHub and the user's devices.
+
+## Environment limitation
+
+The production Vite build cannot be executed in the assistant environment because its internal npm mirror does not provide `@vitejs/plugin-react`. GitHub Actions is the source of truth for build, bundle and deployed-artifact verification.

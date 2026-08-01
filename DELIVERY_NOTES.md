@@ -1,23 +1,28 @@
-# V0.1 — Part 22 delivery notes
+# V0.1 — Part 23 delivery notes
 
 ## Purpose
 
-This release improves resilience and performance without changing the trip schema or adding a new business feature.
+This release creates V0.1.22 rc.1 without adding a business feature. It closes the planned stabilization sequence and prepares an evidence-based V1.0 decision.
 
 ## Changes
 
-- Added route-level React lazy loading and a small accessible loading fallback.
-- Added a browser-storage health service.
-- Added safe cleanup for orphaned attachments, stale response cache entries and old recovery snapshots.
-- Added optional persistent-storage requests where supported by the browser.
-- Added storage volume summaries without exposing private content.
-- Added a bounded same-origin service-worker cache and offline application-shell fallback.
-- Added Vite vendor chunks and a production bundle-size audit.
-- Added tests for storage maintenance and performance contracts.
-- Kept public indexing disabled.
+- Changed the release stage from stabilization to release candidate.
+- Added a candidate identifier while keeping the brand, domain, SEO and commercial activation locked.
+- Added end-to-end domain tests for the complete local trip lifecycle.
+- Added demonstration-data integrity and default-partner privacy tests.
+- Added release identity, CI and documentation contract tests.
+- Added a release-candidate audit that checks source and built files.
+- Added a deployed `release-status.json` report.
+- Added the browser acceptance plan, release checklist, limitations, readiness report and rollback procedure.
+- Added a mandatory Release candidate audit step to GitHub Actions.
 
 ## Data compatibility
 
 - Trip schema remains version 16.
-- Existing trips and attachments are preserved.
-- Cleanup only removes files whose trip/document parent no longer exists, old cache entries and excess recovery snapshots.
+- Backup format remains version 2.
+- No migration or data reset is required.
+- Existing trips, settings and attachments remain compatible.
+
+## Decision
+
+This archive is ready for controlled testing. It should become V1.0 only after the conditions in `V1_READINESS_REPORT.md` and `RELEASE_CHECKLIST.md` are met.
