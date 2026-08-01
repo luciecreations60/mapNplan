@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import { translateForCurrentBrowser } from '../../contexts/LocalizationContext.jsx';
+import { diagnosticsService } from '../../services/diagnostics/DiagnosticsService.js';
 
 export class ErrorBoundary extends Component {
   state = { hasError: false };
@@ -9,6 +10,7 @@ export class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, info) {
+    diagnosticsService.capture(error, { source: 'react-error-boundary', componentStack: info?.componentStack || '' });
     console.error('Unhandled application error.', error, info);
   }
 
