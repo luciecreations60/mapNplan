@@ -1,33 +1,16 @@
-# Installation — V0.1 Partie 19
+# Upload V0.1 Part 20 to GitHub
 
-1. Décompresser `travel-planner-v0.1-part19.zip`.
-2. Ouvrir le dépôt GitHub `travel-planner`.
-3. Choisir **Add file → Upload files**.
-4. Déposer tout le contenu du dossier extrait.
-5. Autoriser le remplacement des fichiers existants.
-6. Utiliser le message :
-
-```text
-feat: add v0.1.18 static SEO publishing workflow
-```
-
-7. Valider directement dans `main`.
-8. Attendre la coche verte dans **Actions**.
-9. Ouvrir :
+1. Extract `travel-planner-v0.1-part20.zip`.
+2. Open the `travel-planner` repository.
+3. Choose **Add file → Upload files**.
+4. Upload all extracted files and replace existing versions.
+5. Commit to `main` with:
 
 ```text
-https://luciecreations60.github.io/travel-planner/guides/
-https://luciecreations60.github.io/travel-planner/sitemap.xml
-https://luciecreations60.github.io/travel-planner/robots.txt
-https://luciecreations60.github.io/travel-planner/seo-status.json
+chore: add v0.1.19 reliability and test gates
 ```
 
-## Publication suivante depuis l’application
+6. Open **Actions**. Quality checks, automated tests and the production build must all pass before deployment.
+7. Reload Chrome with `Ctrl + F5` or Safari with `Cmd + Option + R`.
 
-Le fichier téléchargé par **Studio de contenu → Télécharger le fichier de publication** doit remplacer :
-
-```text
-content/seo-pages.json
-```
-
-GitHub Actions générera ensuite les pages publiques automatiquement.
+Public search indexing remains disabled.

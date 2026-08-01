@@ -1,37 +1,20 @@
-# V0.1 — Partie 19 — Publication SEO réelle
+# V0.1 — Part 20 delivery notes
 
-## Version
+## Goal
 
-- Application : `0.1.18`
-- Schéma de contenu SEO : `2`
-- Format de publication SEO : `1`
-- Schéma voyage : inchangé (`16`)
+Freeze features and introduce the first reliability gate before the release candidate.
 
-## Principales évolutions
+## Included
 
-- génération statique des guides pendant le build GitHub Actions ;
-- URLs publiques sans hash ;
-- génération automatique du sitemap, du robots.txt et du rapport SEO ;
-- export `seo-pages.json` depuis le Studio de contenu ;
-- audit de publication dans l’interface et dans le build ;
-- URL GitHub Pages centralisée dans `project.config.js` ;
-- prise en charge de la balise de vérification Google Search Console ;
-- schémas Article, BreadcrumbList et FAQPage ;
-- suppression de la balise `meta keywords` ;
-- guide SEO complet en français.
+- Public search indexing locked with `noindex` while brand and domain remain provisional.
+- Empty sitemap and no Search Console sitemap declaration during stabilization.
+- Node built-in automated tests for migrations, route optimization, group expenses, ICS and imports.
+- Central validation of backup and shared-trip payloads.
+- Corrupted LocalStorage values copied to a small recovery quarantine before normalization overwrites them.
+- Global error diagnostics stored only in the current browser session.
+- GitHub Actions quality gate: checks, tests and production build must pass before deployment.
+- Project version aligned at `0.1.19`.
 
-## Workflow de publication
+## Intentionally excluded
 
-1. passer les guides relus au statut Publiée ;
-2. télécharger `seo-pages.json` depuis le Studio ;
-3. remplacer `content/seo-pages.json` sur GitHub ;
-4. attendre GitHub Actions ;
-5. contrôler `/guides/`, `/sitemap.xml` et `/seo-status.json` ;
-6. envoyer le sitemap dans Search Console.
-
-## Limites
-
-- Search Console reste un service externe à configurer manuellement ;
-- une page publiée et indexable n’est pas nécessairement indexée ou bien classée ;
-- le score SEO interne est un contrôle éditorial, pas un score fourni par Google ;
-- la propriété Search Console doit être vérifiée avec une valeur réellement fournie par Google.
+No new travel feature, no public SEO launch, no analytics and no affiliate activation.

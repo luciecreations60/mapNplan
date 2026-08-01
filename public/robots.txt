@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://luciecreations60.github.io/travel-planner/sitemap.xml
+# Public indexing is disabled by page-level noindex metadata.

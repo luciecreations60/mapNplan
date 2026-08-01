@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.19 — Reliability and test gates
+
+- Locked public indexing until branding and domain are finalized.
+- Added automated tests and a mandatory GitHub Actions quality gate.
+- Added strict validation for backups and shared-trip imports.
+- Added local corruption quarantine and session-only diagnostics.
+- Added generated-page noindex validation.
+
 ## [0.1.17] - 2026-08-01
 
 ### Added

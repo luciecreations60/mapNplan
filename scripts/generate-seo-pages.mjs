@@ -42,7 +42,10 @@ for (const article of articles) {
 await fs.writeFile(path.join(guidesDir, 'index.html'), buildGuideIndexHtml(articles), 'utf8');
 await fs.writeFile(path.join(publicDir, 'sitemap.xml'), buildSitemapXml(articles, { generatedAt }), 'utf8');
 await fs.writeFile(path.join(publicDir, 'robots.txt'), buildRobotsTxt(), 'utf8');
-await fs.writeFile(path.join(publicDir, 'seo-status.json'), `${JSON.stringify({ generatedAt: new Date().toISOString(), baseUrl: SEO_CONFIG.siteBaseUrl, publishedPages: articles.length, audit }, null, 2)}\n`, 'utf8');
+await fs.writeFile(path.join(publicDir, 'seo-status.json'), `${JSON.stringify({ generatedAt: new Date().toISOString(), baseUrl: SEO_CONFIG.siteBaseUrl, publicIndexingEnabled: SEO_CONFIG.publicIndexingEnabled, publishedPages: articles.length, audit }, null, 2)}
+`, 'utf8');
 
 console.log(`Generated ${articles.length} public SEO page(s) in public/guides.`);
-console.log(`Sitemap: ${SEO_CONFIG.siteBaseUrl}/sitemap.xml`);
+console.log(SEO_CONFIG.publicIndexingEnabled
+  ? `Sitemap: ${SEO_CONFIG.siteBaseUrl}/sitemap.xml`
+  : 'Public indexing is locked: generated pages contain noindex metadata.');

@@ -39,6 +39,12 @@ export function normalizePublicationArticle(article) {
   };
 }
 
+function robotsDirective() {
+  return SEO_CONFIG.publicIndexingEnabled
+    ? 'index,follow,max-image-preview:large'
+    : 'noindex,nofollow,noarchive';
+}
+
 export function buildGuideHtml(article, allPublished, options = {}) {
   const baseUrl = normalizeBaseUrl(options.baseUrl || SEO_CONFIG.siteBaseUrl);
   const canonicalUrl = buildCanonicalUrl(article, baseUrl);
@@ -90,7 +96,7 @@ export function buildGuideHtml(article, allPublished, options = {}) {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${title}</title>
 <meta name="description" content="${description}">
-<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="robots" content="${robotsDirective()}">
 <link rel="canonical" href="${escapeHtml(canonicalUrl)}">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="${escapeHtml(PROJECT_CONFIG.brandName)}">
@@ -133,10 +139,13 @@ export function buildGuideIndexHtml(articles, options = {}) {
     url: canonical,
     hasPart: articles.map((article) => ({ '@type': 'Article', name: article.title, url: buildCanonicalUrl(article, baseUrl) })),
   };
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Travel guides and itineraries | ${escapeHtml(PROJECT_CONFIG.brandName)}</title><meta name="description" content="Practical destination guides and realistic travel itineraries created with ${escapeHtml(PROJECT_CONFIG.brandName)}."><meta name="robots" content="index,follow"><link rel="canonical" href="${escapeHtml(canonical)}"><script type="application/ld+json">${safeJsonLd(itemSchema)}</script><style>:root{font-family:Inter,system-ui,sans-serif;color:#17211e;background:#f6f8f7}*{box-sizing:border-box}body{margin:0}main{width:min(1000px,calc(100% - 32px));margin:auto;padding:60px 0}a{color:#28624f}h1{font-size:clamp(2.2rem,6vw,4.5rem);margin-bottom:8px}.lead{color:#52615d;font-size:1.1rem}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:36px}article{padding:22px;border:1px solid #dce5e1;border-radius:18px;background:#fff}article p{font-size:.72rem;font-weight:800;text-transform:uppercase;color:#4e7f70}article h2{font-size:1.2rem}article h2 a{text-decoration:none}article span{color:#5c6965;line-height:1.6}@media(max-width:680px){.grid{grid-template-columns:1fr}}</style></head><body><main><a href="${escapeHtml(baseUrl)}/">← ${escapeHtml(PROJECT_CONFIG.brandName)}</a><h1>Travel guides and itineraries</h1><p class="lead">Useful planning pages designed around realistic days, clear priorities and flexible travel.</p><section class="grid">${cards}</section></main></body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Travel guides and itineraries | ${escapeHtml(PROJECT_CONFIG.brandName)}</title><meta name="description" content="Practical destination guides and realistic travel itineraries created with ${escapeHtml(PROJECT_CONFIG.brandName)}."><meta name="robots" content="${robotsDirective()}"><link rel="canonical" href="${escapeHtml(canonical)}"><script type="application/ld+json">${safeJsonLd(itemSchema)}</script><style>:root{font-family:Inter,system-ui,sans-serif;color:#17211e;background:#f6f8f7}*{box-sizing:border-box}body{margin:0}main{width:min(1000px,calc(100% - 32px));margin:auto;padding:60px 0}a{color:#28624f}h1{font-size:clamp(2.2rem,6vw,4.5rem);margin-bottom:8px}.lead{color:#52615d;font-size:1.1rem}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:36px}article{padding:22px;border:1px solid #dce5e1;border-radius:18px;background:#fff}article p{font-size:.72rem;font-weight:800;text-transform:uppercase;color:#4e7f70}article h2{font-size:1.2rem}article h2 a{text-decoration:none}article span{color:#5c6965;line-height:1.6}@media(max-width:680px){.grid{grid-template-columns:1fr}}</style></head><body><main><a href="${escapeHtml(baseUrl)}/">← ${escapeHtml(PROJECT_CONFIG.brandName)}</a><h1>Travel guides and itineraries</h1><p class="lead">Useful planning pages designed around realistic days, clear priorities and flexible travel.</p><section class="grid">${cards}</section></main></body></html>`;
 }
 
 export function buildSitemapXml(articles, options = {}) {
+  if (!SEO_CONFIG.publicIndexingEnabled) {
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>\n`;
+  }
   const baseUrl = normalizeBaseUrl(options.baseUrl || SEO_CONFIG.siteBaseUrl);
   const urls = [
     { loc: `${baseUrl}/`, lastmod: options.generatedAt },
@@ -146,7 +155,10 @@ export function buildSitemapXml(articles, options = {}) {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(({ loc, lastmod }) => `  <url>\n    <loc>${escapeHtml(loc)}</loc>${lastmod ? `\n    <lastmod>${escapeHtml(lastmod)}</lastmod>` : ''}\n  </url>`).join('\n')}\n</urlset>\n`;
 }
 
-export function buildRobotsTxt(options = {}) {
-  const baseUrl = normalizeBaseUrl(options.baseUrl || SEO_CONFIG.siteBaseUrl);
+export function buildRobotsTxt() {
+  if (!SEO_CONFIG.publicIndexingEnabled) {
+    return 'User-agent: *\nAllow: /\n\n# Public indexing is disabled by page-level noindex metadata.\n';
+  }
+  const baseUrl = normalizeBaseUrl(SEO_CONFIG.siteBaseUrl);
   return `User-agent: *\nAllow: /\n\nSitemap: ${baseUrl}/sitemap.xml\n`;
 }

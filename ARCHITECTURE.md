@@ -1,90 +1,17 @@
-# Architecture — TripFlow V0.1.18
+# Architecture — V0.1.19 stabilization baseline
 
-## Runtime application
+## Reliability layers
 
-The private planning application is a React/Vite single-page application using `HashRouter`, local browser storage and service boundaries.
+1. **Domain normalization** — `TripService` remains the migration and normalization façade.
+2. **Import validation** — `ImportValidationService` rejects incompatible versions, excessive collections, oversized text and malformed attachments.
+3. **Storage recovery** — `LocalStorageService` keeps up to five small quarantine snapshots when JSON parsing fails.
+4. **Runtime diagnostics** — `DiagnosticsService` captures React, window and promise errors in `sessionStorage`; nothing is transmitted.
+5. **Continuous validation** — GitHub Actions requires project checks, Node tests and a Vite production build before deployment.
 
-```text
-src/
-├── components/
-├── config/
-├── contexts/
-├── data/
-├── hooks/
-├── layouts/
-├── pages/
-├── services/
-├── styles/
-└── utils/
-```
+## SEO release lock
 
-Private trip information remains in LocalStorage and IndexedDB until a future authenticated backend is introduced.
+`PROJECT_CONFIG.release.publicIndexingEnabled` is the single public-indexing switch. It stays `false` until the final name and production domain are approved.
 
-## Static SEO publication pipeline
+## Test strategy
 
-Search engines must not depend on the browser's private LocalStorage. Public editorial pages therefore use a separate build-time pipeline.
-
-```text
-Content Studio in browser
-        │
-        ├── exports seo-pages.json
-        ▼
-content/seo-pages.json
-        │
-        ├── npm run seo:generate
-        ▼
-public/guides/<slug>/index.html
-public/guides/index.html
-public/sitemap.xml
-public/robots.txt
-public/seo-status.json
-        │
-        ├── vite build
-        ▼
-dist/ → GitHub Pages
-```
-
-## Key SEO files
-
-### `project.config.js`
-
-Single source of truth for brand, version, production URL and optional Search Console verification value.
-
-### `src/config/seo.config.js`
-
-SEO thresholds, public path, languages and publication format.
-
-### `content/seo-pages.json`
-
-Versioned source file containing only reviewed public editorial content.
-
-### `scripts/generate-seo-pages.mjs`
-
-Creates crawlable HTML, guide index, sitemap, robots and build report.
-
-### `scripts/audit-seo.mjs`
-
-Checks HTTPS, placeholder domains, duplicate slugs, page availability and minimum editorial score.
-
-### `src/services/content/ContentStudioService.js`
-
-Maintains local drafts and exports a publication file without coupling the React page to storage details.
-
-## Structured data
-
-Generated guide pages include:
-
-- `Article`;
-- `BreadcrumbList`;
-- `FAQPage` when questions are available.
-
-Structured data is generated from the same normalized article model as the visible page to reduce inconsistencies.
-
-## Design constraints
-
-- draft content is never published automatically;
-- only articles marked `published` enter the static build;
-- duplicate public slugs are blocking build errors;
-- partner links remain separate from SEO publication data;
-- a future custom domain is changed centrally;
-- generated public pages work without JavaScript.
+The suite uses the Node 22 built-in test runner, avoiding an additional test framework. Browser compatibility and visual accessibility are handled in Part 21.
