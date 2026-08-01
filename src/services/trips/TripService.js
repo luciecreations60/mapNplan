@@ -3,11 +3,12 @@ import { DEMO_TRIPS } from '../../data/demoTrips.js';
 import { createId } from '../../utils/id.js';
 import { hasValidCoordinates } from '../../utils/map.js';
 import { normalizeExternalUrl } from '../../utils/url.js';
+import { createSavedPlace } from '../../utils/savedPlaces.js';
 import { normalizeCompanionSettings } from '../../utils/travelCompanion.js';
 import { localStorageService } from '../storage/LocalStorageService.js';
 
 const STORAGE_KEY = 'trips';
-const CURRENT_TRIP_SCHEMA_VERSION = 14;
+const CURRENT_TRIP_SCHEMA_VERSION = 15;
 
 /**
  * Trip repository façade.
@@ -58,6 +59,7 @@ class TripService {
       checklist: [],
       reservations: [],
       documents: [],
+      savedPlaces: [],
       notes: '',
       collaboration: null,
       companion: null,
@@ -144,6 +146,14 @@ class TripService {
         attachments: [],
         createdAt: now,
       })),
+      savedPlaces: sourceTrip.savedPlaces.map((place) => ({
+        ...place,
+        id: createId('place'),
+        status: place.status === 'visited' ? 'idea' : place.status,
+        visitedAt: null,
+        createdAt: now,
+        updatedAt: now,
+      })),
       companion: {
         ...sourceTrip.companion,
         lastPreparedAt: null,
@@ -228,6 +238,7 @@ class TripService {
         : this.#findLegacyDestinationCoordinate(trip, 'longitude'),
       sourceTemplateId: Object.hasOwn(trip, 'sourceTemplateId') ? trip.sourceTemplateId : null,
       sourceTemplateName: Object.hasOwn(trip, 'sourceTemplateName') ? trip.sourceTemplateName : '',
+      savedPlaces: Object.hasOwn(trip, 'savedPlaces') ? trip.savedPlaces : [],
     };
 
     if (!demoTrip) return migratedTrip;
@@ -260,6 +271,7 @@ class TripService {
     const itinerary = this.#normalizeItinerary(trip.itinerary);
     const reservations = this.#normalizeReservations(trip.reservations);
     const documents = this.#normalizeDocuments(trip.documents, reservations);
+    const savedPlaces = this.#normalizeSavedPlaces(trip.savedPlaces);
     const companion = normalizeCompanionSettings(trip.companion);
     const calculatedSpent = expenses
       .reduce((sum, expense) => sum + expense.paidAmount, 0);
@@ -303,6 +315,7 @@ class TripService {
       checklist,
       reservations,
       documents,
+      savedPlaces,
       companion,
       collaboration,
       archivedAt: trip.archivedAt || null,
@@ -569,6 +582,16 @@ class TripService {
     }));
   }
 
+
+
+  #normalizeSavedPlaces(savedPlaces) {
+    if (!Array.isArray(savedPlaces)) return [];
+
+    return savedPlaces
+      .map((place) => createSavedPlace(place))
+      .filter((place) => place.name)
+      .slice(0, 1000);
+  }
 
   #normalizeReminderMinutes(value) {
     if (value === null || value === undefined || value === '') return null;

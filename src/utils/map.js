@@ -68,6 +68,21 @@ export function getTripMapPoints(trip) {
       time: reservation.startTime,
     }));
 
-  return [...destinationPoints, ...itineraryPoints, ...reservationPoints]
+  const savedPlacePoints = (trip.savedPlaces || [])
+    .filter((place) => hasValidCoordinates(place.latitude, place.longitude))
+    .map((place, index) => ({
+      id: `saved-place-${place.id}`,
+      source: 'savedPlace',
+      order: 20000 + index,
+      title: place.name,
+      subtitle: place.label || [place.city, place.country].filter(Boolean).join(', '),
+      latitude: Number(place.latitude),
+      longitude: Number(place.longitude),
+      type: place.category === 'food' ? 'food' : 'pin',
+      date: '',
+      time: '',
+    }));
+
+  return [...destinationPoints, ...itineraryPoints, ...reservationPoints, ...savedPlacePoints]
     .sort((left, right) => left.order - right.order);
 }

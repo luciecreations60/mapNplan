@@ -4250,3 +4250,83 @@
   .calendar-agenda__external-actions { grid-template-columns: 1fr; }
   .calendar-agenda__external-actions button { justify-content: flex-start; }
 }
+
+/* ========================================================================== */
+/* V0.1.15 — Saved places and inspiration library                            */
+/* ========================================================================== */
+.saved-places-panel { min-width: 0; }
+.saved-places-heading { align-items: flex-start; }
+.saved-places-heading__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.saved-places-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.saved-places-stat { display: flex; min-width: 0; align-items: center; gap: 11px; padding: 15px; }
+.saved-places-stat > span { display: grid; width: 39px; height: 39px; flex: 0 0 auto; place-items: center; border-radius: 11px; color: var(--color-primary); background: var(--color-primary-soft); }
+.saved-places-stat > div { display: grid; min-width: 0; }
+.saved-places-stat strong { font-size: 1.08rem; }
+.saved-places-stat small { overflow: hidden; color: var(--color-text-muted); font-size: .64rem; text-overflow: ellipsis; white-space: nowrap; }
+.saved-places-filters { display: grid; grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(130px, .65fr)); gap: 9px; padding: 12px; }
+.saved-places-filters select,
+.saved-places-filter { min-width: 0; min-height: 42px; border: 1px solid var(--color-border); border-radius: 11px; color: var(--color-text); background: var(--color-surface-muted); }
+.saved-places-filters select { width: 100%; padding: 0 10px; }
+.saved-places-filter { display: flex; align-items: center; gap: 8px; padding: 0 11px; }
+.saved-places-filter svg { flex: 0 0 auto; color: var(--color-text-muted); }
+.saved-places-filter input { width: 100%; min-width: 0; height: 40px; border: 0; outline: 0; color: var(--color-text); background: transparent; }
+.saved-places-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.saved-place-card { position: relative; display: grid; min-width: 0; gap: 13px; padding: 17px; overflow: hidden; }
+.saved-place-card::before { position: absolute; top: 0; bottom: 0; left: 0; width: 4px; content: ''; background: var(--color-border-strong); }
+.saved-place-card--high::before { background: var(--color-danger); }
+.saved-place-card--medium::before { background: var(--color-warning); }
+.saved-place-card--low::before { background: var(--color-primary); }
+.saved-place-card__header { display: grid; min-width: 0; grid-template-columns: 42px minmax(0, 1fr); gap: 12px; }
+.saved-place-card__icon { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 12px; color: var(--color-primary); background: var(--color-primary-soft); }
+.saved-place-card__header > div { min-width: 0; }
+.saved-place-card__header h3 { margin: 4px 0 3px; overflow: hidden; font-size: .94rem; text-overflow: ellipsis; white-space: nowrap; }
+.saved-place-card__header p { margin: 0; overflow: hidden; color: var(--color-text-muted); font-size: .68rem; line-height: 1.45; text-overflow: ellipsis; white-space: nowrap; }
+.saved-place-card__badges { display: flex; min-width: 0; flex-wrap: wrap; gap: 5px; }
+.saved-place-card__badges span { padding: 3px 7px; border-radius: 999px; color: var(--color-text-muted); background: var(--color-surface-muted); font-size: .55rem; font-weight: 800; }
+.saved-place-card__meta { display: flex; min-width: 0; flex-wrap: wrap; gap: 8px 14px; color: var(--color-text-muted); font-size: .62rem; }
+.saved-place-card__meta span { display: inline-flex; min-width: 0; align-items: center; gap: 5px; }
+.saved-place-card__notes { margin: 0; color: var(--color-text-muted); font-size: .69rem; line-height: 1.55; }
+.saved-place-card__actions { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; gap: 7px; padding-top: 2px; border-top: 1px solid var(--color-border); }
+.saved-place-card__actions .button { margin-right: auto; }
+.explore-search--library > span { flex: 0 0 auto; padding: 5px 9px; border-radius: 999px; color: var(--color-primary); background: var(--color-primary-soft); font-size: .62rem; font-weight: 800; }
+.explore-save-card { padding: 18px; }
+.explore-save-form { display: grid; grid-template-columns: minmax(220px, 1.4fr) minmax(150px, 1fr) minmax(140px, .8fr) minmax(120px, .7fr) minmax(110px, .65fr) auto; align-items: end; gap: 11px; }
+.explore-save-form .location-autocomplete { min-width: 0; }
+.explore-save-form .button { min-height: 44px; }
+.inspiration-library-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+.inspiration-library-card { display: grid; min-width: 0; grid-template-columns: 40px minmax(0, 1fr); gap: 11px; padding: 15px; }
+.inspiration-library-card__icon { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 11px; color: var(--color-primary); background: var(--color-primary-soft); }
+.inspiration-library-card > div { min-width: 0; }
+.inspiration-library-card small { color: var(--color-text-muted); font-size: .58rem; }
+.inspiration-library-card h3 { margin: 4px 0; overflow: hidden; font-size: .84rem; text-overflow: ellipsis; white-space: nowrap; }
+.inspiration-library-card p { margin: 0 0 8px; overflow: hidden; color: var(--color-text-muted); font-size: .64rem; text-overflow: ellipsis; white-space: nowrap; }
+.inspiration-library-card > div > div { display: flex; flex-wrap: wrap; gap: 4px; }
+.inspiration-library-card > div > div span { padding: 2px 6px; border-radius: 999px; color: var(--color-text-muted); background: var(--color-surface-muted); font-size: .53rem; }
+.inspiration-library-card .text-link { grid-column: 2; justify-self: start; }
+
+@media (max-width: 1180px) {
+  .explore-save-form { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .explore-save-form .location-autocomplete { grid-column: span 2; }
+  .inspiration-library-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 900px) {
+  .saved-places-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .saved-places-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .saved-places-filter--search { grid-column: 1 / -1; }
+  .saved-places-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 680px) {
+  .saved-places-heading { align-items: stretch; flex-direction: column; }
+  .saved-places-heading__actions { display: grid; grid-template-columns: 1fr; }
+  .saved-places-heading__actions .button { width: 100%; }
+  .saved-places-summary { grid-template-columns: 1fr 1fr; }
+  .saved-places-filters { grid-template-columns: 1fr; }
+  .saved-places-filter--search { grid-column: auto; }
+  .saved-place-card__actions .button { width: 100%; margin-right: 0; }
+  .explore-save-form { grid-template-columns: 1fr; }
+  .explore-save-form .location-autocomplete { grid-column: auto; }
+  .explore-save-form .button { width: 100%; }
+  .inspiration-library-grid { grid-template-columns: 1fr; }
+}

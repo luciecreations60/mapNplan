@@ -53,6 +53,18 @@ export function tripMatchesQuery(trip, rawQuery) {
   ], query));
   if (reservationMatch) return true;
 
+  const savedPlaceMatch = (trip.savedPlaces || []).some((place) => includesQuery([
+    place.name,
+    place.label,
+    place.city,
+    place.country,
+    place.category,
+    place.list,
+    place.notes,
+    ...(place.tags || []),
+  ], query));
+  if (savedPlaceMatch) return true;
+
   return (trip.documents || []).some((document) => includesQuery([
     document.title,
     document.reference,
@@ -117,6 +129,27 @@ export function searchTripContent(trips, rawQuery, limit = 12) {
         tab: 'reservations',
         title: reservation.title,
         subtitle: [trip.name, reservation.provider, reservation.startDate].filter(Boolean).join(' · '),
+      });
+    }
+
+    for (const place of trip.savedPlaces || []) {
+      if (!includesQuery([
+        place.name,
+        place.label,
+        place.city,
+        place.country,
+        place.category,
+        place.list,
+        place.notes,
+        ...(place.tags || []),
+      ], query)) continue;
+      push({
+        id: `saved-place-${trip.id}-${place.id}`,
+        type: 'savedPlace',
+        tripId: trip.id,
+        tab: 'places',
+        title: place.name,
+        subtitle: [trip.name, place.city || place.country, place.list].filter(Boolean).join(' · '),
       });
     }
 
