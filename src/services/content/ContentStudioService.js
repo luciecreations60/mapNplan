@@ -233,7 +233,7 @@ class ContentStudioService {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${title}</title>
 <meta name="description" content="${description}">
-<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="robots" content="${SEO_CONFIG.publicIndexingEnabled ? 'index,follow,max-image-preview:large' : 'noindex,nofollow,noarchive'}">
 <link rel="canonical" href="${escapeHtml(canonicalUrl)}">
 <meta property="og:type" content="article">
 <meta property="og:title" content="${title}">
@@ -267,7 +267,9 @@ ${faq}
   }
 
   downloadSitemap(baseUrl = SEO_CONFIG.siteBaseUrl) {
-    const published = this.getArticles().filter((article) => article.status === 'published');
+    const published = SEO_CONFIG.publicIndexingEnabled
+      ? this.getArticles().filter((article) => article.status === 'published')
+      : [];
     const urls = published.map((article) => `  <url>\n    <loc>${escapeHtml(buildCanonicalUrl(article, baseUrl))}</loc>\n    <lastmod>${escapeHtml(article.updatedAt.slice(0, 10))}</lastmod>\n  </url>`).join('\n');
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
     downloadText('sitemap.xml', xml, 'application/xml');
@@ -276,7 +278,9 @@ ${faq}
 
   downloadRobots(baseUrl = SEO_CONFIG.siteBaseUrl) {
     const base = String(baseUrl || SEO_CONFIG.siteBaseUrl).replace(/\/$/, '');
-    const text = `User-agent: *\nAllow: /\n\nSitemap: ${base}/sitemap.xml\n`;
+    const text = SEO_CONFIG.publicIndexingEnabled
+      ? `User-agent: *\nAllow: /\n\nSitemap: ${base}/sitemap.xml\n`
+      : 'User-agent: *\nAllow: /\n\n# Public indexing is disabled by page-level noindex metadata.\n';
     downloadText('robots.txt', text, 'text/plain');
     return text;
   }

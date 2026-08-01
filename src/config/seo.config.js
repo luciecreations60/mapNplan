@@ -11,6 +11,7 @@ export const SEO_CONFIG = Object.freeze({
   schemaVersion: 2,
   publicationFormatVersion: 1,
   siteBaseUrl: PROJECT_CONFIG.deployment.siteBaseUrl,
+  publicIndexingEnabled: PROJECT_CONFIG.release.publicIndexingEnabled,
   googleSiteVerification: PROJECT_CONFIG.deployment.googleSiteVerification,
   defaultSocialImageUrl: PROJECT_CONFIG.deployment.defaultSocialImageUrl,
   defaultLanguage: 'en',

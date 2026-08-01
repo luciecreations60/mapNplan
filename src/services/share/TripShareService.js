@@ -1,5 +1,6 @@
 
 import { PROJECT_CONFIG } from '../../../project.config.js';
+import { validateSharedTripPayload } from '../validation/ImportValidationService.js';
 
 const SHARE_FORMAT = 'tripflow-share';
 const SHARE_VERSION = 1;
@@ -130,28 +131,20 @@ class TripShareService {
   }
 
   validateSnapshot(snapshot) {
-    if (
-      snapshot?.format !== SHARE_FORMAT
-      || snapshot?.version !== SHARE_VERSION
-      || !snapshot?.trip?.name
-      || !Array.isArray(snapshot.trip.itinerary)
-      || !Array.isArray(snapshot.trip.reservations)
-    ) {
-      throw new Error('Unsupported shared trip format.');
-    }
+    const validatedSnapshot = validateSharedTripPayload(snapshot);
 
     return {
-      ...snapshot,
+      ...validatedSnapshot,
       trip: {
-        ...snapshot.trip,
-        itinerary: snapshot.trip.itinerary,
-        reservations: snapshot.trip.reservations,
-        expenses: Array.isArray(snapshot.trip.expenses) ? snapshot.trip.expenses : [],
-        checklist: Array.isArray(snapshot.trip.checklist) ? snapshot.trip.checklist : [],
+        ...validatedSnapshot.trip,
+        itinerary: validatedSnapshot.trip.itinerary,
+        reservations: validatedSnapshot.trip.reservations,
+        expenses: Array.isArray(validatedSnapshot.trip.expenses) ? validatedSnapshot.trip.expenses : [],
+        checklist: Array.isArray(validatedSnapshot.trip.checklist) ? validatedSnapshot.trip.checklist : [],
         shareOptions: {
-          includeBudget: Boolean(snapshot.trip.shareOptions?.includeBudget),
-          includeNotes: Boolean(snapshot.trip.shareOptions?.includeNotes),
-          includeChecklist: snapshot.trip.shareOptions?.includeChecklist !== false,
+          includeBudget: Boolean(validatedSnapshot.trip.shareOptions?.includeBudget),
+          includeNotes: Boolean(validatedSnapshot.trip.shareOptions?.includeNotes),
+          includeChecklist: validatedSnapshot.trip.shareOptions?.includeChecklist !== false,
         },
       },
     };
