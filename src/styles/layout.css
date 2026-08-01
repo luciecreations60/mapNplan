@@ -556,3 +556,65 @@
     display: none;
   }
 }
+
+
+/* ========================================================================== */
+/* V0.1.20 — Browser-safe shell and responsive containment                   */
+/* ========================================================================== */
+
+.app-shell,
+.app-shell__main,
+.page-container,
+.page-stack,
+.content-section {
+  max-width: 100%;
+}
+
+.app-shell__main {
+  overflow-x: clip;
+}
+
+.page-container:focus {
+  outline: none;
+}
+
+.sidebar,
+.modal,
+.global-search__panel,
+.notification-panel {
+  -webkit-overflow-scrolling: touch;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .topbar,
+  .trip-tabs,
+  .sidebar-overlay,
+  .modal-backdrop {
+    background: var(--color-surface);
+  }
+}
+
+@media (max-width: 960px) {
+  .sidebar[aria-hidden="true"] {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .sidebar--open {
+    visibility: visible;
+  }
+
+  .app-shell__main {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar__actions {
+    flex: 0 0 auto;
+  }
+
+  .page-container {
+    width: 100%;
+  }
+}

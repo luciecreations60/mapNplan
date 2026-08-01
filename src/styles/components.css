@@ -889,3 +889,59 @@
     text-align: left;
   }
 }
+
+
+/* ========================================================================== */
+/* V0.1.20 — Accessible controls and temporary surfaces                      */
+/* ========================================================================== */
+
+.button,
+.icon-button,
+.avatar,
+.text-link {
+  touch-action: manipulation;
+}
+
+.button:focus-visible,
+.icon-button:focus-visible,
+.avatar:focus-visible,
+.text-link:focus-visible,
+.field__input:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-primary) 44%, transparent);
+  outline-offset: 3px;
+}
+
+.icon-button:disabled,
+.button:disabled {
+  transform: none;
+}
+
+.modal {
+  overscroll-behavior: contain;
+}
+
+.modal__body,
+.modal__header,
+.modal__footer {
+  min-width: 0;
+}
+
+.global-search__result--active {
+  color: var(--color-text);
+  background: var(--color-primary-soft);
+}
+
+@media (max-width: 620px) {
+  .modal {
+    max-height: 94vh;
+    max-height: 94dvh;
+  }
+
+  .modal__footer {
+    flex-wrap: wrap;
+  }
+
+  .modal__footer .button {
+    flex: 1 1 180px;
+  }
+}

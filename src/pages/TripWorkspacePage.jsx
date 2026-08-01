@@ -98,7 +98,13 @@ export function TripWorkspacePage() {
       <TripHero trip={trip} onEdit={() => setEditOpen(true)} />
       <TripTabs navRef={tabsRef} activeTab={activeTab} onChange={handleTabChange} />
 
-      <div className="trip-workspace__content">
+      <div
+        id={`trip-panel-${activeTab}`}
+        className="trip-workspace__content"
+        role="tabpanel"
+        aria-labelledby={`trip-tab-${activeTab}`}
+        tabIndex="0"
+      >
         {activeTab === 'overview' && <OverviewPanel trip={trip} onOpenTab={handleTabChange} />}
         {activeTab === 'today' && <TodayPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} />}
         {activeTab === 'itinerary' && <ItineraryPanel trip={trip} onUpdate={handleUpdate} />}

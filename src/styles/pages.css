@@ -4561,3 +4561,92 @@
   .seo-publication-status { grid-column: 2; justify-self: start; }
   .seo-publication-steps { grid-template-columns: 1fr; }
 }
+
+
+/* ========================================================================== */
+/* V0.1.20 — Responsive workspace and accessible tab/action contracts        */
+/* ========================================================================== */
+
+.trip-tabs {
+  width: 100%;
+  max-width: 100%;
+  scroll-padding-inline: 8px;
+  scrollbar-gutter: stable;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.trip-tabs__button {
+  min-width: max-content;
+}
+
+.trip-tabs__button[aria-selected="true"] {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.trip-workspace__content {
+  min-width: 0;
+  max-width: 100%;
+  scroll-margin-top: calc(var(--topbar-height) + 76px);
+}
+
+.trip-workspace__content:focus {
+  outline: none;
+}
+
+.itinerary-item,
+.itinerary-item__content,
+.itinerary-list,
+.itinerary-day,
+.workspace-section,
+.workspace-panel,
+.workspace-form,
+.workspace-form__grid {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.itinerary-item > .item-actions {
+  display: grid;
+  width: min(100%, 184px);
+  grid-template-columns: repeat(4, minmax(40px, 1fr));
+  justify-self: end;
+  gap: 6px;
+}
+
+.itinerary-item > .item-actions .icon-button {
+  width: 100%;
+  min-width: 40px;
+}
+
+.table-wrap,
+.print-table-wrap,
+.calendar-grid,
+.booking-category-tabs {
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 720px) {
+  .trip-tabs {
+    top: calc(var(--topbar-height) + env(safe-area-inset-top, 0px));
+    border-radius: 13px;
+  }
+
+  .trip-tabs__button {
+    min-height: 44px;
+    padding-inline: 13px;
+  }
+
+  .itinerary-item > .item-actions {
+    width: 100%;
+    justify-self: stretch;
+  }
+}
+
+@media (max-width: 420px) {
+  .itinerary-item > .item-actions {
+    grid-template-columns: repeat(2, minmax(44px, 1fr));
+  }
+}

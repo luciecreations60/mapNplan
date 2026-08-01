@@ -17,7 +17,7 @@ export const TRANSLATIONS = Object.freeze({
     },
     nav: {
       dashboard: 'Dashboard', trips: 'My trips', templates: 'Templates', explore: 'Explore', contentStudio: 'Content studio', settings: 'Settings',
-      aria: 'Application navigation', openMenu: 'Open menu', closeMenu: 'Close menu',
+      aria: 'Application navigation', mobileNavigation: 'Mobile navigation', openMenu: 'Open menu', closeMenu: 'Close menu',
       search: 'Search trips and places', notifications: 'Notifications', profile: 'Open profile',
       buildTitle: 'Build your next journey',
       buildText: 'Planning, budgets and reservations will live in one calm workspace.',
@@ -35,6 +35,7 @@ export const TRANSLATIONS = Object.freeze({
       browserDetected: 'The browser language is used until you make a manual choice.',
       changedTitle: 'Language updated', changedMessage: 'The interface language has been updated.',
     },
+    a11y: { skipToContent: 'Skip to main content' },
     modal: { eyebrow: 'New adventure' },
     error: {
       title: 'Something went wrong',
@@ -499,7 +500,7 @@ export const TRANSLATIONS = Object.freeze({
       title: 'Search your travel workspace', placeholder: 'Search trips, activities, bookings or documents…',
       clear: 'Clear search', hint: 'Type at least two characters to search all your travel content.',
       noResults: 'No matching travel content', noResultsText: 'Try a destination, provider, activity, reference number or document name.',
-      footer: 'Search stays on this device',
+      footer: 'Search stays on this device', results: 'Search results', resultCount: '{{count}} results',
       types: { trip: 'Trip', activity: 'Activity', reservation: 'Reservation', document: 'Document', notes: 'Notes', savedPlace: 'Saved place', bookingOption: 'Booking option' },
     },
     tripLibrary: {
@@ -699,7 +700,7 @@ export const TRANSLATIONS = Object.freeze({
     },
     nav: {
       dashboard: 'Tableau de bord', trips: 'Mes voyages', templates: 'Modèles', explore: 'Explorer', contentStudio: 'Studio de contenu', settings: 'Paramètres',
-      aria: 'Navigation de l’application', openMenu: 'Ouvrir le menu', closeMenu: 'Fermer le menu',
+      aria: 'Navigation de l’application', mobileNavigation: 'Navigation mobile', openMenu: 'Ouvrir le menu', closeMenu: 'Fermer le menu',
       search: 'Rechercher des voyages et des lieux', notifications: 'Notifications', profile: 'Ouvrir le profil',
       buildTitle: 'Construisez votre prochain voyage',
       buildText: 'Planning, budgets et réservations réunis dans un espace simple et apaisé.',
@@ -717,6 +718,7 @@ export const TRANSLATIONS = Object.freeze({
       browserDetected: 'La langue du navigateur est utilisée tant que vous ne faites pas de choix manuel.',
       changedTitle: 'Langue mise à jour', changedMessage: 'La langue de l’interface a été mise à jour.',
     },
+    a11y: { skipToContent: 'Aller au contenu principal' },
     modal: { eyebrow: 'Nouvelle aventure' },
     error: {
       title: 'Une erreur est survenue',
@@ -1181,7 +1183,7 @@ export const TRANSLATIONS = Object.freeze({
       title: 'Rechercher dans votre espace voyage', placeholder: 'Rechercher un voyage, une activité, une réservation ou un document…',
       clear: 'Effacer la recherche', hint: 'Saisissez au moins deux caractères pour rechercher dans toutes vos données de voyage.',
       noResults: 'Aucun contenu de voyage correspondant', noResultsText: 'Essayez une destination, un prestataire, une activité, une référence ou un document.',
-      footer: 'La recherche reste sur cet appareil',
+      footer: 'La recherche reste sur cet appareil', results: 'Résultats de recherche', resultCount: '{{count}} résultats',
       types: { trip: 'Voyage', activity: 'Activité', reservation: 'Réservation', document: 'Document', notes: 'Notes', savedPlace: 'Lieu enregistré', bookingOption: 'Option de réservation' },
     },
     tripLibrary: {

@@ -140,3 +140,83 @@ dd,
 dt {
   overflow-wrap: anywhere;
 }
+
+
+/* ========================================================================== */
+/* V0.1.20 — Cross-browser accessibility baseline                            */
+/* ========================================================================== */
+
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+}
+
+html,
+body {
+  overflow-x: clip;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 1000;
+  top: 10px;
+  left: 10px;
+  padding: 11px 15px;
+  border: 2px solid var(--color-primary);
+  border-radius: 10px;
+  color: var(--color-text);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  font-weight: 800;
+  transform: translateY(-180%);
+  transition: transform var(--transition-fast);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@supports not (overflow: clip) {
+  html,
+  body { overflow-x: hidden; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  :focus-visible { outline: 3px solid Highlight; }
+  .button,
+  .icon-button,
+  .card,
+  .field__input,
+  .trip-tabs { border: 1px solid CanvasText; }
+  .trip-tabs__button--active,
+  .sidebar__link--active { outline: 2px solid Highlight; }
+}
+
+@media (pointer: coarse) {
+  .icon-button,
+  .icon-button--small,
+  .trip-tabs__button,
+  .sidebar__link,
+  .text-link {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
