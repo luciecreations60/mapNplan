@@ -4061,3 +4061,192 @@
   .template-card__actions .button, .day-template-card__actions .button { width: 100%; }
   .template-card__actions .icon-button, .day-template-card__actions .icon-button { align-self: flex-end; }
 }
+
+/* ========================================================================== 
+   Calendar interoperability and conflict analysis
+   ========================================================================== */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+}
+
+.calendar-sync,
+.calendar-health,
+.calendar-import {
+  display: grid;
+  min-width: 0;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 17px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-xs);
+}
+
+.calendar-sync {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.calendar-sync__intro,
+.calendar-health__heading {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.calendar-sync__intro > div,
+.calendar-health__heading > div { min-width: 0; }
+.calendar-sync__intro h3,
+.calendar-health__heading h3,
+.calendar-import__heading h3 { margin: 2px 0 5px; font-size: .92rem; }
+.calendar-sync__intro p:last-child,
+.calendar-health__heading p,
+.calendar-import__heading p { margin: 0; color: var(--color-text-muted); font-size: .7rem; line-height: 1.55; }
+
+.calendar-sync__icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 14px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.calendar-sync__actions {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.calendar-sync__notice { margin-bottom: 16px; }
+
+.calendar-health {
+  border-color: color-mix(in srgb, var(--color-warning) 34%, var(--color-border));
+  background: color-mix(in srgb, var(--color-warning) 7%, var(--color-surface));
+}
+.calendar-health__heading > svg { flex: 0 0 auto; color: var(--color-warning); }
+.calendar-health__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.calendar-health__list button {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+  padding: 11px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  color: inherit;
+  text-align: left;
+  background: var(--color-surface);
+  cursor: pointer;
+}
+.calendar-health__list button:hover { border-color: var(--color-warning); }
+.calendar-health__list strong { color: var(--color-warning-strong, var(--color-warning)); font-size: .68rem; }
+.calendar-health__list span { overflow: hidden; font-size: .72rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.calendar-health__list small { color: var(--color-text-muted); font-size: .61rem; text-transform: capitalize; }
+
+.calendar-import__heading {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+.calendar-import__heading > div { min-width: 0; }
+.calendar-import__list { display: grid; max-height: 320px; overflow: auto; gap: 8px; }
+.calendar-import__item {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface-muted);
+  cursor: pointer;
+}
+.calendar-import__item input { margin-top: 3px; }
+.calendar-import__item > span { display: grid; min-width: 0; gap: 3px; }
+.calendar-import__item strong { overflow: hidden; font-size: .74rem; text-overflow: ellipsis; white-space: nowrap; }
+.calendar-import__item small { color: var(--color-text-muted); font-size: .62rem; line-height: 1.45; }
+
+.calendar-agenda__event {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  background: var(--color-surface-muted);
+}
+.calendar-agenda__event .calendar-agenda__item {
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.calendar-agenda__tools {
+  display: grid;
+  gap: 9px;
+  padding: 0 10px 10px;
+}
+.calendar-agenda__tools > label {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-muted);
+  font-size: .62rem;
+}
+.calendar-agenda__tools select {
+  min-width: 0;
+  height: 34px;
+  padding: 0 9px;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+.calendar-agenda__external-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.calendar-agenda__external-actions button {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 7px;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  cursor: pointer;
+}
+.calendar-agenda__external-actions button:hover { color: var(--color-primary); border-color: var(--color-primary); }
+.calendar-agenda__external-actions span { overflow: hidden; font-size: .58rem; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
+
+@media (max-width: 900px) {
+  .calendar-sync { grid-template-columns: 1fr; }
+  .calendar-sync__actions { justify-content: flex-start; }
+}
+
+@media (max-width: 680px) {
+  .calendar-health__list { grid-template-columns: 1fr; }
+  .calendar-import__heading { align-items: stretch; flex-direction: column; }
+  .calendar-import__heading .button { width: 100%; }
+  .calendar-sync__actions { display: grid; grid-template-columns: 1fr; }
+  .calendar-sync__actions .button { width: 100%; }
+  .calendar-agenda__external-actions { grid-template-columns: 1fr; }
+  .calendar-agenda__external-actions button { justify-content: flex-start; }
+}

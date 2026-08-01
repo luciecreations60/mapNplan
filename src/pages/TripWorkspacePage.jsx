@@ -101,7 +101,7 @@ export function TripWorkspacePage() {
         {activeTab === 'today' && <TodayPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} />}
         {activeTab === 'itinerary' && <ItineraryPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'route' && <RouteOptimizerPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} />}
-        {activeTab === 'calendar' && <CalendarPanel trip={trip} onOpenTab={handleTabChange} />}
+        {activeTab === 'calendar' && <CalendarPanel trip={trip} onOpenTab={handleTabChange} onUpdate={handleUpdate} />}
         {activeTab === 'map' && <MapPanel trip={trip} onOpenTab={handleTabChange} />}
         {activeTab === 'tools' && <TravelToolsPanel trip={trip} onOpenTab={handleTabChange} />}
         {activeTab === 'reservations' && <ReservationsPanel trip={trip} onUpdate={handleUpdate} />}

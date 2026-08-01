@@ -7,7 +7,7 @@ import { normalizeCompanionSettings } from '../../utils/travelCompanion.js';
 import { localStorageService } from '../storage/LocalStorageService.js';
 
 const STORAGE_KEY = 'trips';
-const CURRENT_TRIP_SCHEMA_VERSION = 13;
+const CURRENT_TRIP_SCHEMA_VERSION = 14;
 
 /**
  * Trip repository façade.
@@ -112,7 +112,7 @@ class TripService {
         ...day,
         id: createId('day'),
         routePlan: this.#normalizeRoutePlan(null),
-        items: day.items.map((item) => ({ ...item, id: createId('activity'), completedAt: null, comments: [] })),
+        items: day.items.map((item) => ({ ...item, id: createId('activity'), externalCalendarUid: '', completedAt: null, comments: [] })),
       })),
       travelParty: duplicatedTravelParty,
       expenses: sourceTrip.expenses.map((expense) => ({
@@ -136,6 +136,7 @@ class TripService {
         id: createId('reservation'),
         createdAt: now,
         comments: [],
+        externalCalendarUid: '',
       })),
       documents: sourceTrip.documents.map((document) => ({
         ...document,
@@ -461,6 +462,8 @@ class TripService {
               durationMinutes: Math.max(0, Number(item.durationMinutes) || 0),
               estimatedCost: Math.max(0, Number(item.estimatedCost) || 0),
               notes: String(item.notes || '').trim(),
+              reminderMinutes: this.#normalizeReminderMinutes(item.reminderMinutes),
+              externalCalendarUid: String(item.externalCalendarUid || '').trim(),
               completedAt: item.completedAt || null,
               comments: this.#normalizeComments(item.comments),
             }))
@@ -527,6 +530,8 @@ class TripService {
       latitude: this.#normalizeLatitude(reservation.latitude),
       longitude: this.#normalizeLongitude(reservation.longitude),
       notes: String(reservation.notes || '').trim(),
+      reminderMinutes: this.#normalizeReminderMinutes(reservation.reminderMinutes),
+      externalCalendarUid: String(reservation.externalCalendarUid || '').trim(),
       comments: this.#normalizeComments(reservation.comments),
       createdAt: reservation.createdAt || new Date().toISOString(),
     }));
@@ -562,6 +567,14 @@ class TripService {
         : [],
       createdAt: document.createdAt || new Date().toISOString(),
     }));
+  }
+
+
+  #normalizeReminderMinutes(value) {
+    if (value === null || value === undefined || value === '') return null;
+    const minutes = Number(value);
+    if (!Number.isFinite(minutes)) return null;
+    return Math.min(10080, Math.max(0, Math.round(minutes)));
   }
 
   #normalizeComments(comments) {
