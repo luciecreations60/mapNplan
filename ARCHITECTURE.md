@@ -1,4 +1,4 @@
-# Architecture — V0.1.16
+# Architecture — V0.1.17
 
 ## Commercial preparation boundary
 
@@ -103,3 +103,74 @@ booked option back into a saved comparison.
 - `AffiliateSettingsCard.jsx`: central provider administration.
 - `bookingOptions.js`: domain normalization and summaries.
 - `TripService.js`: schema migration, persistence and duplication.
+
+## V0.1.17 — SEO content studio
+
+Editorial content is deliberately separated from trips and partner settings.
+It uses its own local repository boundary:
+
+```text
+ContentStudioPage
+        ↓
+ContentStudioContext
+        ↓
+ContentStudioService
+        ↓
+LocalStorageService
+```
+
+The service owns normalization, slug uniqueness, JSON import/export, static
+HTML generation, sitemap generation and robots-file generation. React pages do
+not write editorial content directly to browser storage.
+
+### Editorial article model
+
+```js
+{
+  id,
+  slug,
+  language,          // en | fr
+  status,            // draft | published
+  title,
+  metaTitle,
+  metaDescription,
+  destination,
+  country,
+  primaryKeyword,
+  secondaryKeywords,
+  heroImageUrl,
+  heroAlt,
+  excerpt,
+  introduction,
+  itineraryBody,
+  practicalTips,
+  faq,
+  affiliateCategories,
+  createdAt,
+  updatedAt,
+  publishedAt
+}
+```
+
+### Static export boundary
+
+`ContentStudioService.generateHtml()` produces one self-contained HTML page
+with:
+
+- title and meta description;
+- canonical URL;
+- Open Graph and Twitter metadata;
+- TravelAction and FAQPage JSON-LD;
+- escaped user-authored content;
+- optional partner links resolved through `AffiliateService`;
+- a small embedded responsive stylesheet.
+
+No disabled provider appears in exported HTML. A selected category alone never
+creates a commercial link.
+
+### Indexation limitation
+
+Hash-routed, LocalStorage-backed previews are not independently crawlable
+public pages. The exported HTML must be committed or published to a real route
+before a search engine can index it. The future CMS/backend layer can replace
+the local adapter while retaining the editor and export contracts.

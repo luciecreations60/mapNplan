@@ -1,46 +1,55 @@
-# V0.1 — Part 17 delivery notes
+# V0.1 Part 18 — Delivery notes
 
-## Versions
+## Version
 
-- Application: `0.1.16`
-- Trip schema: `16`
-- Affiliate settings schema: `1`
-- Service-worker cache: `tripflow-v0.1.16`
+- Application: `0.1.17`
+- Trip schema: unchanged at `16`
+- SEO content schema: `1`
+- Service-worker cache: `tripflow-v0.1.17`
 
-## Main additions
+## Added
 
-- New **Book & compare / Réserver et comparer** trip tab.
-- Manual offer comparison across six commercial categories.
-- Saved, shortlisted, booked and rejected option states.
-- Provider configuration in Settings.
-- Central URL templates with trip variables.
-- Optional affiliate parameter injection.
-- Local click and declared-conversion analytics.
-- Search results for saved booking options.
-- Sample comparison data in the Japan demonstration trip.
+- Content studio page in the main navigation.
+- Local French/English destination-guide library.
+- Draft and published statuses.
+- Live SEO score with nine checks.
+- Search, language and status filters.
+- Article duplication and deletion.
+- JSON import/export.
+- Local public preview route: `#/guides/:slug`.
+- Standalone HTML export.
+- Canonical, Open Graph, Twitter and JSON-LD metadata.
+- Sitemap and robots exports.
+- Optional affiliate categories resolved through enabled provider settings.
 
-## Safety rules
+## Important behaviour
 
-- Every provider is disabled by default.
-- No tracking identifier is shipped in source code.
-- Enabling a provider only enables its configured URL.
-- Local analytics are not presented as verified commission reports.
-- Public share snapshots still exclude comparison and commercial data.
+- The code name and placeholder domain remain configurable.
+- The default base URL is `https://example.com` and must be changed before
+  production exports.
+- Local previews are not public SEO pages.
+- Partner links only appear when a provider is enabled and has a valid URL.
+- Content remains on the current device until exported.
 
-## Migration
+## Main files added
 
-Existing trips are preserved. Migration adds an empty `bookingOptions`
-collection when none exists. No itinerary, reservation, expense, document,
-attachment or saved place is modified.
+```text
+src/config/seo.config.js
+src/data/builtInSeoContent.js
+src/utils/seoContent.js
+src/services/content/ContentStudioService.js
+src/contexts/ContentStudioContext.jsx
+src/hooks/useContentStudio.js
+src/pages/ContentStudioPage.jsx
+src/pages/PublicDestinationPage.jsx
+```
 
-## Suggested checks
+## Validation performed
 
-1. Open Japan Discovery and select **Book & compare**.
-2. Review the demonstration options.
-3. Add and edit a manual hotel option.
-4. Mark it shortlisted, then booked.
-5. Search its title with Ctrl/Cmd + K.
-6. Open Settings and find **Partners and affiliation**.
-7. Confirm every provider starts disabled.
-8. Configure a harmless test URL template, enable it and open the provider.
-9. Confirm the local click counter changes.
+- TypeScript parser check over every JavaScript and JSX source file.
+- Direct Node syntax checks for the new non-JSX modules.
+- Translation dictionary import and French/English section-count comparison.
+- Content-service creation, normalization and static-HTML generation test with
+  an isolated LocalStorage mock.
+- Relative import resolution check.
+- JSON parsing and ZIP integrity checks.

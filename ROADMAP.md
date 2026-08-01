@@ -14,25 +14,26 @@
 - Part 15: calendar export/import, provider links, reminders and conflict checks.
 - Part 16: saved places, custom inspiration lists and itinerary insertion.
 - Part 17: booking comparison, provider configuration and affiliate preparation.
+- Part 18: SEO content studio, destination-page preview and static exports.
 
 ## Next planned milestones
 
-### Part 18 — Backend-ready data layer
+### Part 19 — Backend-ready data layer
 
 - formal repository interfaces for local and remote persistence;
 - account and authentication boundary;
-- Supabase schema proposal without enabling paid infrastructure;
+- Supabase-compatible schema proposal without requiring paid infrastructure;
 - local-to-remote synchronization strategy;
 - conflict resolution rules;
 - remote object-storage adapter contract for documents.
 
-### Part 19 — SEO and legal commercial preparation
+### Part 20 — Legal and commercial preparation
 
-- SEO destination-page structure;
-- editorial destination guides;
-- consent, privacy and legal preparation;
-- commercial disclosure pages;
-- verified conversion reporting adapter.
+- privacy and cookie-consent foundations;
+- affiliate disclosure page;
+- terms and legal-page templates;
+- data-retention controls;
+- verified conversion-reporting adapter contract.
 
 ## Later milestones
 

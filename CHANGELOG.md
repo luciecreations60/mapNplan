@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.1.17] - 2026-08-01
+
+### Added
+
+- Local SEO content studio for destination guides.
+- Live on-page SEO scoring and editorial checks.
+- French and English destination-page editing.
+- Local public preview route for destination guides.
+- Standalone static HTML export with canonical, Open Graph and JSON-LD data.
+- Sitemap and robots-file export for the future production domain.
+- Versioned editorial-library JSON import and export.
+- Optional commercial blocks limited to enabled partner providers.
+
+### Changed
+
+- Main navigation now includes the Content studio workspace.
+- Application version upgraded to 0.1.17.
+- Service-worker cache updated to `tripflow-v0.1.17`.
+
 ## [0.1.16] - 2026-08-01
 
 ### Added
