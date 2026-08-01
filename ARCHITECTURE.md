@@ -1,71 +1,65 @@
-# Architecture — V0.1.14
+# Architecture — V0.1.15
 
-## Calendar domain boundary
+## Saved-place domain
 
-Calendar interoperability is split into a pure domain utility and a browser
-adapter:
-
-- `calendarInterop.js` builds and parses ICS content, computes event end times,
-  detects conflicts and converts imported events into itinerary activities;
-- `CalendarInteropService.js` handles browser downloads and provider links;
-- `tripCalendar.js` maps itinerary activities and reservations to one stable
-  calendar-event representation;
-- `CalendarPanel.jsx` orchestrates the user interface without containing the
-  calendar file-format rules.
-
-This boundary allows a future CalDAV, Microsoft Graph or Google Calendar API
-integration without rewriting itinerary and reservation components.
-
-## Calendar event model
+Saved places are stored inside their owning trip. This keeps ideas close to the
+itinerary, map, export and future collaboration boundary while avoiding a
+second source of truth.
 
 ```js
 {
   id,
-  sourceId,
-  source,                 // activity | reservation
-  date,
-  time,
-  endDate,
-  endTime,
-  title,
-  location,
+  name,
+  label,
+  city,
+  country,
+  countryCode,
+  latitude,
+  longitude,
+  category,      // sight | food | nature | shopping | nightlife | ...
+  list,          // built-in or user-defined string
+  priority,      // high | medium | low
+  status,        // idea | planned | visited
   notes,
-  durationMinutes,
-  reminderMinutes,
-  externalCalendarUid
+  tags,
+  source,
+  createdAt,
+  updatedAt,
+  visitedAt
 }
 ```
 
-## Trip schema 14
+## Boundaries
 
-Activities and reservations now store optional calendar metadata:
+- `savedPlaces.js` owns normalization, JSON portability and itinerary insertion.
+- `TripService.js` owns persistence, migration and duplication rules.
+- `SavedPlacesPanel.jsx` owns the per-trip library interface.
+- `ExplorePage.jsx` provides the cross-trip inspiration view.
+- `tripSearch.js` exposes saved places to the global search palette.
+- `map.js` exposes geolocated saved places to the existing Leaflet adapter.
+
+The geocoding provider remains isolated behind `GeocodingService`, so a
+commercial or self-hosted provider can replace Photon without changing saved
+place components.
+
+## Trip schema 15
+
+Trip schema 15 adds:
 
 ```js
 {
-  reminderMinutes: null | number,
-  externalCalendarUid: string
+  savedPlaces: SavedPlace[]
 }
 ```
 
-`externalCalendarUid` prevents duplicate imports when the same ICS event is
-selected again. It is cleared when a trip is duplicated so each copied journey
-remains independent.
+Legacy trips receive an empty list automatically. Demonstration data receives a
+small example library. Duplicating a trip creates new saved-place identifiers
+and resets places already marked as visited back to ideas.
 
-## Conflict analysis
+## Privacy and portability
 
-The local conflict engine checks:
-
-- overlapping timed events;
-- missing event dates;
-- missing event times;
-- end times before start times;
-- events outside the trip date range.
-
-The analysis is advisory and never changes the itinerary automatically.
-
-## Privacy
-
-- No calendar credentials are stored.
-- Exported ICS files are generated in the browser.
-- Imported ICS files are parsed locally.
-- Google Calendar and Outlook links contain only the selected event details.
+- Saved places remain local with the trip.
+- They are included in the normal trip backup.
+- A smaller `tripflow-saved-places` JSON file can be exported independently.
+- No reservation confirmation, document attachment or collaboration email is
+  included in that smaller file.

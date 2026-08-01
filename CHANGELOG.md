@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.1.15] - 2026-08-01
+
+### Added
+
+- Per-trip saved-place and inspiration library.
+- Custom lists, categories, priorities, tags and visit statuses.
+- Direct saved-place insertion into itinerary days.
+- Saved-place markers on the trip map.
+- Cross-trip inspiration library in Explore.
+- Global search results for saved places.
+- Versioned saved-place JSON import and export.
+
+### Changed
+
+- Trip schema upgraded from 14 to 15.
+- Demonstration Japan trip now includes example saved places.
+- Service-worker cache updated to `tripflow-v0.1.15`.
+
 ## [0.1.14] - 2026-08-01
 
 ### Added

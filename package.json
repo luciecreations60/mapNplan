@@ -1,7 +1,7 @@
 {
   "name": "travel-planner",
   "private": true,
-  "version": "0.1.14",
+  "version": "0.1.15",
   "type": "module",
   "description": "A modern, extensible travel planning application.",
   "scripts": {
