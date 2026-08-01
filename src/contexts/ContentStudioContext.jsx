@@ -44,6 +44,8 @@ export function ContentStudioProvider({ children }) {
     deleteArticle,
     duplicateArticle,
     exportLibrary: () => contentStudioService.exportLibrary(),
+    exportPublication: () => contentStudioService.exportPublication(),
+    auditPublication: (baseUrl) => contentStudioService.auditPublication(baseUrl),
     importLibrary,
     downloadHtml: (article, options) => contentStudioService.downloadHtml(article, options),
     downloadSitemap: (baseUrl) => contentStudioService.downloadSitemap(baseUrl),

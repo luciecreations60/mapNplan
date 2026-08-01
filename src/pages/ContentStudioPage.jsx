@@ -44,6 +44,8 @@ export function ContentStudioPage() {
     deleteArticle,
     duplicateArticle,
     exportLibrary,
+    exportPublication,
+    auditPublication,
     importLibrary,
     downloadHtml,
     downloadSitemap,
@@ -75,6 +77,11 @@ export function ContentStudioPage() {
       ? Math.round(articles.reduce((sum, article) => sum + scoreSeoArticle(article).score, 0) / articles.length)
       : 0,
   }), [articles]);
+
+  const publicationAudit = useMemo(
+    () => auditPublication(baseUrl),
+    [articles, auditPublication, baseUrl],
+  );
 
   async function handleImport(event) {
     const [file] = event.target.files || [];
@@ -140,9 +147,42 @@ export function ContentStudioPage() {
           <input value={baseUrl} placeholder="https://example.com" onChange={(event) => setBaseUrl(event.target.value)} />
         </label>
         <div className="seo-export-tools__actions">
+          <Button variant="secondary" icon="download" onClick={() => {
+            const payload = exportPublication();
+            setNotice({ tone: 'success', title: t('seoStudio.publicationExportedTitle'), message: t('seoStudio.publicationExportedText', { count: payload.articles.length }) });
+          }}>{t('seoStudio.publicationFile')}</Button>
           <Button variant="secondary" icon="download" onClick={() => downloadSitemap(baseUrl)}>{t('seoStudio.sitemap')}</Button>
           <Button variant="secondary" icon="download" onClick={() => downloadRobots(baseUrl)}>{t('seoStudio.robots')}</Button>
         </div>
+      </Card>
+
+      <Card className="seo-publication-guide">
+        <div className="seo-publication-guide__header">
+          <span><Icon name="globe" size={22} /></span>
+          <div>
+            <p className="eyebrow">{t('seoStudio.publicationEyebrow')}</p>
+            <h2>{t('seoStudio.publicationTitle')}</h2>
+            <p>{t('seoStudio.publicationText')}</p>
+          </div>
+          <strong className={`seo-publication-status ${publicationAudit.passed ? 'is-ready' : 'has-errors'}`}>
+            {publicationAudit.passed ? t('seoStudio.readyToPublish') : t('seoStudio.needsAttention')}
+          </strong>
+        </div>
+        <ol className="seo-publication-steps">
+          <li><strong>1</strong><span>{t('seoStudio.publicationStep1')}</span></li>
+          <li><strong>2</strong><span>{t('seoStudio.publicationStep2')}</span></li>
+          <li><strong>3</strong><span>{t('seoStudio.publicationStep3')}</span></li>
+          <li><strong>4</strong><span>{t('seoStudio.publicationStep4')}</span></li>
+        </ol>
+        <div className="seo-publication-audit">
+          {publicationAudit.checks.map((check) => (
+            <span key={check.id} className={check.passed ? 'is-passed' : 'is-failed'}>
+              <Icon name={check.passed ? 'checkCircle' : 'alertTriangle'} size={15} />
+              {t(`seoStudio.publicationChecks.${check.id}`)}
+            </span>
+          ))}
+        </div>
+        <p className="seo-publication-path"><code>{SEO_CONFIG.publicationFilePath}</code> · {publicationAudit.publishedCount} {t('seoStudio.publishedPagesLabel')}</p>
       </Card>
 
       <Card className="seo-studio-filters">

@@ -6,12 +6,14 @@ import { createId } from '../../utils/id.js';
 import {
   buildCanonicalUrl,
   buildDestinationSchema,
+  buildBreadcrumbSchema,
   buildFaqSchema,
   escapeHtml,
   normalizeKeywords,
   paragraphsToHtml,
   safeJsonLd,
   slugify,
+  auditSeoPublication,
 } from '../../utils/seoContent.js';
 
 function nowIso() {
@@ -158,6 +160,22 @@ class ContentStudioService {
     return next;
   }
 
+  exportPublication() {
+    const articles = this.getArticles().filter((article) => article.status === 'published');
+    const payload = {
+      format: 'tripflow-seo-publication',
+      formatVersion: SEO_CONFIG.publicationFormatVersion,
+      exportedAt: nowIso(),
+      articles,
+    };
+    downloadText('seo-pages.json', `${JSON.stringify(payload, null, 2)}\n`, 'application/json');
+    return payload;
+  }
+
+  auditPublication(baseUrl = SEO_CONFIG.siteBaseUrl) {
+    return auditSeoPublication(this.getArticles(), baseUrl);
+  }
+
   buildAffiliateLinks(article, locale = 'en-GB') {
     const pseudoTrip = {
       destination: article.destination,
@@ -176,6 +194,7 @@ class ContentStudioService {
   generateHtml(article, options = {}) {
     const canonicalUrl = buildCanonicalUrl(article, options.baseUrl || SEO_CONFIG.siteBaseUrl);
     const travelSchema = buildDestinationSchema(article, canonicalUrl);
+    const breadcrumbSchema = buildBreadcrumbSchema(article, canonicalUrl, options.baseUrl || SEO_CONFIG.siteBaseUrl);
     const faqSchema = buildFaqSchema(article);
     const affiliateLinks = this.buildAffiliateLinks(article, options.locale);
     const labels = article.language === 'fr'
@@ -191,7 +210,6 @@ class ContentStudioService {
         };
     const title = escapeHtml(article.metaTitle || article.title);
     const description = escapeHtml(article.metaDescription || article.excerpt);
-    const keywords = escapeHtml([article.primaryKeyword, ...article.secondaryKeywords].filter(Boolean).join(', '));
     const imageMeta = article.heroImageUrl
       ? `<meta property="og:image" content="${escapeHtml(article.heroImageUrl)}">\n<meta name="twitter:image" content="${escapeHtml(article.heroImageUrl)}">`
       : '';
@@ -204,7 +222,7 @@ class ContentStudioService {
     const faq = article.faq.length > 0
       ? `<section><h2>${escapeHtml(labels.faq)}</h2>${article.faq.map((item) => `<details><summary>${escapeHtml(item.question)}</summary><p>${escapeHtml(item.answer)}</p></details>`).join('')}</section>`
       : '';
-    const jsonLd = [travelSchema, faqSchema].filter(Boolean)
+    const jsonLd = [travelSchema, breadcrumbSchema, faqSchema].filter(Boolean)
       .map((schema) => `<script type="application/ld+json">${safeJsonLd(schema)}</script>`)
       .join('\n');
 
@@ -215,7 +233,7 @@ class ContentStudioService {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${title}</title>
 <meta name="description" content="${description}">
-<meta name="keywords" content="${keywords}">
+<meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="${escapeHtml(canonicalUrl)}">
 <meta property="og:type" content="article">
 <meta property="og:title" content="${title}">

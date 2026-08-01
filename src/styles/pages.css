@@ -4528,3 +4528,36 @@
   .seo-article-card header > .seo-score { grid-column: 2; justify-self: start; }
   .seo-article-card__actions .button { width: 100%; margin-right: 0; }
 }
+
+/* ========================================================================== */
+/* V0.1.18 — SEO publication workflow and build audit                        */
+/* ========================================================================== */
+.seo-publication-guide { display: grid; min-width: 0; gap: 17px; padding: 19px; }
+.seo-publication-guide__header { display: grid; min-width: 0; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: start; gap: 13px; }
+.seo-publication-guide__header > span { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 13px; color: var(--color-primary); background: var(--color-primary-soft); }
+.seo-publication-guide__header > div { min-width: 0; }
+.seo-publication-guide__header h2 { margin: 3px 0 5px; font-size: 1.02rem; }
+.seo-publication-guide__header p { margin: 0; color: var(--color-text-muted); font-size: .68rem; line-height: 1.55; }
+.seo-publication-status { align-self: center; padding: 6px 10px; border-radius: 999px; font-size: .61rem; white-space: nowrap; }
+.seo-publication-status.is-ready { color: var(--color-success); background: color-mix(in srgb, var(--color-success) 13%, var(--color-surface)); }
+.seo-publication-status.has-errors { color: var(--color-danger); background: color-mix(in srgb, var(--color-danger) 12%, var(--color-surface)); }
+.seo-publication-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.seo-publication-steps li { display: grid; min-width: 0; grid-template-columns: 28px minmax(0, 1fr); align-items: start; gap: 8px; padding: 12px; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface-muted); }
+.seo-publication-steps strong { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 9px; color: var(--color-primary); background: var(--color-primary-soft); font-size: .68rem; }
+.seo-publication-steps span { color: var(--color-text-muted); font-size: .62rem; line-height: 1.48; }
+.seo-publication-audit { display: flex; min-width: 0; flex-wrap: wrap; gap: 7px; }
+.seo-publication-audit span { display: inline-flex; min-width: 0; align-items: center; gap: 5px; padding: 6px 9px; border-radius: 999px; font-size: .58rem; font-weight: 750; }
+.seo-publication-audit .is-passed { color: var(--color-success); background: color-mix(in srgb, var(--color-success) 11%, var(--color-surface)); }
+.seo-publication-audit .is-failed { color: var(--color-warning); background: color-mix(in srgb, var(--color-warning) 13%, var(--color-surface)); }
+.seo-publication-path { margin: 0; color: var(--color-text-muted); font-size: .61rem; }
+.seo-publication-path code { padding: 3px 6px; border-radius: 6px; color: var(--color-primary); background: var(--color-primary-soft); }
+
+@media (max-width: 980px) {
+  .seo-publication-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .seo-publication-guide__header { grid-template-columns: 40px minmax(0, 1fr); }
+  .seo-publication-status { grid-column: 2; justify-self: start; }
+  .seo-publication-steps { grid-template-columns: 1fr; }
+}

@@ -1,3 +1,4 @@
+import { PROJECT_CONFIG } from '../../project.config.js';
 import { SEO_CONFIG } from '../config/seo.config.js';
 
 export function slugify(value) {
@@ -28,9 +29,12 @@ export function countWords(article) {
   return source.trim() ? source.trim().split(/\s+/).length : 0;
 }
 
+export function normalizeBaseUrl(value = SEO_CONFIG.siteBaseUrl) {
+  return String(value || SEO_CONFIG.siteBaseUrl).trim().replace(/\/+$/, '');
+}
+
 export function buildCanonicalUrl(article, baseUrl = SEO_CONFIG.siteBaseUrl) {
-  const base = String(baseUrl || SEO_CONFIG.siteBaseUrl).replace(/\/$/, '');
-  return `${base}${SEO_CONFIG.publicPathPrefix}/${article.slug}`;
+  return `${normalizeBaseUrl(baseUrl)}${SEO_CONFIG.publicPathPrefix}/${article.slug}/`;
 }
 
 export function scoreSeoArticle(article) {
@@ -54,7 +58,7 @@ export function scoreSeoArticle(article) {
     { id: 'keyword-introduction', passed: Boolean(primaryKeyword && introduction.includes(primaryKeyword)), score: 10 },
     { id: 'word-count', passed: words >= SEO_CONFIG.minimumArticleWords, score: 15 },
     { id: 'slug', passed: Boolean(article?.slug && article.slug.length <= 75), score: 10 },
-    { id: 'hero-alt', passed: Boolean(String(article?.heroAlt || '').trim()), score: 5 },
+    { id: 'hero-alt', passed: !article?.heroImageUrl || Boolean(String(article?.heroAlt || '').trim()), score: 5 },
     { id: 'faq', passed: Array.isArray(article?.faq) && article.faq.some((item) => item.question && item.answer), score: 5 },
     { id: 'sections', passed: Boolean(article?.itineraryBody && article?.practicalTips), score: 10 },
   ];
@@ -65,21 +69,85 @@ export function scoreSeoArticle(article) {
   };
 }
 
+/**
+ * Returns a publication-level audit. This is deliberately deterministic and
+ * can run both in the browser and in the GitHub Actions build.
+ */
+export function auditSeoPublication(articles, baseUrl = SEO_CONFIG.siteBaseUrl) {
+  const published = (Array.isArray(articles) ? articles : []).filter((article) => article.status === 'published');
+  const slugCounts = published.reduce((map, article) => {
+    const slug = String(article.slug || '');
+    map.set(slug, (map.get(slug) || 0) + 1);
+    return map;
+  }, new Map());
+  const url = normalizeBaseUrl(baseUrl);
+  const articleResults = published.map((article) => ({
+    id: article.id,
+    slug: article.slug,
+    title: article.title,
+    ...scoreSeoArticle(article),
+  }));
+  const checks = [
+    { id: 'https', passed: url.startsWith('https://'), severity: 'error' },
+    { id: 'placeholder-domain', passed: !/example\.com/i.test(url), severity: 'error' },
+    { id: 'published-pages', passed: published.length > 0, severity: 'warning' },
+    { id: 'unique-slugs', passed: [...slugCounts.values()].every((count) => count === 1), severity: 'error' },
+    { id: 'quality-score', passed: articleResults.every((result) => result.score >= 70), severity: 'warning' },
+  ];
+  return {
+    baseUrl: url,
+    publishedCount: published.length,
+    checks,
+    articles: articleResults,
+    errors: checks.filter((check) => check.severity === 'error' && !check.passed).length,
+    warnings: checks.filter((check) => check.severity === 'warning' && !check.passed).length,
+    passed: checks.every((check) => check.passed || check.severity !== 'error'),
+  };
+}
+
+/**
+ * Article markup is used because the generated destination guides are
+ * editorial pages. `about` keeps the destination context machine-readable.
+ */
 export function buildDestinationSchema(article, canonicalUrl) {
   const schema = {
     '@context': 'https://schema.org',
-    '@type': 'TravelAction',
-    name: article.metaTitle || article.title,
+    '@type': 'Article',
+    headline: article.metaTitle || article.title,
     description: article.metaDescription || article.excerpt,
     url: canonicalUrl,
+    mainEntityOfPage: canonicalUrl,
     inLanguage: article.language || SEO_CONFIG.defaultLanguage,
-    toLocation: {
+    datePublished: article.publishedAt || article.createdAt,
+    dateModified: article.updatedAt || article.publishedAt || article.createdAt,
+    author: {
+      '@type': 'Organization',
+      name: PROJECT_CONFIG.brandName,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: PROJECT_CONFIG.brandName,
+    },
+    about: {
       '@type': 'Place',
       name: [article.destination, article.country].filter(Boolean).join(', '),
     },
   };
-  if (article.heroImageUrl) schema.image = article.heroImageUrl;
+  if (article.heroImageUrl) schema.image = [article.heroImageUrl];
   return schema;
+}
+
+export function buildBreadcrumbSchema(article, canonicalUrl, baseUrl = SEO_CONFIG.siteBaseUrl) {
+  const base = normalizeBaseUrl(baseUrl);
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: PROJECT_CONFIG.brandName, item: `${base}/` },
+      { '@type': 'ListItem', position: 2, name: 'Travel guides', item: `${base}${SEO_CONFIG.publicPathPrefix}/` },
+      { '@type': 'ListItem', position: 3, name: article.title, item: canonicalUrl },
+    ],
+  };
 }
 
 export function buildFaqSchema(article) {
