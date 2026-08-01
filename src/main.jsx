@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 import { AffiliateProvider } from './contexts/AffiliateContext.jsx';
+import { ContentStudioProvider } from './contexts/ContentStudioContext.jsx';
 import { LocalizationProvider } from './contexts/LocalizationContext.jsx';
 import { ThemeProvider } from './contexts/ThemeContext.jsx';
 import { TemplateProvider } from './contexts/TemplateContext.jsx';
@@ -21,7 +22,9 @@ createRoot(document.getElementById('root')).render(
         <TripProvider>
           <AffiliateProvider>
             <TemplateProvider>
-              <App />
+              <ContentStudioProvider>
+                <App />
+              </ContentStudioProvider>
             </TemplateProvider>
           </AffiliateProvider>
         </TripProvider>

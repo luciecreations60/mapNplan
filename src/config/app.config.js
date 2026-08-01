@@ -39,6 +39,8 @@ export const APP_CONFIG = Object.freeze({
     calendarInteroperability: true,
     savedPlacesLibrary: true,
     affiliateLinks: true,
+    seoContentStudio: true,
+    staticSeoExport: true,
     aiAssistant: false,
   }),
 });

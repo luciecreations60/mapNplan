@@ -4420,3 +4420,111 @@
 @media (max-width: 480px) {
   .booking-summary-grid, .affiliate-analytics-grid { grid-template-columns: 1fr; }
 }
+
+/* ========================================================================== */
+/* V0.1.17 — SEO content studio and static destination pages                 */
+/* ========================================================================== */
+.seo-studio-page { min-width: 0; }
+.seo-studio-heading { align-items: flex-start; }
+.seo-studio-heading__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.seo-studio-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.seo-summary-card { display: flex; min-width: 0; align-items: center; gap: 12px; padding: 15px; }
+.seo-summary-card > span { display: grid; width: 40px; height: 40px; flex: 0 0 auto; place-items: center; border-radius: 12px; color: var(--color-primary); background: var(--color-primary-soft); }
+.seo-summary-card > div { display: grid; min-width: 0; }
+.seo-summary-card strong { overflow: hidden; font-size: 1.05rem; text-overflow: ellipsis; white-space: nowrap; }
+.seo-summary-card small { color: var(--color-text-muted); font-size: .63rem; }
+.seo-export-tools { display: grid; min-width: 0; grid-template-columns: minmax(220px, 1fr) minmax(220px, .75fr) auto; align-items: end; gap: 16px; padding: 18px; }
+.seo-export-tools h2 { margin: 3px 0 5px; font-size: 1rem; }
+.seo-export-tools p { margin: 0; color: var(--color-text-muted); font-size: .67rem; line-height: 1.5; }
+.seo-export-tools__actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.seo-studio-filters { display: grid; grid-template-columns: minmax(220px, 1fr) repeat(2, minmax(150px, .35fr)); gap: 9px; padding: 12px; }
+.seo-studio-filters select { width: 100%; min-width: 0; min-height: 42px; padding: 0 10px; border: 1px solid var(--color-border); border-radius: 11px; color: var(--color-text); background: var(--color-surface-muted); }
+.seo-studio-search { display: flex; min-width: 0; min-height: 42px; align-items: center; gap: 8px; padding: 0 11px; border: 1px solid var(--color-border); border-radius: 11px; background: var(--color-surface-muted); }
+.seo-studio-search svg { flex: 0 0 auto; color: var(--color-text-muted); }
+.seo-studio-search input { width: 100%; min-width: 0; border: 0; outline: 0; color: var(--color-text); background: transparent; }
+.seo-article-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+.seo-article-card { display: grid; min-width: 0; gap: 12px; padding: 17px; }
+.seo-article-card header { display: grid; min-width: 0; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 11px; }
+.seo-article-card__icon { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 12px; color: var(--color-primary); background: var(--color-primary-soft); }
+.seo-article-card header > div { min-width: 0; }
+.seo-article-card small { color: var(--color-text-muted); font-size: .58rem; }
+.seo-article-card h2 { margin: 3px 0; overflow: hidden; font-size: .88rem; text-overflow: ellipsis; white-space: nowrap; }
+.seo-article-card header p { margin: 0; overflow: hidden; color: var(--color-text-muted); font-size: .63rem; text-overflow: ellipsis; white-space: nowrap; }
+.seo-score { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 50%; font-size: .72rem; font-weight: 850; }
+.seo-score--good { color: var(--color-success); background: color-mix(in srgb, var(--color-success) 13%, var(--color-surface)); }
+.seo-score--medium { color: var(--color-warning); background: color-mix(in srgb, var(--color-warning) 14%, var(--color-surface)); }
+.seo-score--low { color: var(--color-danger); background: color-mix(in srgb, var(--color-danger) 12%, var(--color-surface)); }
+.seo-article-card__excerpt { margin: 0; color: var(--color-text-muted); font-size: .68rem; line-height: 1.55; }
+.seo-article-card__meta { display: flex; min-width: 0; flex-wrap: wrap; gap: 7px 13px; color: var(--color-text-muted); font-size: .59rem; }
+.seo-article-card__meta span { display: inline-flex; min-width: 0; align-items: center; gap: 5px; }
+.seo-article-card__actions { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; gap: 6px; padding-top: 10px; border-top: 1px solid var(--color-border); }
+.seo-article-card__actions .button:first-child { margin-right: auto; }
+.seo-editor { display: grid; grid-template-columns: 220px minmax(0, 1fr); align-items: start; gap: 18px; }
+.seo-editor-score { position: sticky; top: 0; display: grid; gap: 8px; padding: 14px; border: 1px solid var(--color-border); border-radius: 14px; background: var(--color-surface-muted); }
+.seo-editor-score__value { display: grid; width: 74px; height: 74px; place-items: center; border-radius: 50%; font-size: 1rem; font-weight: 900; }
+.seo-editor-score > small { color: var(--color-text-muted); font-size: .62rem; }
+.seo-editor-score ul { display: grid; gap: 7px; margin: 5px 0 0; padding: 0; list-style: none; }
+.seo-editor-score li { display: flex; align-items: flex-start; gap: 6px; color: var(--color-text-muted); font-size: .58rem; line-height: 1.35; }
+.seo-editor-score li.is-passed { color: var(--color-success); }
+.seo-editor__body { display: grid; min-width: 0; gap: 16px; }
+.seo-editor fieldset { min-width: 0; margin: 0; padding: 14px; border: 1px solid var(--color-border); border-radius: 14px; }
+.seo-editor legend { padding: 0 6px; font-size: .68rem; font-weight: 850; }
+.seo-editor-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+.seo-editor .workspace-field small { color: var(--color-text-muted); font-size: .55rem; }
+.seo-faq-editor { display: grid; gap: 10px; }
+.seo-faq-editor__item { display: grid; min-width: 0; grid-template-columns: minmax(180px, .7fr) minmax(240px, 1.3fr) auto; align-items: end; gap: 9px; padding: 10px; border-radius: 12px; background: var(--color-surface-muted); }
+.seo-affiliate-options { display: flex; flex-wrap: wrap; gap: 8px 13px; }
+.seo-affiliate-options label { display: inline-flex; align-items: center; gap: 6px; color: var(--color-text-muted); font-size: .64rem; }
+
+.public-guide { min-height: 100vh; padding: 30px 16px 80px; color: var(--color-text); background: var(--color-background); }
+.public-guide > article, .public-guide__nav { width: min(880px, 100%); margin-right: auto; margin-left: auto; }
+.public-guide__nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 35px; }
+.public-guide__nav a { display: inline-flex; align-items: center; gap: 6px; color: var(--color-primary); font-size: .7rem; font-weight: 800; text-decoration: none; }
+.public-guide__nav > span { padding: 5px 9px; border-radius: 999px; color: var(--color-text-muted); background: var(--color-surface-muted); font-size: .58rem; font-weight: 800; }
+.public-guide__hero { padding: 10px 0 25px; }
+.public-guide__hero h1 { max-width: 800px; margin: 8px 0 14px; font-size: clamp(2rem, 6vw, 4.4rem); line-height: 1.03; }
+.public-guide__hero > p:not(.eyebrow) { max-width: 720px; margin: 0; color: var(--color-text-muted); font-size: clamp(.96rem, 2vw, 1.16rem); line-height: 1.7; }
+.public-guide__hero > div { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 17px; }
+.public-guide__hero > div span { padding: 4px 8px; border-radius: 999px; color: var(--color-primary); background: var(--color-primary-soft); font-size: .57rem; font-weight: 800; }
+.public-guide__image { margin: 12px 0 30px; }
+.public-guide__image img { width: 100%; max-height: 520px; object-fit: cover; border-radius: 22px; }
+.public-guide__section, .public-guide__affiliate { margin-top: 22px; padding: clamp(20px, 4vw, 32px); border: 1px solid var(--color-border); border-radius: 20px; background: var(--color-surface); box-shadow: var(--shadow-card); }
+.public-guide__section h2 { margin: 0 0 14px; font-size: 1.18rem; }
+.public-guide__section p { color: var(--color-text-muted); font-size: .78rem; line-height: 1.75; white-space: pre-line; }
+.public-guide__section details { padding: 13px 0; border-bottom: 1px solid var(--color-border); }
+.public-guide__section summary { font-size: .78rem; font-weight: 800; cursor: pointer; }
+.public-guide__affiliate { display: flex; align-items: flex-start; gap: 11px; color: var(--color-primary); background: var(--color-primary-soft); }
+.public-guide__affiliate p { margin: 4px 0 0; color: var(--color-text-muted); font-size: .68rem; line-height: 1.55; }
+.public-guide--empty { display: grid; min-height: 100vh; place-content: center; justify-items: center; text-align: center; }
+.public-guide--empty p { color: var(--color-text-muted); }
+.public-guide--empty a { color: var(--color-primary); font-weight: 800; }
+
+@media (max-width: 1080px) {
+  .seo-studio-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .seo-export-tools { grid-template-columns: 1fr 1fr; }
+  .seo-export-tools > div:first-child { grid-column: 1 / -1; }
+  .seo-editor { grid-template-columns: 1fr; }
+  .seo-editor-score { position: static; }
+  .seo-editor-score ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  .seo-studio-heading { align-items: stretch; flex-direction: column; }
+  .seo-studio-heading__actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .seo-studio-heading__actions .button { width: 100%; }
+  .seo-studio-filters, .seo-export-tools, .seo-article-grid { grid-template-columns: 1fr; }
+  .seo-export-tools > div:first-child { grid-column: auto; }
+  .seo-editor-grid { grid-template-columns: 1fr; }
+  .seo-editor-grid .workspace-form__wide, .seo-editor-grid .workspace-form__full { grid-column: auto; }
+  .seo-faq-editor__item { grid-template-columns: 1fr; }
+  .seo-faq-editor__item .icon-button { justify-self: end; }
+  .seo-editor-score ul { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .seo-studio-summary { grid-template-columns: 1fr; }
+  .seo-studio-heading__actions { grid-template-columns: 1fr; }
+  .seo-article-card header { grid-template-columns: 38px minmax(0, 1fr); }
+  .seo-article-card header > .seo-score { grid-column: 2; justify-self: start; }
+  .seo-article-card__actions .button { width: 100%; margin-right: 0; }
+}

@@ -1,10 +1,12 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ErrorBoundary } from './components/feedback/ErrorBoundary.jsx';
 import { AppLayout } from './layouts/AppLayout.jsx';
+import { ContentStudioPage } from './pages/ContentStudioPage.jsx';
 import { DashboardPage } from './pages/DashboardPage.jsx';
 import { ExplorePage } from './pages/ExplorePage.jsx';
 import { NotFoundPage } from './pages/NotFoundPage.jsx';
 import { PrintTripPage } from './pages/PrintTripPage.jsx';
+import { PublicDestinationPage } from './pages/PublicDestinationPage.jsx';
 import { SharedTripPage } from './pages/SharedTripPage.jsx';
 import { SettingsPage } from './pages/SettingsPage.jsx';
 import { TemplatesPage } from './pages/TemplatesPage.jsx';
@@ -24,6 +26,7 @@ export default function App() {
         <Routes>
           <Route path="/trips/:tripId/print" element={<PrintTripPage />} />
           <Route path="/shared" element={<SharedTripPage />} />
+          <Route path="/guides/:slug" element={<PublicDestinationPage />} />
           <Route element={<AppLayout />}>
             <Route index element={<Navigate replace to="/dashboard" />} />
             <Route path="/dashboard" element={<DashboardPage />} />
@@ -31,6 +34,7 @@ export default function App() {
             <Route path="/trips/:tripId" element={<TripWorkspacePage />} />
             <Route path="/templates" element={<TemplatesPage />} />
             <Route path="/explore" element={<ExplorePage />} />
+            <Route path="/content" element={<ContentStudioPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
