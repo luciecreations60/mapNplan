@@ -1,31 +1,15 @@
-# Stabilization roadmap
+# Roadmap après V0.1.23 rc.2
 
-## Completed
+## Étape immédiate
 
-- Part 20 — reliability, import validation, recovery and deployment gates.
-- Part 21 — browser compatibility, responsive contracts and accessibility.
-- Part 22 — storage resilience, offline hardening and performance budgets.
-- Part 23 — Release Candidate, end-to-end domain regression tests and release audit.
+Tester la RC2 sur le site GitHub Pages avec les données réelles ou une copie de sauvegarde. Relever uniquement les anomalies, incompréhensions et lenteurs rencontrées dans un usage normal.
 
-## Current phase
+## Décision suivante
 
-**V0.1.22 rc.1 is ready for controlled acceptance testing.**
+- aucun défaut bloquant ou majeur : préparation de la V1.0 stable ;
+- défauts bloquants ou majeurs : RC3 corrective ciblée ;
+- demandes de confort non indispensables : consignées pour une évolution postérieure à la V1.0.
 
-No additional feature part is planned before the V1.0 decision. The next work depends only on test evidence:
+## Après la V1.0
 
-- blockers or data-loss defects produce an rc.2 correction;
-- major regressions produce an rc.2 correction;
-- no blockers and accepted limitations allow the V1.0 packaging step;
-- minor cosmetic findings can be included in V1.0 or a later V1.0.1 maintenance release.
-
-## Deferred until after V1.0 discussion
-
-- definitive brand, company and domain;
-- public SEO activation;
-- real affiliate agreements and consent tooling;
-- accounts, backend synchronization and real-time collaboration;
-- new product features suggested by actual user testing.
-
-## Feature freeze
-
-A change before V1.0 is accepted only when it unblocks an existing journey, prevents data loss, fixes a regression or resolves a critical accessibility problem.
+Le nom définitif, le domaine, le lancement SEO, la création de société, les partenaires d’affiliation, les comptes et la synchronisation seront discutés séparément. Aucune de ces évolutions ne sera ajoutée automatiquement sans validation de leur utilité.

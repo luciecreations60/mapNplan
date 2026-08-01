@@ -1,28 +1,19 @@
-# V0.1 — Part 23 delivery notes
+# Notes de livraison — V0.1.23 rc.2
 
-## Purpose
+La Partie 24 correspond à une RC2 corrective issue de retours d’utilisation réels. Elle ne rajoute pas de prestataires d’affiliation et n’active pas le référencement.
 
-This release creates V0.1.22 rc.1 without adding a business feature. It closes the planned stabilization sequence and prepares an evidence-based V1.0 decision.
+## Itinéraire
 
-## Changes
+Les jours compris entre le départ et le retour sont affichés même lorsqu’ils sont vides. Chaque journée dispose de son propre bouton d’ajout, avec la date déjà sélectionnée. Le bouton situé en bas reprend le dernier jour de l’itinéraire contenant une activité. La durée est maintenant saisie en heures et minutes.
 
-- Changed the release stage from stabilization to release candidate.
-- Added a candidate identifier while keeping the brand, domain, SEO and commercial activation locked.
-- Added end-to-end domain tests for the complete local trip lifecycle.
-- Added demonstration-data integrity and default-partner privacy tests.
-- Added release identity, CI and documentation contract tests.
-- Added a release-candidate audit that checks source and built files.
-- Added a deployed `release-status.json` report.
-- Added the browser acceptance plan, release checklist, limitations, readiness report and rollback procedure.
-- Added a mandatory Release candidate audit step to GitHub Actions.
+Les activités de transport peuvent enregistrer un lieu de départ, un lieu d’arrivée et un mode de transport. Une estimation locale est proposée lorsque les deux lieux possèdent des coordonnées. Le modèle longue distance a été corrigé pour éviter les durées irréalistes comme celle signalée entre Blaincourt et Mâcon.
 
-## Data compatibility
+## Carte, météo et réservations
 
-- Trip schema remains version 16.
-- Backup format remains version 2.
-- No migration or data reset is required.
-- Existing trips, settings and attachments remain compatible.
+Un clic sur la carte sélectionne un point, tente d’en retrouver le nom et ouvre un formulaire d’activité avec date, heure et type. La météo demande jusqu’à seize jours de prévisions et signale si les dates du voyage dépassent cette fenêtre.
 
-## Decision
+Une réservation peut recevoir des fichiers lors de sa création ou modification. Un document lié est alors créé automatiquement et apparaît dans l’onglet Documents. Les activités hôtel, avion, transport et billet peuvent aussi générer une réservation afin d’éviter une double saisie.
 
-This archive is ready for controlled testing. It should become V1.0 only after the conditions in `V1_READINESS_REPORT.md` and `RELEASE_CHECKLIST.md` are met.
+## Présentation et dépenses
+
+Le chevauchement entre l’icône et le texte des champs Lieu est corrigé avec une règle commune. La taille de base passe à 16 px et les espacements de formulaires sont resserrés. Les montants sont normalisés à deux décimales. Les dépenses de groupe peuvent être triées par date ou ordre alphabétique et leur date peut être choisie dans les journées du voyage.

@@ -1,47 +1,19 @@
-# Testing — V0.1.22 rc.1
+# Tests — V0.1.23 rc.2
 
-## Automated commands
+## Commandes
 
 ```bash
 npm run quality
-npm run test
+npm test
 npm run build
 npm run performance:audit
 npm run release:audit:ci
 ```
 
-`npm run check` executes the same complete gate in sequence.
+## Suite automatisée
 
-## Automated coverage
+La suite contient 38 tests répartis dans 14 fichiers. Elle couvre les migrations, sauvegardes, partages, calculs de dépenses, calendrier ICS, stockage, accessibilité, responsive, performances, verrouillage SEO, cycle de vie d’un voyage et ergonomie de l’itinéraire.
 
-The Release Candidate contains 32 tests covering:
+## Vérifications manuelles prioritaires
 
-- accessibility and responsive contracts;
-- calendar ICS round trips;
-- import validation and unsupported formats;
-- LocalStorage quarantine and bounded recovery;
-- lazy loading, service-worker bounds and bundle budgets;
-- release identity, documentation and CI contract;
-- complete create/update/archive/restore/backup/share/duplicate/delete lifecycle;
-- normalized demonstration-data integrity;
-- affiliate providers disabled by default;
-- route optimisation restoration;
-- shared-expense calculations and rounding;
-- storage-maintenance safety;
-- trip migrations and private-file removal during duplication;
-- public-indexing lock.
-
-## Manual acceptance
-
-Follow `RELEASE_CANDIDATE_TEST_PLAN.md`. The minimum V1.0 decision evidence is:
-
-1. green GitHub Actions for this version;
-2. complete core journey on the deployed site;
-3. Chrome and Safari acceptance;
-4. mobile layout acceptance;
-5. successful JSON backup restoration;
-6. zero blocker and data-loss defects.
-
-## Release status
-
-After deployment, `release-status.json` reports the source/build release audit. It is a technical signal only and does not replace manual browser acceptance.
+Tester l’ajout depuis le premier, un jour intermédiaire et le dernier jour du séjour. Vérifier le bouton inférieur après plusieurs ajouts. Tester un transport avec deux suggestions de lieux. Cliquer sur la carte et ajouter le lieu. Joindre un PDF à une réservation puis le retrouver dans Documents. Saisir `12,50` ou `12.50` selon le navigateur et contrôler l’affichage à deux décimales. Tester les quatre tris de dépenses.

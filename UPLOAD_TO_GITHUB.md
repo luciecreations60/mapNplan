@@ -1,32 +1,16 @@
-# Upload V0.1 Part 23 to GitHub
+# Installation GitHub — V0.1.23 rc.2
 
-1. Download and extract `travel-planner-v0.1-part23.zip`.
-2. Export a JSON backup from the currently deployed application.
-3. Open the GitHub repository.
-4. Choose **Add file → Upload files**.
-5. Upload the complete extracted contents and replace existing files.
-6. Commit directly to `main` with:
-
-```text
-chore: publish v0.1.22 release candidate 1
-```
-
-7. Open **Actions** and confirm these steps are green:
+1. Télécharger puis décompresser `travel-planner-v0.1-part24.zip`.
+2. Dans le dépôt `travel-planner`, ouvrir **Add file → Upload files**.
+3. Déposer le contenu du dossier extrait, et non le dossier parent.
+4. Autoriser le remplacement des fichiers existants.
+5. Utiliser le message de commit :
 
 ```text
-Project quality checks
-Automated tests
-Production build
-Build size audit
-Release candidate audit
-Upload production artifact
-Deploy to GitHub Pages
+fix: publish v0.1.23 release candidate 2
 ```
 
-8. Open the deployed site and verify that Settings displays version `0.1.22`.
-9. Open `/release-status.json` under the GitHub Pages site and confirm `passed: true` and `buildChecked: true`.
-10. Follow `RELEASE_CANDIDATE_TEST_PLAN.md` before discussing V1.0.
-
-## Rollback
-
-Keep the Part 22 archive and the pre-update JSON backup until the complete acceptance plan passes. See `ROLLBACK.md` for the recovery procedure.
+6. Ouvrir **Actions** et attendre la fin de toutes les étapes.
+7. Vérifier `release-status.json` sur le site déployé : `version` doit valoir `0.1.23`, `candidate` doit valoir `rc.2`, `buildChecked` et `passed` doivent être vrais.
+8. Recharger Chrome, Edge ou Firefox avec `Ctrl + F5`, ou Safari avec `Cmd + Option + R`.
+9. Exécuter le plan `RELEASE_CANDIDATE_TEST_PLAN.md`.

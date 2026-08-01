@@ -1,35 +1,11 @@
-# Known limitations — V0.1.22 rc.1
+# Limites connues — V0.1.23 rc.2
 
-These limitations are deliberate and do not represent hidden promises for the current release candidate.
+Les durées de trajet sont des estimations locales basées sur la distance à vol d’oiseau, un facteur de réseau et une vitesse moyenne selon le mode. Elles ne tiennent pas compte du trafic, des travaux, des horaires, des correspondances, des péages ou d’un itinéraire routier réel. Elles servent à détecter les ordres de grandeur manifestement faux, pas à remplacer un GPS.
 
-## Local-only data
+La recherche inversée de la carte et les suggestions de lieux dépendent du service public Photon. Une panne réseau laisse les coordonnées utilisables mais peut empêcher l’obtention automatique du nom.
 
-Trips, settings and most application data are stored in the current browser profile. There is no account, cloud synchronization or automatic multi-device recovery. Users must export JSON backups themselves. Private files use IndexedDB and are included in backup version 2 when the export completes successfully.
+Les prévisions météo disponibles sont limitées à la fenêtre maximale fournie par le service, actuellement seize jours. Un voyage plus lointain ne peut pas recevoir de prévisions fiables dès sa création.
 
-## Local collaboration
+Les fichiers restent stockés localement dans IndexedDB. Ils ne sont pas synchronisés entre appareils et peuvent être supprimés par le navigateur si l’utilisateur efface les données du site. Une sauvegarde complète reste recommandée.
 
-Participants, comments, notifications and read-only sharing simulate collaboration locally. They do not provide real-time multi-user editing, access revocation, server permissions or durable shared links.
-
-## External services
-
-Weather, currency, geocoding and map functions depend on third-party network services and may be unavailable, rate-limited or changed outside the application. Cached or local fallback information may be shown when supported.
-
-## Route estimates
-
-Itinerary optimisation and travel-time calculations are deterministic planning estimates, not live navigation. They do not replace a routing or transit provider and must not be used as guaranteed journey times.
-
-## Offline mode
-
-The installed application shell and existing local data can remain available offline after a successful online visit. First load, external maps, searches, live weather, currency updates and partner websites still require a network connection.
-
-## Browser storage
-
-Storage quotas and persistence policies differ by browser and device. Private browsing, browser cleanup, device policies and low-storage conditions can remove local data. A downloaded backup remains the safest recovery method.
-
-## Brand, legal and commercial status
-
-TripFlow is a provisional code name. The final company, brand, domain, legal pages, consent setup, analytics and affiliate agreements are intentionally not activated. Search-engine indexing remains disabled.
-
-## Verification boundary
-
-Automated source and service tests are included, but the assistant environment cannot execute the complete Vite production build because its internal npm mirror lacks `@vitejs/plugin-react`. GitHub Actions and the user's manual browser matrix are the release sources of truth.
+Le référencement, le domaine définitif, les affiliations réelles, les comptes et la synchronisation cloud restent volontairement hors périmètre de cette candidate.

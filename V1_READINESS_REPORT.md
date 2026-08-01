@@ -1,38 +1,17 @@
-# V1 readiness report — V0.1.22 rc.1
+# Rapport de préparation V1 — V0.1.23 rc.2
 
-## Current assessment
+## Évaluation actuelle
 
-**Status: ready for controlled acceptance testing, not yet declared V1.0 stable.**
+La candidate est techniquement prête pour une nouvelle phase de tests d’acceptation. Les retours pratiques de Chrome ont été intégrés sans réouvrir le périmètre commercial. Les contrôles source, traductions, tests de données et audit Release Candidate sont réussis.
 
-The functional scope is frozen. Reliability, accessibility, responsive behaviour, storage maintenance, offline handling and automated release gates are now present. The release candidate adds end-to-end domain tests, demo-data integrity tests, privacy tests and a CI audit of the actual production build.
+## Conditions avant promotion en V1.0
 
-## Evidence available before manual acceptance
+1. GitHub Actions doit produire un build vert avec `buildChecked: true`.
+2. Les parcours du plan RC2 doivent réussir sous Chrome et Safari.
+3. Une sauvegarde complète doit être restaurée avec succès.
+4. Aucun bug bloquant ou perte de données ne doit être observé pendant plusieurs sessions de test.
+5. Les éventuels défauts restants doivent être classés en bloquants, majeurs ou mineurs.
 
-- automated service and contract tests cover migrations, trip lifecycle, backup validation, sharing privacy, calendar interoperability, expenses, storage recovery, accessibility contracts, responsive contracts, performance contracts and release locks;
-- translations are checked for key parity;
-- JavaScript, JSX, MJS, imports and JSON are checked by the project quality script;
-- the production workflow must pass build, bundle budgets and a release-candidate audit before deployment;
-- SEO and commercial activation remain locked.
+## Décision
 
-## Evidence still required from the user environment
-
-- a green GitHub Actions run for this exact archive;
-- the complete core journey in the deployed application;
-- at least Chrome and Safari acceptance;
-- mobile layout acceptance;
-- one successful backup deletion and restoration exercise;
-- confirmation that no blocking or data-loss issue was found during normal use.
-
-## Decision rule
-
-After the user tests this candidate, classify findings as:
-
-- **Blocker**: application cannot start, data is lost, backup cannot restore, or a core journey cannot complete;
-- **Major**: important journey is severely impaired but a workaround exists;
-- **Minor**: visual, wording or convenience defect that does not block the journey.
-
-V1.0 should be created when blockers are zero, majors are zero or explicitly accepted, and the checklist is signed off. Minor corrections can be included in V1.0 or scheduled for V1.0.1 without reopening feature development.
-
-## Recommendation
-
-Do not add new product features before the acceptance result. Test this release candidate for several real planning sessions, record defects with browser and steps to reproduce, then make one evidence-based V1.0 decision.
+Cette RC2 ne doit pas encore être renommée V1.0 avant le retour de test utilisateur. Si aucun défaut bloquant ou majeur n’est découvert, la prochaine livraison pourra être une V1.0 de gel et documentation, sans ajout fonctionnel. Dans le cas contraire, une RC3 limitée aux corrections sera produite.

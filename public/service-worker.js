@@ -5,7 +5,7 @@
  * Versioned assets use cache-first. External API responses are deliberately
  * excluded because the application already owns a bounded data cache.
  */
-const CACHE_VERSION = 'tripflow-v0.1.22';
+const CACHE_VERSION = 'tripflow-v0.1.23';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const ASSET_CACHE = `${CACHE_VERSION}-assets`;
 const MAX_ASSET_ENTRIES = 80;

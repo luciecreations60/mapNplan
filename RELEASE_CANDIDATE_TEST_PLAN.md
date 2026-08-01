@@ -1,70 +1,27 @@
-# Release Candidate test plan — V0.1.22 rc.1
+# Plan de test Release Candidate — V0.1.23 rc.2
 
-This plan validates existing journeys only. It must not be used to introduce new business features before V1.0.
+## Préparation
 
-## Entry conditions
+Sauvegarder les données actuelles en JSON, envoyer la RC2 dans GitHub, attendre que toutes les étapes Actions soient vertes puis faire un rechargement forcé. Vérifier que la version affichée est `0.1.23` et que les voyages existants sont toujours présents.
 
-- GitHub Actions is green for quality, tests, production build, bundle budget and release audit.
-- The deployed application displays version `0.1.22`.
-- Public indexing is disabled and the provisional brand remains marked as non-final.
-- A JSON backup has been downloaded before destructive browser-storage tests.
+## Parcours itinéraire
 
-## Core journey
+1. Créer un voyage de quatre jours et ouvrir Itinéraire.
+2. Vérifier que les quatre journées existent avant tout ajout.
+3. Ajouter une activité depuis le bouton du troisième jour et contrôler la date préremplie.
+4. Ajouter une autre activité avec le bouton du bas et contrôler qu’il reprend le troisième jour.
+5. Modifier la durée en `1 heure 20 minutes` et vérifier l’affichage `1 h 20 min`.
+6. Créer un transport avec départ, arrivée et mode voiture, puis lancer l’estimation.
+7. Créer une réservation depuis cette activité et contrôler l’onglet Réservations.
 
-1. Reset demonstration data and open the Japan trip.
-2. Create a new trip with destination, dates, travelers, currency and budget.
-3. Add one itinerary day and two activities with times, places, costs and notes.
-4. Edit, move, complete, duplicate and delete an activity.
-5. Add one reservation, one document, one saved place and one booking option.
-6. Add checklist entries, expenses, participants and a partial settlement.
-7. Verify overview, calendar, map, statistics, today view and printable plan.
-8. Export the trip calendar and verify that the ICS file opens in a calendar application.
-9. Export a complete JSON backup, delete the test trip, import the backup and verify restoration.
-10. Duplicate, favorite, pin, archive, restore and finally delete the copied trip.
+## Carte et météo
 
-## Privacy journey
+Cliquer sur plusieurs points de la carte, ajouter l’un d’eux à une date choisie et vérifier sa présence dans l’itinéraire. Ouvrir les outils météo et vérifier l’affichage horizontal étendu ainsi que l’indication de couverture des dates du voyage.
 
-- Create a read-only share without budget or notes.
-- Confirm that confirmation numbers, document references, attachments and discussion comments are absent.
-- Confirm that affiliate providers remain disabled unless explicitly configured locally.
-- Confirm that `robots.txt`, the application HTML and generated guide pages stay non-indexable.
+## Réservations, documents et dépenses
 
-## Browser matrix
+Ajouter une réservation avec un PDF ou une image. Contrôler que le document lié apparaît dans Documents et peut être ouvert. Ajouter des dépenses avec décimales, modifier une dépense, sélectionner une date de l’itinéraire et tester les tris par date et par nom.
 
-Test the deployed URL, not only the GitHub preview editor.
+## Navigateurs
 
-| Environment | Required coverage |
-|---|---|
-| Chrome desktop | full core journey, keyboard navigation, file import/export |
-| Safari desktop or iPhone | trip editing, sticky tabs, map, file downloads |
-| Firefox desktop | forms, dialogs, print view, offline reload |
-| Edge desktop | responsive sidebar, focus, storage diagnostics |
-| Mobile width | menu drawer, activity actions, horizontal tabs, modals |
-| Tablet width | two-column layouts, map panels, forms and cards |
-
-## Accessibility checks
-
-- Navigate the main journey with `Tab`, `Shift+Tab`, arrow keys, `Enter`, `Space` and `Escape`.
-- Verify visible focus and logical focus order.
-- Verify that dialogs retain focus and restore it after closing.
-- Verify French and English labels with a screen reader when available.
-- Verify reduced motion and Windows forced-colour mode when available.
-
-## Offline and storage checks
-
-- Load the site once online, switch developer tools to Offline and reload.
-- Confirm that the application shell and local trip data remain readable.
-- Run **Settings → Data health and maintenance**.
-- Verify that safe cleanup never removes valid trips or linked documents.
-- Test recovery from intentionally corrupted application LocalStorage only after exporting a backup.
-
-## Exit criteria
-
-The candidate can be discussed as V1.0 only when:
-
-- GitHub Actions is green;
-- no blocker or data-loss bug remains;
-- the core journey passes on Chrome and Safari;
-- no major layout issue remains on mobile;
-- backup restoration has been manually confirmed;
-- known limitations are accepted and documented.
+Exécuter le parcours principal sous Chrome et Safari. Contrôler aussi la mise en page avec une largeur mobile, le zoom navigateur à 125 % et 150 %, le thème sombre et la navigation clavier.

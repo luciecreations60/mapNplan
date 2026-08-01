@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.23 rc.2 — Correctifs d’usage réels
+
+- jours du séjour générés dans l’itinéraire ;
+- ajout par journée et ajout inférieur avec dernière date utilisée ;
+- transports départ/arrivée/mode et durée heures/minutes ;
+- estimation longue distance corrigée ;
+- activité ajoutable depuis la carte ;
+- météo étendue à seize jours ;
+- fichiers ajoutables depuis une réservation ;
+- réservation créable depuis une activité compatible ;
+- décimales et tris des dépenses ;
+- dates dans l’aperçu ;
+- corrections globales de lisibilité et d’alignement.
+
+
 ## 0.1.22 rc.1 — Release Candidate
 
 - Froze the product scope and changed the release stage to `release-candidate`.

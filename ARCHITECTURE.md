@@ -1,50 +1,21 @@
-# Architecture — V0.1.22 rc.1
+# Architecture — V0.1.23 rc.2
 
-## Release-candidate boundary
+## Identité technique
 
-The business scope is frozen. Version `0.1.22` changes release validation and documentation only; the trip schema remains version 16.
+- version applicative : `0.1.23` ;
+- candidate : `rc.2` ;
+- schéma voyage : `17` ;
+- indexation publique : désactivée ;
+- cache PWA : `tripflow-v0.1.23`.
 
-`PROJECT_CONFIG.release` centrally locks:
+## Nouveaux éléments de domaine
 
-- stage `release-candidate`;
-- candidate `rc.1`;
-- provisional branding;
-- empty production domain;
-- disabled public indexing.
+`src/utils/itinerary.js` centralise les plages de dates, l’insertion dans une journée vide, la dernière date utilisée et les conversions heures/minutes. Les activités peuvent désormais porter les champs `departureLocation`, `departureLatitude`, `departureLongitude`, `transportMode` et `linkedReservationId`. Les réservations peuvent conserver `sourceActivityId`.
 
-## Data layers
+## Services
 
-- `TripService` owns normalized trip data and migrations in LocalStorage.
-- `AttachmentStorageService` owns binary files in IndexedDB.
-- `ResponseCacheService` owns bounded third-party response caches.
-- `StorageHealthService` performs conservative diagnostics and cleanup.
-- `DataPortabilityService` and `ImportValidationService` define the recovery boundary.
+Le service de géocodage expose maintenant une recherche inversée utilisée uniquement après un clic sur la carte. Le service météo inclut la profondeur de prévision dans sa clé de cache. Les pièces jointes ajoutées depuis une réservation utilisent le même `AttachmentStorageService` IndexedDB que l’onglet Documents.
 
-No release-candidate change modifies these persistence formats.
+## Compatibilité
 
-## Automated release gate
-
-GitHub Actions must complete, in order:
-
-1. project quality checks;
-2. automated domain and contract tests;
-3. production Vite build;
-4. generated bundle-size audit;
-5. release-candidate audit against source and `dist`;
-6. Pages artifact upload and deployment.
-
-`scripts/audit-release-candidate.mjs` verifies the release identity, privacy locks, acceptance documentation, demo-data coherence, absence of disabled tests and the built application shell. It emits `release-status.json` into the deployed artifact.
-
-## Test boundaries
-
-The automated suite covers domain services, migrations, imports, privacy, calendar interchange, finance, route restoration, browser-storage recovery, responsive/accessibility contracts, performance contracts and a complete local trip lifecycle.
-
-Real browser rendering and file-download behaviour remain acceptance-test responsibilities because they require the deployed GitHub Pages environment.
-
-## Compatibility
-
-- Trip schema: 16.
-- Backup format: 2.
-- SEO publication schema: 2, indexing disabled.
-- Service-worker cache: `tripflow-v0.1.22`.
-- No data migration is required from Part 22.
+Les nouvelles données sont normalisées par `TripService` lors du chargement. Les anciennes activités et réservations restent compatibles : les nouveaux champs reçoivent des valeurs neutres. Les duplications suppriment les associations privées afin de ne pas relier la copie à d’anciens fichiers ou réservations.

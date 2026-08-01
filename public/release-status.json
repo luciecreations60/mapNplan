@@ -1,18 +1,18 @@
 {
   "format": "tripflow-release-readiness",
   "formatVersion": 1,
-  "version": "0.1.22",
-  "candidate": "rc.1",
+  "version": "0.1.23",
+  "candidate": "rc.2",
   "stage": "release-candidate",
-  "generatedAt": "2026-08-01T12:33:08.704Z",
+  "generatedAt": "2026-08-01T17:02:26.832Z",
   "buildChecked": false,
   "passed": true,
   "summary": {
-    "checks": 34,
-    "passed": 34,
+    "checks": 35,
+    "passed": 35,
     "errors": 0,
     "warnings": 1,
-    "automatedTestFiles": 13
+    "automatedTestFiles": 14
   },
   "checks": [
     {
@@ -109,6 +109,10 @@
     },
     {
       "name": "No disabled tests: import-validation.test.mjs",
+      "passed": true
+    },
+    {
+      "name": "No disabled tests: itinerary-usability.test.mjs",
       "passed": true
     },
     {

@@ -1,36 +1,31 @@
-# Travel planner — V0.1.22 rc.1
+# Travel planner — V0.1.23 rc.2
 
-Application locale de planification de voyage, responsive et bilingue, construite avec React/Vite et déployée sur GitHub Pages.
+Cette Release Candidate corrige les problèmes pratiques observés lors des premiers tests Chrome, sans ouvrir un nouveau cycle d’ajout de fonctionnalités.
 
-## État du projet
+## Changements principaux
 
-Le périmètre fonctionnel est gelé. Cette livraison est la première **Release Candidate** avant la décision V1.0. Elle ajoute uniquement des contrôles de régression, un audit de livraison et la documentation d’acceptation.
+- toutes les dates du séjour sont visibles dans l’itinéraire ;
+- ajout d’une activité depuis chaque journée et depuis le bas de la page ;
+- sélection automatique du dernier jour utilisé ;
+- transports avec départ, arrivée, mode et estimation locale ;
+- durée saisie en heures et minutes ;
+- ajout d’une activité depuis un clic sur la carte ;
+- météo demandée sur la fenêtre maximale de 16 jours ;
+- documents ajoutables directement depuis une réservation ;
+- création d’une réservation depuis certaines activités ;
+- montants à deux décimales et tri des dépenses de groupe ;
+- dates visibles dans l’aperçu de l’itinéraire ;
+- corrections d’alignement, de densité et de lisibilité.
 
-Le site reste volontairement non indexable. TripFlow reste un nom de code et aucun partenaire commercial n’est activé par défaut.
+Le référencement reste désactivé, la marque reste provisoire et les partenaires commerciaux restent désactivés par défaut.
 
-## Commandes
+## Contrôles
 
 ```bash
-npm install
-npm run dev
 npm run quality
-npm run test
-npm run build
-npm run performance:audit
+npm test
 npm run release:audit
-npm run check
+npm run build
 ```
 
-`npm run release:audit:ci` exige la présence du build `dist` et est exécuté par GitHub Actions avant le déploiement.
-
-## Décision V1.0
-
-La Release Candidate est prête pour un test contrôlé, mais ne sera déclarée stable qu’après :
-
-- un workflow GitHub entièrement vert ;
-- le parcours utilisateur complet ;
-- une restauration de sauvegarde réussie ;
-- une validation Chrome et Safari ;
-- l’absence de bug bloquant ou de perte de données.
-
-Consulte `RELEASE_CANDIDATE_TEST_PLAN.md` et `V1_READINESS_REPORT.md`.
+Le build et l’audit avec `dist` sont obligatoires dans GitHub Actions avant tout déploiement.

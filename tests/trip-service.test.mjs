@@ -8,7 +8,7 @@ const { tripService } = await import('../src/services/trips/TripService.js');
 test('legacy trips are migrated and normalized without losing notes', () => {
   localStorage.setItem('tripflow:trips', JSON.stringify([{ id: 'legacy', name: ' Legacy ', travelers: 0, currency: 'eur', itinerary: [{ id: 'd', date: '2026-08-01', items: [{ id: 'i', title: 'Place', latitude: 120, longitude: 220 }] }], notes: 'keep me' }]));
   const [trip] = tripService.getAll();
-  assert.equal(trip.schemaVersion, 16);
+  assert.equal(trip.schemaVersion, 17);
   assert.equal(trip.name, 'Legacy');
   assert.equal(trip.travelers, 1);
   assert.equal(trip.currency, 'EUR');
