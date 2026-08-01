@@ -39,6 +39,30 @@ class ResponseCacheService {
     localStorageService.remove(CACHE_KEY);
   }
 
+
+  cleanup(maxAgeMs = 7 * 24 * 60 * 60 * 1000) {
+    const cache = localStorageService.get(CACHE_KEY, {});
+    const cutoff = Date.now() - Math.max(0, Number(maxAgeMs) || 0);
+    const freshEntries = Object.entries(cache)
+      .filter(([, entry]) => Number(entry?.savedAt) >= cutoff);
+    const removedCount = Math.max(0, Object.keys(cache).length - freshEntries.length);
+    if (freshEntries.length > 0) localStorageService.set(CACHE_KEY, Object.fromEntries(freshEntries));
+    else localStorageService.remove(CACHE_KEY);
+    return removedCount;
+  }
+
+  getSummary() {
+    const cache = localStorageService.get(CACHE_KEY, {});
+    const savedAtValues = Object.values(cache)
+      .map((entry) => Number(entry?.savedAt) || 0)
+      .filter(Boolean);
+    return {
+      entryCount: Object.keys(cache).length,
+      oldestSavedAt: savedAtValues.length ? Math.min(...savedAtValues) : null,
+      newestSavedAt: savedAtValues.length ? Math.max(...savedAtValues) : null,
+    };
+  }
+
   #prune(cache) {
     const entries = Object.entries(cache)
       .sort((left, right) => right[1].savedAt - left[1].savedAt)

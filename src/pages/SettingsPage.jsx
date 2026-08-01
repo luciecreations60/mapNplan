@@ -9,6 +9,7 @@ import { useI18n } from '../hooks/useI18n.js';
 import { useTheme } from '../hooks/useTheme.js';
 import { useTrips } from '../hooks/useTrips.js';
 import { attachmentStorageService } from '../services/storage/AttachmentStorageService.js';
+import { storageHealthService } from '../services/storage/StorageHealthService.js';
 
 export function SettingsPage() {
   const { language, locale, setLanguage, supportedLanguages, t } = useI18n();
@@ -20,6 +21,10 @@ export function SettingsPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [storageUsage, setStorageUsage] = useState(null);
+  const [storageHealth, setStorageHealth] = useState(null);
+  const [isCheckingStorage, setIsCheckingStorage] = useState(false);
+  const [isCleaningStorage, setIsCleaningStorage] = useState(false);
+  const [isRequestingPersistence, setIsRequestingPersistence] = useState(false);
 
   const themes = [
     { id: 'light', label: t('theme.light'), icon: 'sun', description: t('theme.lightDescription') },
@@ -35,9 +40,22 @@ export function SettingsPage() {
     }
   }, []);
 
+  const refreshStorageHealth = useCallback(async () => {
+    setIsCheckingStorage(true);
+    try {
+      setStorageHealth(await storageHealthService.analyse(trips));
+    } catch (error) {
+      setStorageHealth(null);
+      showFeedback('danger', t('settings.storageCheckFailedTitle'), error.message || t('settings.storageCheckFailedText'));
+    } finally {
+      setIsCheckingStorage(false);
+    }
+  }, [t, trips]);
+
   useEffect(() => {
     refreshStorageUsage();
-  }, [refreshStorageUsage, trips]);
+    refreshStorageHealth();
+  }, [refreshStorageHealth, refreshStorageUsage, trips]);
 
   function showFeedback(tone, title, message) {
     setFeedback({ tone, title, message });
@@ -68,6 +86,44 @@ export function SettingsPage() {
       showFeedback('danger', t('settings.resetFailedTitle'), error.message || t('settings.resetFailedText'));
     } finally {
       setIsResetting(false);
+    }
+  }
+
+  async function handleStorageCleanup() {
+    const confirmed = window.confirm(t('settings.storageCleanupConfirm'));
+    if (!confirmed) return;
+    setIsCleaningStorage(true);
+    try {
+      const result = await storageHealthService.clean(trips);
+      showFeedback(
+        'success',
+        t('settings.storageCleanupSuccessTitle'),
+        t('settings.storageCleanupSuccessText', {
+          files: result.deletedAttachments,
+          cache: result.removedCacheEntries,
+          recovery: result.removedRecoveryEntries,
+        }),
+      );
+      await Promise.all([refreshStorageUsage(), refreshStorageHealth()]);
+    } catch (error) {
+      showFeedback('danger', t('settings.storageCleanupFailedTitle'), error.message || t('settings.storageCleanupFailedText'));
+    } finally {
+      setIsCleaningStorage(false);
+    }
+  }
+
+  async function handlePersistentStorage() {
+    setIsRequestingPersistence(true);
+    try {
+      const persisted = await storageHealthService.requestPersistentStorage();
+      showFeedback(
+        persisted ? 'success' : 'warning',
+        persisted ? t('settings.persistenceEnabledTitle') : t('settings.persistenceUnavailableTitle'),
+        persisted ? t('settings.persistenceEnabledText') : t('settings.persistenceUnavailableText'),
+      );
+      await refreshStorageHealth();
+    } finally {
+      setIsRequestingPersistence(false);
     }
   }
 
@@ -224,6 +280,56 @@ export function SettingsPage() {
 
         <p className="settings-helper"><Icon name="info" size={16} /> {t('settings.localFilesPrivate')}</p>
         <Button variant="secondary" icon="refresh" onClick={refreshStorageUsage}>{t('settings.refreshStorage')}</Button>
+      </Card>
+
+      <Card className="settings-card storage-health-card">
+        <header>
+          <span className="settings-card__icon"><Icon name="shield" /></span>
+          <div>
+            <h2>{t('settings.storageHealthTitle')}</h2>
+            <p>{t('settings.storageHealthText')}</p>
+          </div>
+        </header>
+
+        {storageHealth ? (
+          <>
+            <InlineNotice
+              tone={storageHealth.status === 'healthy' ? 'success' : 'warning'}
+              title={storageHealth.status === 'healthy'
+                ? t('settings.storageHealthyTitle')
+                : t('settings.storageAttentionTitle')}
+            >
+              {storageHealth.status === 'healthy'
+                ? t('settings.storageHealthyText')
+                : t('settings.storageAttentionText', { count: storageHealth.indexedDb.orphanCount })}
+            </InlineNotice>
+
+            <div className="storage-health-grid">
+              <div><span>{t('settings.localDataSize')}</span><strong>{formatBytes(storageHealth.localStorage.bytes, locale)}</strong></div>
+              <div><span>{t('settings.recoverySnapshots')}</span><strong>{storageHealth.localStorage.recoveryCount}</strong></div>
+              <div><span>{t('settings.orphanFiles')}</span><strong>{storageHealth.indexedDb.orphanCount}</strong></div>
+              <div><span>{t('settings.cacheEntries')}</span><strong>{storageHealth.cache.entryCount}</strong></div>
+              <div><span>{t('settings.activitiesStored')}</span><strong>{storageHealth.volume.activities}</strong></div>
+              <div><span>{t('settings.persistentStorage')}</span><strong>{storageHealth.persistence.persisted ? t('common.yes') : t('common.no')}</strong></div>
+            </div>
+          </>
+        ) : (
+          <p className="settings-helper">{t('settings.storageHealthPending')}</p>
+        )}
+
+        <div className="settings-card__button-row">
+          <Button variant="secondary" icon="refresh" disabled={isCheckingStorage} onClick={refreshStorageHealth}>
+            {isCheckingStorage ? t('settings.checkingStorage') : t('settings.checkStorage')}
+          </Button>
+          <Button variant="secondary" icon="trash" disabled={isCleaningStorage} onClick={handleStorageCleanup}>
+            {isCleaningStorage ? t('settings.cleaningStorage') : t('settings.cleanStorage')}
+          </Button>
+          {storageHealth?.persistence.supported && !storageHealth.persistence.persisted && (
+            <Button variant="secondary" icon="hardDrive" disabled={isRequestingPersistence} onClick={handlePersistentStorage}>
+              {isRequestingPersistence ? t('settings.requestingPersistence') : t('settings.requestPersistence')}
+            </Button>
+          )}
+        </div>
       </Card>
 
       <Card className="settings-card">

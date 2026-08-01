@@ -72,6 +72,43 @@ class LocalStorageService {
     }
   }
 
+
+  listNamespaceEntries() {
+    try {
+      return this.#keys()
+        .filter((key) => key.startsWith(`${this.#prefix}:`))
+        .map((key) => {
+          const rawValue = localStorage.getItem(key) || '';
+          return {
+            key,
+            bytes: this.#byteLength(`${key}${rawValue}`),
+          };
+        });
+    } catch {
+      return [];
+    }
+  }
+
+  pruneRecoveryEntries(keep = 2) {
+    try {
+      const recoveryKeys = this.#keys()
+        .filter((key) => key.startsWith(`${this.#prefix}:${RECOVERY_PREFIX}:`))
+        .sort()
+        .reverse();
+      const removable = recoveryKeys.slice(Math.max(0, Number(keep) || 0));
+      removable.forEach((key) => localStorage.removeItem(key));
+      return removable.length;
+    } catch {
+      return 0;
+    }
+  }
+
+  #byteLength(value) {
+    const text = String(value || '');
+    if (typeof TextEncoder !== 'undefined') return new TextEncoder().encode(text).byteLength;
+    return text.length * 2;
+  }
+
   #keys() {
     const keys = [];
     for (let index = 0; index < localStorage.length; index += 1) {

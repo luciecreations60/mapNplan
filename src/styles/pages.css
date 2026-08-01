@@ -4650,3 +4650,18 @@
     grid-template-columns: repeat(2, minmax(44px, 1fr));
   }
 }
+
+/* ========================================================================== */
+/* V0.1.21 — storage health and route-level performance                       */
+/* ========================================================================== */
+.route-loading { display: grid; min-height: min(52vh, 480px); place-content: center; justify-items: center; gap: 10px; color: var(--color-text-muted); font-size: .72rem; font-weight: 800; }
+.route-loading__icon { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 50%; color: var(--color-primary); background: var(--color-primary-soft); animation: route-loading-spin 1s linear infinite; }
+@keyframes route-loading-spin { to { transform: rotate(360deg); } }
+.storage-health-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.storage-health-grid > div { display: grid; min-width: 0; gap: 4px; padding: 13px; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface-muted); }
+.storage-health-grid span { color: var(--color-text-muted); font-size: .62rem; }
+.storage-health-grid strong { overflow-wrap: anywhere; font-size: .84rem; }
+.settings-card__button-row { display: flex; flex-wrap: wrap; gap: 9px; }
+@media (max-width: 760px) { .storage-health-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 460px) { .storage-health-grid { grid-template-columns: 1fr; } .settings-card__button-row .button { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .route-loading__icon { animation: none; } }

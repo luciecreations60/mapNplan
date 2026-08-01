@@ -80,6 +80,18 @@ class AttachmentStorageService {
     return this.#getAllByIndex('documentId', String(documentId));
   }
 
+
+  async listAllMetadata() {
+    if (!this.isSupported()) return [];
+    const records = await this.#getAll();
+    return records.map((record) => ({
+      ...this.toMetadata(record),
+      tripId: String(record.tripId || ''),
+      documentId: String(record.documentId || ''),
+      reservationId: record.reservationId ? String(record.reservationId) : null,
+    }));
+  }
+
   async rename(id, name) {
     const record = await this.get(id);
     if (!record) return null;
