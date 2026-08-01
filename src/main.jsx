@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
+import { AffiliateProvider } from './contexts/AffiliateContext.jsx';
 import { LocalizationProvider } from './contexts/LocalizationContext.jsx';
 import { ThemeProvider } from './contexts/ThemeContext.jsx';
 import { TemplateProvider } from './contexts/TemplateContext.jsx';
@@ -18,9 +19,11 @@ createRoot(document.getElementById('root')).render(
     <LocalizationProvider>
       <ThemeProvider>
         <TripProvider>
-          <TemplateProvider>
-            <App />
-          </TemplateProvider>
+          <AffiliateProvider>
+            <TemplateProvider>
+              <App />
+            </TemplateProvider>
+          </AffiliateProvider>
         </TripProvider>
       </ThemeProvider>
     </LocalizationProvider>

@@ -4,11 +4,12 @@ import { createId } from '../../utils/id.js';
 import { hasValidCoordinates } from '../../utils/map.js';
 import { normalizeExternalUrl } from '../../utils/url.js';
 import { createSavedPlace } from '../../utils/savedPlaces.js';
+import { normalizeBookingOption } from '../../utils/bookingOptions.js';
 import { normalizeCompanionSettings } from '../../utils/travelCompanion.js';
 import { localStorageService } from '../storage/LocalStorageService.js';
 
 const STORAGE_KEY = 'trips';
-const CURRENT_TRIP_SCHEMA_VERSION = 15;
+const CURRENT_TRIP_SCHEMA_VERSION = 16;
 
 /**
  * Trip repository façade.
@@ -60,6 +61,7 @@ class TripService {
       reservations: [],
       documents: [],
       savedPlaces: [],
+      bookingOptions: [],
       notes: '',
       collaboration: null,
       companion: null,
@@ -154,6 +156,14 @@ class TripService {
         createdAt: now,
         updatedAt: now,
       })),
+      bookingOptions: sourceTrip.bookingOptions.map((option) => ({
+        ...option,
+        id: createId('booking-option'),
+        status: option.status === 'booked' ? 'saved' : option.status,
+        bookedAt: null,
+        createdAt: now,
+        updatedAt: now,
+      })),
       companion: {
         ...sourceTrip.companion,
         lastPreparedAt: null,
@@ -239,6 +249,7 @@ class TripService {
       sourceTemplateId: Object.hasOwn(trip, 'sourceTemplateId') ? trip.sourceTemplateId : null,
       sourceTemplateName: Object.hasOwn(trip, 'sourceTemplateName') ? trip.sourceTemplateName : '',
       savedPlaces: Object.hasOwn(trip, 'savedPlaces') ? trip.savedPlaces : [],
+      bookingOptions: Object.hasOwn(trip, 'bookingOptions') ? trip.bookingOptions : [],
     };
 
     if (!demoTrip) return migratedTrip;
@@ -251,6 +262,7 @@ class TripService {
       reservations: Object.hasOwn(trip, 'reservations') ? trip.reservations : demoTrip.reservations,
       documents: Object.hasOwn(trip, 'documents') ? trip.documents : demoTrip.documents,
       notes: Object.hasOwn(trip, 'notes') ? trip.notes : demoTrip.notes,
+      bookingOptions: Object.hasOwn(trip, 'bookingOptions') ? trip.bookingOptions : demoTrip.bookingOptions,
       destinationCurrency: Object.hasOwn(trip, 'destinationCurrency')
         ? trip.destinationCurrency
         : demoTrip.destinationCurrency,
@@ -272,6 +284,7 @@ class TripService {
     const reservations = this.#normalizeReservations(trip.reservations);
     const documents = this.#normalizeDocuments(trip.documents, reservations);
     const savedPlaces = this.#normalizeSavedPlaces(trip.savedPlaces);
+    const bookingOptions = this.#normalizeBookingOptions(trip.bookingOptions, trip.currency);
     const companion = normalizeCompanionSettings(trip.companion);
     const calculatedSpent = expenses
       .reduce((sum, expense) => sum + expense.paidAmount, 0);
@@ -316,6 +329,7 @@ class TripService {
       reservations,
       documents,
       savedPlaces,
+      bookingOptions,
       companion,
       collaboration,
       archivedAt: trip.archivedAt || null,
@@ -583,6 +597,15 @@ class TripService {
   }
 
 
+
+  #normalizeBookingOptions(options, currency) {
+    if (!Array.isArray(options)) return [];
+
+    return options
+      .map((option) => normalizeBookingOption(option, currency || APP_CONFIG.defaultCurrency))
+      .filter((option) => option.title)
+      .slice(0, 500);
+  }
 
   #normalizeSavedPlaces(savedPlaces) {
     if (!Array.isArray(savedPlaces)) return [];

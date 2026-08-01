@@ -38,7 +38,7 @@ export const APP_CONFIG = Object.freeze({
     reusableTemplates: true,
     calendarInteroperability: true,
     savedPlacesLibrary: true,
-    affiliateLinks: false,
+    affiliateLinks: true,
     aiAssistant: false,
   }),
 });

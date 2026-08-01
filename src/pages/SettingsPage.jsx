@@ -3,6 +3,7 @@ import { Button } from '../components/common/Button.jsx';
 import { Card } from '../components/common/Card.jsx';
 import { Icon } from '../components/common/Icon.jsx';
 import { InlineNotice } from '../components/feedback/InlineNotice.jsx';
+import { AffiliateSettingsCard } from '../components/settings/AffiliateSettingsCard.jsx';
 import { APP_CONFIG } from '../config/app.config.js';
 import { useI18n } from '../hooks/useI18n.js';
 import { useTheme } from '../hooks/useTheme.js';
@@ -255,6 +256,8 @@ export function SettingsPage() {
           <input ref={fileInputRef} className="sr-only" type="file" accept="application/json,.json" onChange={handleImport} />
         </div>
       </Card>
+
+      <AffiliateSettingsCard />
 
       <Card className="settings-card settings-card--danger" id="reset-demo-data">
         <header>

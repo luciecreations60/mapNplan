@@ -4330,3 +4330,93 @@
   .explore-save-form .button { width: 100%; }
   .inspiration-library-grid { grid-template-columns: 1fr; }
 }
+
+/* ========================================================================== */
+/* V0.1.16 — Booking comparison and affiliate preparation                    */
+/* ========================================================================== */
+.booking-panel { min-width: 0; }
+.booking-panel__heading { align-items: flex-start; }
+.booking-summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.booking-summary-card { display: flex; min-width: 0; align-items: center; gap: 11px; padding: 15px; }
+.booking-summary-card > span { display: grid; width: 40px; height: 40px; flex: 0 0 auto; place-items: center; border-radius: 12px; color: var(--color-primary); background: var(--color-primary-soft); }
+.booking-summary-card > div { display: grid; min-width: 0; }
+.booking-summary-card strong { overflow: hidden; font-size: 1.02rem; text-overflow: ellipsis; white-space: nowrap; }
+.booking-summary-card small { color: var(--color-text-muted); font-size: .64rem; }
+.booking-category-tabs { display: flex; max-width: 100%; overflow-x: auto; gap: 7px; padding: 4px 1px 8px; scrollbar-width: thin; }
+.booking-category-tab { display: inline-flex; min-height: 39px; flex: 0 0 auto; align-items: center; gap: 6px; padding: 0 11px; border: 1px solid var(--color-border); border-radius: 999px; color: var(--color-text-muted); background: var(--color-surface); font: inherit; font-size: .68rem; font-weight: 750; cursor: pointer; }
+.booking-category-tab:hover { color: var(--color-primary); border-color: var(--color-primary); }
+.booking-category-tab--active { color: var(--color-primary); border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border)); background: var(--color-primary-soft); }
+.booking-provider-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+.booking-provider { display: grid; min-width: 0; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 14px; border: 1px solid var(--color-border); border-radius: 14px; background: var(--color-surface-muted); }
+.booking-provider--active { border-color: color-mix(in srgb, var(--color-primary) 34%, var(--color-border)); background: color-mix(in srgb, var(--color-primary-soft) 44%, var(--color-surface)); }
+.booking-provider__icon { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 12px; color: var(--color-primary); background: var(--color-surface); }
+.booking-provider__body { min-width: 0; }
+.booking-provider__title { display: flex; min-width: 0; align-items: baseline; gap: 7px; }
+.booking-provider__title strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.booking-provider__title span { flex: 0 0 auto; color: var(--color-text-muted); font-size: .58rem; }
+.booking-provider__body p { margin: 4px 0 7px; color: var(--color-text-muted); font-size: .65rem; line-height: 1.45; }
+.booking-provider__badges { display: flex; min-width: 0; flex-wrap: wrap; gap: 5px; }
+.booking-provider__badges span { padding: 3px 6px; border-radius: 999px; color: var(--color-text-muted); background: var(--color-surface); font-size: .54rem; font-weight: 750; }
+.booking-option-form-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.booking-option-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.booking-option { position: relative; display: grid; min-width: 0; gap: 11px; padding: 15px; overflow: hidden; border: 1px solid var(--color-border); border-radius: 14px; background: var(--color-surface-muted); }
+.booking-option::before { position: absolute; top: 0; bottom: 0; left: 0; width: 4px; content: ''; background: var(--color-border-strong); }
+.booking-option--shortlisted::before { background: var(--color-warning); }
+.booking-option--booked::before { background: var(--color-success); }
+.booking-option--rejected { opacity: .68; }
+.booking-option__heading { display: grid; min-width: 0; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.booking-option__heading > span { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 11px; color: var(--color-primary); background: var(--color-primary-soft); }
+.booking-option__heading > div { min-width: 0; }
+.booking-option__heading small { color: var(--color-text-muted); font-size: .58rem; }
+.booking-option__heading h3 { margin: 3px 0 0; overflow: hidden; font-size: .84rem; text-overflow: ellipsis; white-space: nowrap; }
+.booking-option__heading > strong { max-width: 150px; overflow: hidden; font-size: .85rem; text-overflow: ellipsis; white-space: nowrap; }
+.booking-option__meta { display: flex; flex-wrap: wrap; gap: 5px; }
+.booking-option__meta span { padding: 3px 7px; border-radius: 999px; color: var(--color-text-muted); background: var(--color-surface); font-size: .55rem; font-weight: 750; }
+.booking-option > p { margin: 0; color: var(--color-text-muted); font-size: .66rem; line-height: 1.5; }
+.booking-option__actions { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; gap: 6px; padding-top: 10px; border-top: 1px solid var(--color-border); }
+.booking-option__actions .button:first-child { margin-right: auto; }
+.affiliate-analytics-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.affiliate-analytics-grid > div { display: grid; min-width: 0; gap: 4px; padding: 13px; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface-muted); }
+.affiliate-analytics-grid span { color: var(--color-text-muted); font-size: .61rem; }
+.affiliate-analytics-grid strong { overflow: hidden; font-size: .94rem; text-overflow: ellipsis; white-space: nowrap; }
+.affiliate-provider-settings { display: grid; gap: 8px; }
+.affiliate-provider-setting { overflow: hidden; border: 1px solid var(--color-border); border-radius: 13px; background: var(--color-surface-muted); }
+.affiliate-provider-setting summary { display: grid; min-width: 0; grid-template-columns: 12px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 13px 14px; cursor: pointer; list-style: none; }
+.affiliate-provider-setting summary::-webkit-details-marker { display: none; }
+.affiliate-provider-setting summary > div { display: grid; min-width: 0; }
+.affiliate-provider-setting summary strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.affiliate-provider-setting summary small { color: var(--color-text-muted); font-size: .58rem; }
+.affiliate-provider-setting summary > span:last-child { color: var(--color-text-muted); font-size: .62rem; font-weight: 750; }
+.affiliate-provider-setting__status { width: 9px; height: 9px; border-radius: 50%; background: var(--color-border-strong); }
+.affiliate-provider-setting__status--active { background: var(--color-success); box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-success) 15%, transparent); }
+.affiliate-provider-setting__body { display: grid; gap: 13px; padding: 14px; border-top: 1px solid var(--color-border); background: var(--color-surface); }
+.affiliate-settings-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+.affiliate-template-help { display: flex; min-width: 0; align-items: flex-start; gap: 6px; margin: 0; overflow-wrap: anywhere; color: var(--color-text-muted); font-size: .62rem; line-height: 1.5; }
+.affiliate-provider-setting__actions { display: flex; justify-content: flex-end; }
+.affiliate-settings-actions { margin-top: 0; }
+
+@media (max-width: 1080px) {
+  .booking-summary-grid, .affiliate-analytics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .booking-provider-grid, .booking-option-grid { grid-template-columns: 1fr; }
+  .booking-option-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 720px) {
+  .booking-panel__heading { align-items: stretch; flex-direction: column; }
+  .booking-panel__heading .button { width: 100%; }
+  .booking-summary-grid, .affiliate-analytics-grid { grid-template-columns: 1fr 1fr; }
+  .booking-provider { grid-template-columns: 38px minmax(0, 1fr); }
+  .booking-provider > .button { grid-column: 1 / -1; width: 100%; }
+  .booking-option-form-grid, .affiliate-settings-form-grid { grid-template-columns: 1fr; }
+  .booking-option-form-grid .workspace-form__wide, .booking-option-form-grid .workspace-form__full,
+  .affiliate-settings-form-grid .workspace-form__full { grid-column: auto; }
+  .booking-option__heading { grid-template-columns: 38px minmax(0, 1fr); }
+  .booking-option__heading > strong { grid-column: 2; justify-self: start; max-width: 100%; }
+  .booking-option__actions .button { width: 100%; margin-right: 0; }
+  .affiliate-provider-setting summary { grid-template-columns: 12px minmax(0, 1fr); }
+  .affiliate-provider-setting summary > span:last-child { grid-column: 2; }
+}
+
+@media (max-width: 480px) {
+  .booking-summary-grid, .affiliate-analytics-grid { grid-template-columns: 1fr; }
+}

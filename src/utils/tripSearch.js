@@ -53,6 +53,15 @@ export function tripMatchesQuery(trip, rawQuery) {
   ], query));
   if (reservationMatch) return true;
 
+  const bookingOptionMatch = (trip.bookingOptions || []).some((option) => includesQuery([
+    option.title,
+    option.providerName,
+    option.category,
+    option.status,
+    option.notes,
+  ], query));
+  if (bookingOptionMatch) return true;
+
   const savedPlaceMatch = (trip.savedPlaces || []).some((place) => includesQuery([
     place.name,
     place.label,
@@ -129,6 +138,24 @@ export function searchTripContent(trips, rawQuery, limit = 12) {
         tab: 'reservations',
         title: reservation.title,
         subtitle: [trip.name, reservation.provider, reservation.startDate].filter(Boolean).join(' · '),
+      });
+    }
+
+    for (const option of trip.bookingOptions || []) {
+      if (!includesQuery([
+        option.title,
+        option.providerName,
+        option.category,
+        option.status,
+        option.notes,
+      ], query)) continue;
+      push({
+        id: `booking-option-${trip.id}-${option.id}`,
+        type: 'bookingOption',
+        tripId: trip.id,
+        tab: 'booking',
+        title: option.title,
+        subtitle: [trip.name, option.providerName, option.currency && option.price ? `${option.price} ${option.currency}` : ''].filter(Boolean).join(' · '),
       });
     }
 
