@@ -60,11 +60,11 @@ export function OverviewPanel({ trip, onOpenTab }) {
             <div className="overview-timeline">
               {upcomingItems.map((item) => (
                 <article key={item.id} className="overview-timeline__item">
-                  <span className="overview-timeline__time">{item.time || t('overview.anyTime')}</span>
+                  <span className="overview-timeline__time"><strong>{formatPreviewDate(item.date, locale)}</strong><small>{item.time || t('overview.anyTime')}</small></span>
                   <span className="overview-timeline__marker"><Icon name={item.type} size={17} /></span>
                   <div>
                     <strong>{item.title}</strong>
-                    <small>{item.location || item.date}</small>
+                    <small>{item.location || t('overview.locationToConfirm')}</small>
                   </div>
                 </article>
               ))}
@@ -176,6 +176,12 @@ function WorkspaceEmptyState({ icon, title, copy, action, onAction }) {
       <button className="text-link" type="button" onClick={onAction}>{action} <Icon name="arrowRight" size={16} /></button>
     </div>
   );
+}
+
+function formatPreviewDate(date, locale) {
+  if (!date) return '—';
+  return new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short' })
+    .format(new Date(`${date}T12:00:00`));
 }
 
 function getReservationIcon(type) {

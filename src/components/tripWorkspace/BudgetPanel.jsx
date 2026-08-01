@@ -45,6 +45,10 @@ export function BudgetPanel({ trip, onUpdate }) {
     setForm((current) => ({ ...current, [name]: type === 'checkbox' ? checked : value }));
   }
 
+  function normalizeAmount() {
+    setForm((current) => ({ ...current, amount: formatMoneyInput(current.amount) }));
+  }
+
   function submitExpense(event) {
     event.preventDefault();
     if (!form.label.trim() || Number(form.amount) <= 0) return;
@@ -144,7 +148,7 @@ export function BudgetPanel({ trip, onUpdate }) {
                 </select>
               </Field>
               <Field label={`${t('tools.amount')} (${trip.currency})`}>
-                <input name="amount" type="number" min="0.01" step="0.01" value={form.amount} onChange={updateField} required />
+                <input name="amount" type="number" min="0.01" step="0.01" value={form.amount} onChange={updateField} onBlur={normalizeAmount} required />
               </Field>
               <Field label={t('budget.date')}>
                 <input name="date" type="date" value={form.date} onChange={updateField} />
@@ -226,6 +230,12 @@ export function BudgetPanel({ trip, onUpdate }) {
 
 function Field({ label, className = '', children }) {
   return <label className={`workspace-field ${className}`.trim()}><span>{label}</span>{children}</label>;
+}
+
+function formatMoneyInput(value) {
+  if (value === '') return '';
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.max(0, number).toFixed(2) : '';
 }
 
 function formatExpenseDate(date, locale) {

@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
+import { attachmentStorageService } from '../../services/storage/AttachmentStorageService.js';
 import { formatCurrency } from '../../utils/currency.js';
 import { createId } from '../../utils/id.js';
 import { RESERVATION_STATUSES, RESERVATION_TYPES, getCategoryLabel } from '../../utils/tripWorkspace.js';
@@ -11,11 +12,12 @@ import { Button } from '../common/Button.jsx';
 import { Card } from '../common/Card.jsx';
 import { Icon } from '../common/Icon.jsx';
 import { LocationAutocomplete } from '../common/LocationAutocomplete.jsx';
+import { InlineNotice } from '../feedback/InlineNotice.jsx';
 
 const EMPTY_FORM = Object.freeze({
   type: 'flight', title: '', provider: '', confirmationNumber: '', startDate: '', startTime: '',
   endDate: '', endTime: '', location: '', status: 'confirmed', amount: 0, url: '',
-  latitude: '', longitude: '', notes: '',
+  latitude: '', longitude: '', notes: '', sourceActivityId: null,
 });
 
 export function ReservationsPanel({ trip, onUpdate }) {
@@ -23,18 +25,37 @@ export function ReservationsPanel({ trip, onUpdate }) {
   const [form, setForm] = useState(() => ({ ...EMPTY_FORM, startDate: trip.startDate || '' }));
   const [isFormOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [feedback, setFeedback] = useState(null);
+  const [isSaving, setSaving] = useState(false);
   const formAnchorRef = useRef(null);
+  const fileInputRef = useRef(null);
   const reservations = useMemo(() => [...trip.reservations].sort(compareReservations), [trip.reservations]);
+  const documentsByReservation = useMemo(() => {
+    const grouped = new Map();
+    for (const document of trip.documents || []) {
+      if (!document.linkedReservationId) continue;
+      grouped.set(document.linkedReservationId, [...(grouped.get(document.linkedReservationId) || []), document]);
+    }
+    return grouped;
+  }, [trip.documents]);
 
   function updateField(event) {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
   }
 
+  function scrollToForm() {
+    window.requestAnimationFrame(() => formAnchorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  }
+
   function openCreateForm() {
     setEditingId(null);
     setForm({ ...EMPTY_FORM, startDate: trip.startDate || '' });
+    setSelectedFiles([]);
+    setFeedback(null);
     setFormOpen(true);
+    scrollToForm();
   }
 
   function openEditForm(reservation) {
@@ -50,25 +71,44 @@ export function ReservationsPanel({ trip, onUpdate }) {
       endTime: reservation.endTime || '',
       location: reservation.location || '',
       status: reservation.status || 'pending',
-      amount: reservation.amount || 0,
+      amount: Number(reservation.amount || 0).toFixed(2),
       url: reservation.url || '',
       latitude: reservation.latitude ?? '',
       longitude: reservation.longitude ?? '',
       notes: reservation.notes || '',
+      sourceActivityId: reservation.sourceActivityId || null,
     });
+    setSelectedFiles([]);
+    setFeedback(null);
     setFormOpen(true);
-    window.requestAnimationFrame(() => formAnchorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    scrollToForm();
   }
 
   function closeForm() {
     setEditingId(null);
+    setSelectedFiles([]);
     setFormOpen(false);
   }
 
-  function submitReservation(event) {
-    event.preventDefault();
-    if (!form.title.trim()) return;
+  function chooseFiles(event) {
+    const files = [...(event.target.files || [])].slice(0, 5);
+    event.target.value = '';
+    try {
+      files.forEach((file) => attachmentStorageService.validateFile(file));
+      setSelectedFiles(files);
+      setFeedback(null);
+    } catch (error) {
+      setSelectedFiles([]);
+      setFeedback({ tone: 'danger', title: t('reservations.documentErrorTitle'), message: error.message });
+    }
+  }
 
+  async function submitReservation(event) {
+    event.preventDefault();
+    if (!form.title.trim() || isSaving) return;
+
+    setSaving(true);
+    setFeedback(null);
     const previousReservation = trip.reservations.find((reservation) => reservation.id === editingId);
     const reservation = {
       id: editingId || createId('reservation'),
@@ -85,6 +125,7 @@ export function ReservationsPanel({ trip, onUpdate }) {
       reminderMinutes: previousReservation?.reminderMinutes ?? null,
       externalCalendarUid: previousReservation?.externalCalendarUid || '',
       comments: previousReservation?.comments || [],
+      sourceActivityId: previousReservation?.sourceActivityId || form.sourceActivityId || null,
       createdAt: previousReservation?.createdAt || new Date().toISOString(),
     };
 
@@ -92,8 +133,63 @@ export function ReservationsPanel({ trip, onUpdate }) {
       ? trip.reservations.map((item) => item.id === editingId ? reservation : item)
       : [...trip.reservations, reservation];
 
-    onUpdate({ reservations: nextReservations });
-    closeForm();
+    let nextDocuments = [...(trip.documents || [])];
+    const savedAttachments = [];
+
+    try {
+      if (selectedFiles.length > 0) {
+        const existingDocument = nextDocuments.find((document) => document.linkedReservationId === reservation.id);
+        const document = existingDocument || {
+          id: createId('document'),
+          type: 'booking',
+          title: t('reservations.generatedDocumentTitle', { name: reservation.title }),
+          reference: reservation.confirmationNumber,
+          url: reservation.url,
+          expiryDate: reservation.endDate || '',
+          notes: reservation.notes,
+          linkedReservationId: reservation.id,
+          attachments: [],
+          createdAt: new Date().toISOString(),
+        };
+
+        for (const file of selectedFiles) {
+          const metadata = await attachmentStorageService.saveFile({
+            file,
+            tripId: trip.id,
+            documentId: document.id,
+            reservationId: reservation.id,
+          });
+          savedAttachments.push(metadata);
+        }
+
+        const updatedDocument = {
+          ...document,
+          title: existingDocument?.title || t('reservations.generatedDocumentTitle', { name: reservation.title }),
+          reference: existingDocument?.reference || reservation.confirmationNumber,
+          url: existingDocument?.url || reservation.url,
+          linkedReservationId: reservation.id,
+          attachments: [...(document.attachments || []), ...savedAttachments],
+        };
+        nextDocuments = existingDocument
+          ? nextDocuments.map((item) => item.id === existingDocument.id ? updatedDocument : item)
+          : [...nextDocuments, updatedDocument];
+      }
+
+      onUpdate({ reservations: nextReservations, documents: nextDocuments });
+      setFeedback({
+        tone: 'success',
+        title: t('reservations.savedTitle'),
+        message: selectedFiles.length > 0
+          ? t('reservations.savedWithFiles', { count: selectedFiles.length })
+          : t('reservations.savedText'),
+      });
+      closeForm();
+    } catch (error) {
+      await Promise.allSettled(savedAttachments.map((attachment) => attachmentStorageService.delete(attachment.id)));
+      setFeedback({ tone: 'danger', title: t('reservations.documentErrorTitle'), message: error.message });
+    } finally {
+      setSaving(false);
+    }
   }
 
   function updateStatus(reservationId, status) {
@@ -104,7 +200,6 @@ export function ReservationsPanel({ trip, onUpdate }) {
     if (!window.confirm(t('reservations.deleteConfirm', { name: reservation.title }))) return;
     onUpdate({ reservations: trip.reservations.filter((item) => item.id !== reservation.id) });
   }
-
 
   function addReservationComment(reservation, message) {
     const actorName = getCurrentActorName(trip);
@@ -135,70 +230,66 @@ export function ReservationsPanel({ trip, onUpdate }) {
         </Button>
       </section>
 
+      {feedback && <InlineNotice tone={feedback.tone} title={feedback.title}>{feedback.message}</InlineNotice>}
+
       {isFormOpen && (
         <>
           <div ref={formAnchorRef} className="workspace-form-anchor" />
           <Card className="workspace-form-card">
-          <form className="workspace-form" onSubmit={submitReservation}>
-            <div className="workspace-form__title-row">
-              <div>
-                <p className="eyebrow">{t(editingId ? 'reservations.editEyebrow' : 'reservations.newEyebrow')}</p>
-                <h3>{t(editingId ? 'reservations.editTitle' : 'reservations.newTitle')}</h3>
+            <form className="workspace-form" onSubmit={submitReservation}>
+              <div className="workspace-form__title-row">
+                <div>
+                  <p className="eyebrow">{t(editingId ? 'reservations.editEyebrow' : 'reservations.newEyebrow')}</p>
+                  <h3>{t(editingId ? 'reservations.editTitle' : 'reservations.newTitle')}</h3>
+                </div>
               </div>
-            </div>
-            <div className="workspace-form__grid">
-              <Field label={t('reservations.type')}>
-                <select name="type" value={form.type} onChange={updateField}>
-                  {RESERVATION_TYPES.map((type) => <option key={type.id} value={type.id}>{t(type.labelKey)}</option>)}
-                </select>
-              </Field>
-              <Field label={t('common.status')}>
-                <select name="status" value={form.status} onChange={updateField}>
-                  {RESERVATION_STATUSES.map((status) => <option key={status.id} value={status.id}>{t(status.labelKey)}</option>)}
-                </select>
-              </Field>
-              <Field label={t('reservations.titleLabel')} className="workspace-form__wide"><input name="title" value={form.title} onChange={updateField} placeholder={t('reservations.titlePlaceholder')} required /></Field>
-              <Field label={t('common.provider')}><input name="provider" value={form.provider} onChange={updateField} placeholder={t('reservations.providerPlaceholder')} /></Field>
-              <Field label={t('reservations.confirmationNumber')}><input name="confirmationNumber" value={form.confirmationNumber} onChange={updateField} placeholder={t('reservations.optionalReference')} /></Field>
-              <Field label={t('reservations.startDate')}><input name="startDate" type="date" value={form.startDate} onChange={updateField} /></Field>
-              <Field label={t('reservations.startTime')}><input name="startTime" type="time" value={form.startTime} onChange={updateField} /></Field>
-              <Field label={t('reservations.endDate')}><input name="endDate" type="date" value={form.endDate} onChange={updateField} /></Field>
-              <Field label={t('reservations.endTime')}><input name="endTime" type="time" value={form.endTime} onChange={updateField} /></Field>
-              <LocationAutocomplete
-                id="reservation-location"
-                variant="workspace"
-                className="workspace-form__wide"
-                label={t('common.location')}
-                value={form.location}
-                placeholder={t('reservations.locationPlaceholder')}
-                bias={{ latitude: trip.destinationLatitude, longitude: trip.destinationLongitude }}
-                hint={t('placeSearch.locationHint')}
-                onValueChange={(value) => setForm((current) => ({
-                  ...current, location: value, latitude: '', longitude: '',
-                }))}
-                onPlaceSelect={(place) => {
-                  if (!place) return;
-                  setForm((current) => ({
-                    ...current,
-                    location: place.label,
-                    latitude: place.latitude,
-                    longitude: place.longitude,
-                  }));
-                }}
-              />
-              <Field label={`${t('tools.amount')} (${trip.currency})`}><input name="amount" type="number" min="0" step="0.01" value={form.amount} onChange={updateField} /></Field>
-              <Field label={t('reservations.bookingLink')}><input name="url" type="url" value={form.url} onChange={updateField} placeholder={t('reservations.linkPlaceholder')} /></Field>
-              <Field label={t('common.latitude')}><input name="latitude" type="number" min="-90" max="90" step="any" value={form.latitude} onChange={updateField} placeholder="35.6762" /></Field>
-              <Field label={t('common.longitude')}><input name="longitude" type="number" min="-180" max="180" step="any" value={form.longitude} onChange={updateField} placeholder="139.6503" /></Field>
-              <Field label={t('common.notes')} className="workspace-form__full"><textarea name="notes" rows="3" value={form.notes} onChange={updateField} placeholder={t('reservations.notesPlaceholder')} /></Field>
-            </div>
-            <div className="workspace-form__actions">
-              <Button variant="ghost" onClick={closeForm}>{t('common.cancel')}</Button>
-              <Button type="submit" icon={editingId ? 'save' : 'plus'}>
-                {t(editingId ? 'reservations.saveChanges' : 'reservations.save')}
-              </Button>
-            </div>
-          </form>
+              <div className="workspace-form__grid">
+                <Field label={t('reservations.type')}>
+                  <select name="type" value={form.type} onChange={updateField}>
+                    {RESERVATION_TYPES.map((type) => <option key={type.id} value={type.id}>{t(type.labelKey)}</option>)}
+                  </select>
+                </Field>
+                <Field label={t('common.status')}>
+                  <select name="status" value={form.status} onChange={updateField}>
+                    {RESERVATION_STATUSES.map((status) => <option key={status.id} value={status.id}>{t(status.labelKey)}</option>)}
+                  </select>
+                </Field>
+                <Field label={t('reservations.titleLabel')} className="workspace-form__wide"><input name="title" value={form.title} onChange={updateField} placeholder={t('reservations.titlePlaceholder')} required /></Field>
+                <Field label={t('common.provider')}><input name="provider" value={form.provider} onChange={updateField} placeholder={t('reservations.providerPlaceholder')} /></Field>
+                <Field label={t('reservations.confirmationNumber')}><input name="confirmationNumber" value={form.confirmationNumber} onChange={updateField} placeholder={t('reservations.optionalReference')} /></Field>
+                <Field label={t('reservations.startDate')}><input name="startDate" type="date" value={form.startDate} onChange={updateField} /></Field>
+                <Field label={t('reservations.startTime')}><input name="startTime" type="time" value={form.startTime} onChange={updateField} /></Field>
+                <Field label={t('reservations.endDate')}><input name="endDate" type="date" value={form.endDate} onChange={updateField} /></Field>
+                <Field label={t('reservations.endTime')}><input name="endTime" type="time" value={form.endTime} onChange={updateField} /></Field>
+                <LocationAutocomplete
+                  id="reservation-location"
+                  variant="workspace"
+                  className="workspace-form__wide"
+                  label={t('common.location')}
+                  value={form.location}
+                  placeholder={t('reservations.locationPlaceholder')}
+                  bias={{ latitude: trip.destinationLatitude, longitude: trip.destinationLongitude }}
+                  hint={t('placeSearch.locationHint')}
+                  onValueChange={(value) => setForm((current) => ({ ...current, location: value, latitude: '', longitude: '' }))}
+                  onPlaceSelect={(place) => place && setForm((current) => ({ ...current, location: place.label, latitude: place.latitude, longitude: place.longitude }))}
+                />
+                <Field label={`${t('tools.amount')} (${trip.currency})`}><input name="amount" type="number" min="0" step="0.01" value={form.amount} onChange={updateField} onBlur={() => setForm((current) => ({ ...current, amount: normalizeMoney(current.amount) }))} /></Field>
+                <Field label={t('reservations.bookingLink')}><input name="url" type="url" value={form.url} onChange={updateField} placeholder={t('reservations.linkPlaceholder')} /></Field>
+                <Field label={t('common.latitude')}><input name="latitude" type="number" min="-90" max="90" step="any" value={form.latitude} onChange={updateField} placeholder="35.6762" /></Field>
+                <Field label={t('common.longitude')}><input name="longitude" type="number" min="-180" max="180" step="any" value={form.longitude} onChange={updateField} placeholder="139.6503" /></Field>
+                <Field label={t('common.notes')} className="workspace-form__full"><textarea name="notes" rows="3" value={form.notes} onChange={updateField} placeholder={t('reservations.notesPlaceholder')} /></Field>
+                <Field label={t('reservations.documents')} className="workspace-form__full">
+                  <input ref={fileInputRef} type="file" multiple accept="application/pdf,image/*,.doc,.docx,.xls,.xlsx,.txt" onChange={chooseFiles} />
+                  <small>{selectedFiles.length > 0 ? t('reservations.filesSelected', { count: selectedFiles.length }) : t('reservations.documentsHint')}</small>
+                </Field>
+              </div>
+              <div className="workspace-form__actions">
+                <Button variant="ghost" onClick={closeForm}>{t('common.cancel')}</Button>
+                <Button type="submit" icon={editingId ? 'save' : 'plus'} disabled={isSaving}>
+                  {isSaving ? t('common.loading') : t(editingId ? 'reservations.saveChanges' : 'reservations.save')}
+                </Button>
+              </div>
+            </form>
           </Card>
         </>
       )}
@@ -207,6 +298,8 @@ export function ReservationsPanel({ trip, onUpdate }) {
         <div className="reservation-list">
           {reservations.map((reservation) => {
             const safeUrl = normalizeExternalUrl(reservation.url);
+            const linkedDocuments = documentsByReservation.get(reservation.id) || [];
+            const attachmentCount = linkedDocuments.reduce((sum, document) => sum + (document.attachments?.length || 0), 0);
             return (
               <Card key={reservation.id} className="reservation-card">
                 <div className={`reservation-card__icon reservation-card__icon--${reservation.type}`}><Icon name={getReservationIcon(reservation.type)} size={21} /></div>
@@ -220,22 +313,13 @@ export function ReservationsPanel({ trip, onUpdate }) {
                     {reservation.location && <span><Icon name="pin" size={15} /> {reservation.location}</span>}
                     {reservation.provider && <span><Icon name="building" size={15} /> {reservation.provider}</span>}
                     {reservation.amount > 0 && <span><Icon name="wallet" size={15} /> {formatCurrency(reservation.amount, trip.currency, locale)}</span>}
+                    {attachmentCount > 0 && <span><Icon name="paperclip" size={15} /> {t('reservations.documentCount', { count: attachmentCount })}</span>}
                   </div>
                   {reservation.confirmationNumber && <p className="reservation-card__reference">{t('reservations.confirmation')} <strong>{reservation.confirmationNumber}</strong></p>}
                   {reservation.notes && <p className="reservation-card__notes">{reservation.notes}</p>}
-                  <DiscussionThread
-                    comments={reservation.comments}
-                    currentUserName={getCurrentActorName(trip)}
-                    onAdd={(message) => addReservationComment(reservation, message)}
-                    onRemove={(commentId) => removeReservationComment(reservation.id, commentId)}
-                  />
+                  <DiscussionThread comments={reservation.comments} currentUserName={getCurrentActorName(trip)} onAdd={(message) => addReservationComment(reservation, message)} onRemove={(commentId) => removeReservationComment(reservation.id, commentId)} />
                   <div className="reservation-card__actions">
-                    <label>
-                      <span className="sr-only">{t('reservations.status')}</span>
-                      <select value={reservation.status} onChange={(event) => updateStatus(reservation.id, event.target.value)}>
-                        {RESERVATION_STATUSES.map((status) => <option key={status.id} value={status.id}>{t(status.labelKey)}</option>)}
-                      </select>
-                    </label>
+                    <label><span className="sr-only">{t('reservations.status')}</span><select value={reservation.status} onChange={(event) => updateStatus(reservation.id, event.target.value)}>{RESERVATION_STATUSES.map((status) => <option key={status.id} value={status.id}>{t(status.labelKey)}</option>)}</select></label>
                     {safeUrl && <a className="text-link" href={safeUrl} target="_blank" rel="noreferrer">{t('reservations.openBooking')} <Icon name="externalLink" size={15} /></a>}
                     <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.edit')} ${reservation.title}`} onClick={() => openEditForm(reservation)}><Icon name="edit" size={16} /></button>
                     <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.delete')} ${reservation.title}`} onClick={() => removeReservation(reservation)}><Icon name="trash" size={16} /></button>
@@ -260,24 +344,20 @@ export function ReservationsPanel({ trip, onUpdate }) {
 function Field({ label, className = '', children }) {
   return <label className={`workspace-field ${className}`.trim()}><span>{label}</span>{children}</label>;
 }
-
+function normalizeMoney(value) {
+  if (value === '') return '';
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.max(0, number).toFixed(2) : '';
+}
 function compareReservations(left, right) {
   const leftKey = `${left.startDate || '9999-12-31'}T${left.startTime || '23:59'}`;
   const rightKey = `${right.startDate || '9999-12-31'}T${right.startTime || '23:59'}`;
   return leftKey.localeCompare(rightKey);
 }
-
 function formatReservationDate(reservation, locale, t) {
   if (!reservation.startDate) return reservation.startTime || t('reservations.timeToConfirm');
-  const date = new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric', year: 'numeric' })
-    .format(new Date(`${reservation.startDate}T12:00:00`));
+  const date = new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(`${reservation.startDate}T12:00:00`));
   return reservation.startTime ? `${date} · ${reservation.startTime}` : date;
 }
-
-function getReservationIcon(type) {
-  return { flight: 'plane', accommodation: 'hotel', transport: 'car', activity: 'ticket' }[type] || 'ticket';
-}
-
-function getStatusTone(status) {
-  return { confirmed: 'success', pending: 'warning', cancelled: 'neutral' }[status] || 'neutral';
-}
+function getReservationIcon(type) { return { flight: 'plane', accommodation: 'hotel', transport: 'car', activity: 'ticket' }[type] || 'ticket'; }
+function getStatusTone(status) { return { confirmed: 'success', pending: 'warning', cancelled: 'neutral' }[status] || 'neutral'; }

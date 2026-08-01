@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
 import { formatCurrency } from '../../utils/currency.js';
 import { createId } from '../../utils/id.js';
+import { buildTripDateRange } from '../../utils/itinerary.js';
 import {
   buildParticipantBalances,
   buildSettlementSuggestions,
@@ -50,7 +51,7 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
   const [expenseForm, setExpenseForm] = useState(() => createEmptyExpenseForm(participants));
   const [participantForm, setParticipantForm] = useState(EMPTY_PARTICIPANT_FORM);
   const [settlementForm, setSettlementForm] = useState(() => createEmptySettlementForm(participants));
-  const [filters, setFilters] = useState({ search: '', participantId: 'all', category: 'all', status: 'all' });
+  const [filters, setFilters] = useState({ search: '', participantId: 'all', category: 'all', status: 'all', sort: 'dateDesc' });
   const [notice, setNotice] = useState(null);
   const [pendingDelete, setPendingDelete] = useState(null);
 
@@ -60,6 +61,10 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
   const participantsById = useMemo(
     () => new Map(participants.map((participant) => [participant.id, participant])),
     [participants],
+  );
+  const itineraryDates = useMemo(
+    () => buildTripDateRange(trip.startDate, trip.endDate),
+    [trip.startDate, trip.endDate],
   );
 
   const filteredExpenses = useMemo(() => {
@@ -77,7 +82,7 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
         const matchesStatus = filters.status === 'all' || status === filters.status;
         return matchesSearch && matchesParticipant && matchesCategory && matchesStatus;
       })
-      .sort((left, right) => (right.date || '').localeCompare(left.date || ''));
+      .sort((left, right) => compareExpenses(left, right, filters.sort, locale));
   }, [filters, locale, trip.expenses]);
 
   function showNotice(tone, title, message) {
@@ -95,8 +100,8 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
       id: expense.id,
       label: expense.label,
       category: expense.category,
-      amount: String(expense.amount || ''),
-      paidAmount: String(getExpensePaidAmount(expense) || ''),
+      amount: Number(expense.amount || 0).toFixed(2),
+      paidAmount: Number(getExpensePaidAmount(expense) || 0).toFixed(2),
       date: expense.date || TODAY,
       paidById: expense.paidById || participants[0]?.id || '',
       splitBetweenIds: [...(expense.splitBetweenIds || participants.map((participant) => participant.id))],
@@ -108,6 +113,10 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
   function updateExpenseField(event) {
     const { name, value } = event.target;
     setExpenseForm((current) => ({ ...current, [name]: value }));
+  }
+
+  function normalizeMoneyField(fieldName) {
+    setExpenseForm((current) => ({ ...current, [fieldName]: normalizeMoney(current[fieldName]) }));
   }
 
   function toggleSplitParticipant(participantId) {
@@ -406,6 +415,12 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
             <option value="partial">{t('sharedExpenses.statuses.partial')}</option>
             <option value="paid">{t('sharedExpenses.statuses.paid')}</option>
           </select>
+          <select value={filters.sort} aria-label={t('sharedExpenses.sortLabel')} onChange={(event) => setFilters((current) => ({ ...current, sort: event.target.value }))}>
+            <option value="dateDesc">{t('sharedExpenses.sort.dateDesc')}</option>
+            <option value="dateAsc">{t('sharedExpenses.sort.dateAsc')}</option>
+            <option value="labelAsc">{t('sharedExpenses.sort.labelAsc')}</option>
+            <option value="labelDesc">{t('sharedExpenses.sort.labelDesc')}</option>
+          </select>
         </div>
 
         {filteredExpenses.length > 0 ? (
@@ -485,9 +500,12 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
         form={expenseForm}
         participants={participants}
         currency={trip.currency}
+        itineraryDates={itineraryDates}
+        locale={locale}
         t={t}
         onClose={() => setExpenseModalOpen(false)}
         onFieldChange={updateExpenseField}
+        onMoneyBlur={normalizeMoneyField}
         onToggleParticipant={toggleSplitParticipant}
         onSubmit={submitExpense}
       />
@@ -505,7 +523,7 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
   );
 }
 
-function ExpenseDialog({ isOpen, form, participants, currency, t, onClose, onFieldChange, onToggleParticipant, onSubmit }) {
+function ExpenseDialog({ isOpen, form, participants, currency, itineraryDates, locale, t, onClose, onFieldChange, onMoneyBlur, onToggleParticipant, onSubmit }) {
   return (
     <Modal
       isOpen={isOpen}
@@ -517,9 +535,12 @@ function ExpenseDialog({ isOpen, form, participants, currency, t, onClose, onFie
         <div className="workspace-form__grid">
           <label className="workspace-field workspace-form__wide"><span>{t('sharedExpenses.expenseLabel')}</span><input name="label" value={form.label} onChange={onFieldChange} placeholder={t('sharedExpenses.expensePlaceholder')} required /></label>
           <label className="workspace-field"><span>{t('sharedExpenses.category')}</span><select name="category" value={form.category} onChange={onFieldChange}>{EXPENSE_CATEGORIES.map((category) => <option key={category.id} value={category.id}>{t(category.labelKey)}</option>)}</select></label>
-          <label className="workspace-field"><span>{t('sharedExpenses.totalAmount')} ({currency})</span><input name="amount" type="number" min="0.01" step="0.01" value={form.amount} onChange={onFieldChange} required /></label>
-          <label className="workspace-field"><span>{t('sharedExpenses.paidAmount')} ({currency})</span><input name="paidAmount" type="number" min="0" step="0.01" max={form.amount || undefined} value={form.paidAmount} onChange={onFieldChange} /></label>
-          <label className="workspace-field"><span>{t('common.date')}</span><input name="date" type="date" value={form.date} onChange={onFieldChange} /></label>
+          <label className="workspace-field"><span>{t('sharedExpenses.totalAmount')} ({currency})</span><input name="amount" type="number" min="0.01" step="0.01" value={form.amount} onChange={onFieldChange} onBlur={() => onMoneyBlur('amount')} required /></label>
+          <label className="workspace-field"><span>{t('sharedExpenses.paidAmount')} ({currency})</span><input name="paidAmount" type="number" min="0" step="0.01" max={form.amount || undefined} value={form.paidAmount} onChange={onFieldChange} onBlur={() => onMoneyBlur('paidAmount')} /></label>
+          <label className="workspace-field"><span>{t('sharedExpenses.itineraryDate')}</span><select name="date" value={form.date} onChange={onFieldChange}>
+            <option value="">{t('common.none')}</option>
+            {itineraryDates.map((date) => <option key={date} value={date}>{formatDate(date, locale)}</option>)}
+          </select></label>
           <label className="workspace-field"><span>{t('sharedExpenses.paidBy')}</span><select name="paidById" value={form.paidById} onChange={onFieldChange}>{participants.map((participant) => <option key={participant.id} value={participant.id}>{participant.name}</option>)}</select></label>
           <fieldset className="participant-split-field workspace-form__wide">
             <legend>{t('sharedExpenses.splitBetween')}</legend>
@@ -542,6 +563,20 @@ function ExpenseDialog({ isOpen, form, participants, currency, t, onClose, onFie
       </form>
     </Modal>
   );
+}
+
+function normalizeMoney(value) {
+  if (value === '') return '';
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.max(0, number).toFixed(2) : '';
+}
+
+function compareExpenses(left, right, sort, locale) {
+  if (sort === 'labelAsc') return String(left.label || '').localeCompare(String(right.label || ''), locale, { sensitivity: 'base' });
+  if (sort === 'labelDesc') return String(right.label || '').localeCompare(String(left.label || ''), locale, { sensitivity: 'base' });
+  const dateComparison = String(left.date || '').localeCompare(String(right.date || ''));
+  if (dateComparison !== 0) return sort === 'dateAsc' ? dateComparison : -dateComparison;
+  return String(left.label || '').localeCompare(String(right.label || ''), locale, { sensitivity: 'base' });
 }
 
 function SummaryCard({ label, value, hint, primary = false }) {

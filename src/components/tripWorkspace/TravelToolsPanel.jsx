@@ -64,7 +64,7 @@ export function TravelToolsPanel({ trip, onOpenTab }) {
       </section>
 
       <div className="travel-tools-grid">
-        <WeatherCard forecast={forecast} location={location} status={status} error={error} onRefresh={() => loadForecast(true)} />
+        <WeatherCard forecast={forecast} location={location} status={status} error={error} tripStartDate={trip.startDate} tripEndDate={trip.endDate} onRefresh={() => loadForecast(true)} />
         <div className="travel-tools-grid__side">
           <LocalTimeCard timezone={forecast?.timezone} timezoneAbbreviation={forecast?.timezoneAbbreviation} locationLabel={location.label} />
           <CurrencyConverter baseCurrency={trip.currency} destinationCurrency={trip.destinationCurrency} />
