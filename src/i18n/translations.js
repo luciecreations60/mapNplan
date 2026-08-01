@@ -21,7 +21,7 @@ export const TRANSLATIONS = Object.freeze({
       search: 'Search trips and places', notifications: 'Notifications', profile: 'Open profile',
       buildTitle: 'Build your next journey',
       buildText: 'Planning, budgets and reservations will live in one calm workspace.',
-      foundation: 'Foundation',
+      foundation: 'Release candidate',
     },
     theme: {
       light: 'Light', dark: 'Dark', system: 'System',
@@ -718,7 +718,7 @@ export const TRANSLATIONS = Object.freeze({
       search: 'Rechercher des voyages et des lieux', notifications: 'Notifications', profile: 'Ouvrir le profil',
       buildTitle: 'Construisez votre prochain voyage',
       buildText: 'Planning, budgets et réservations réunis dans un espace simple et apaisé.',
-      foundation: 'Fondations',
+      foundation: 'Version candidate',
     },
     theme: {
       light: 'Clair', dark: 'Sombre', system: 'Système',
