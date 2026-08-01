@@ -17,3 +17,8 @@ Une réservation peut recevoir des fichiers lors de sa création ou modification
 ## Présentation et dépenses
 
 Le chevauchement entre l’icône et le texte des champs Lieu est corrigé avec une règle commune. La taille de base passe à 16 px et les espacements de formulaires sont resserrés. Les montants sont normalisés à deux décimales. Les dépenses de groupe peuvent être triées par date ou ordre alphabétique et leur date peut être choisie dans les journées du voyage.
+
+
+## Correctif après premier déploiement RC2
+
+Correction de la configuration Vite 8 : remplacement de `manualChunks` objet par `rolldownOptions.output.codeSplitting.groups`. Aucun changement métier ou de données.

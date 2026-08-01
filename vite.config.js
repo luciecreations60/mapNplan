@@ -47,12 +47,23 @@ export default defineConfig({
     sourcemap: true,
     target: 'es2022',
     chunkSizeWarningLimit: 750,
-    rollupOptions: {
+    rolldownOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'map-vendor': ['leaflet'],
-          'icons-vendor': ['lucide-react'],
+        codeSplitting: {
+          groups: [
+            {
+              test: /node_modules[\\/](react|react-dom|react-router|react-router-dom)[\\/]/,
+              name: 'react-vendor',
+            },
+            {
+              test: /node_modules[\\/]leaflet[\\/]/,
+              name: 'map-vendor',
+            },
+            {
+              test: /node_modules[\\/]lucide-react[\\/]/,
+              name: 'icons-vendor',
+            },
+          ],
         },
       },
     },

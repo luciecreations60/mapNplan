@@ -1,15 +1,13 @@
 {
   "version": "0.1.23",
   "candidate": "rc.2",
+  "hotfix": "vite8-code-splitting",
   "stage": "release-candidate",
   "tripSchemaVersion": 17,
-  "part": 24,
-  "automatedTests": 38,
-  "releaseAuditChecks": 35,
+  "automatedTests": 39,
   "translationKeysPerLocale": 1606,
   "publicIndexingEnabled": false,
-  "generatedFor": "V0.1 Part 24",
-  "fileCount": 187,
+  "fileCount": 188,
   "files": [
     {
       "path": ".env.example",
@@ -43,8 +41,13 @@
     },
     {
       "path": "DELIVERY_NOTES.md",
-      "size": 1898,
-      "sha256": "92f6fdec816b8a92ecb271a1c9da361933db3bd64b72328e99587076ee3b6f2a"
+      "size": 2115,
+      "sha256": "94395b8de4507ee095f15331534043a412f8188241ecfb9f703676d751b30940"
+    },
+    {
+      "path": "HOTFIX_NOTES.md",
+      "size": 554,
+      "sha256": "d9339b97bc2ec78dd48ec18dbb80f3bbb4db0d56d9b8bdf4d1bc679dcfee0d75"
     },
     {
       "path": "KNOWN_LIMITATIONS.md",
@@ -53,8 +56,8 @@
     },
     {
       "path": "QUALITY_REPORT.md",
-      "size": 964,
-      "sha256": "dbf30d25d5146870e286177352ded40762e5d6e1191f1cee2c8467b66bcceb76"
+      "size": 1153,
+      "sha256": "3b7ac79594cf8b577b5e046cd74b6fbd73a75a5055e2292a499cc80782e2d097"
     },
     {
       "path": "README.md",
@@ -93,8 +96,8 @@
     },
     {
       "path": "UPLOAD_TO_GITHUB.md",
-      "size": 777,
-      "sha256": "b9b89ee95b4055e537124546b3d915bdbfc7a4e75064a26aa531c9baca9fba34"
+      "size": 999,
+      "sha256": "a5a978e09a31a215e79260dcd5675c0573d864c3d7649147e9e7d3e56fa7a564"
     },
     {
       "path": "V1_READINESS_REPORT.md",
@@ -893,8 +896,8 @@
     },
     {
       "path": "tests/performance-contract.test.mjs",
-      "size": 1040,
-      "sha256": "574654ef7cee3f8b9ac2ccff9c2d65bb06bd5b9e7ede7940429bc11a8f73d802"
+      "size": 1415,
+      "sha256": "79f6199bfb5e19486bcea21a5b9f111d0e9d3f2e9beacdab438e78ffa2d1656c"
     },
     {
       "path": "tests/release-contract.test.mjs",
@@ -938,8 +941,8 @@
     },
     {
       "path": "vite.config.js",
-      "size": 2097,
-      "sha256": "02cd82649df34c9238e7f7877145c6098c3ffcbb1f970bbb06e2bc3ecaf76f64"
+      "size": 2379,
+      "sha256": "14450c0efdd8d598d9ce250ff70cdfbe317cb8361ffa7d13940fc76387edc6f7"
     }
   ]
 }
