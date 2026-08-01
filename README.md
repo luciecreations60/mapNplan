@@ -1,24 +1,24 @@
-# TripFlow — V0.1.13
+# TripFlow — V0.1.14
 
 > Every journey starts here.
 
 TripFlow is a responsive, bilingual travel-planning application built with
-React and Vite. It currently includes trip planning, maps, reservations,
-budgets, group expenses, travel-day assistance, sharing, route optimization,
-a private local document vault and reusable planning templates.
+React and Vite. It includes trip planning, maps, reservations, budgets, group
+expenses, travel-day assistance, sharing, route optimization, a private local
+document vault, reusable planning templates and calendar interoperability.
 
-## Reusable templates
+## Calendar interoperability
 
-The **Templates** workspace provides:
+The **Calendar** workspace can:
 
-- four built-in trip structures;
-- personal trip templates created from existing journeys;
-- reusable itinerary-day templates;
-- checklist presets for city, road, beach and business travel;
-- JSON import and export for personal template libraries.
+- export the complete trip or one selected day as an ICS file;
+- add an individual event to Google Calendar or Outlook;
+- download an event for Apple Calendar and other ICS-compatible apps;
+- import events from an ICS file after a review step;
+- store reminders on activities and reservations;
+- detect scheduling conflicts and incomplete calendar data.
 
-Private reservations, confirmation numbers, comments and binary attachments are
-never copied into personal templates.
+The feature remains local and requires no paid account or server.
 
 ## Run locally
 

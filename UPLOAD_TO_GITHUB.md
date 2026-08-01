@@ -1,6 +1,6 @@
-# Upload V0.1 Part 14 to GitHub
+# Upload V0.1 Part 15 to GitHub
 
-1. Extract `travel-planner-v0.1-part14.zip`.
+1. Extract `travel-planner-v0.1-part15.zip`.
 2. Open the `travel-planner` repository on GitHub.
 3. Choose **Add file → Upload files**.
 4. Upload the complete contents of the extracted folder.
@@ -8,7 +8,7 @@
 6. Commit directly to `main` with:
 
 ```text
-feat: add v0.1.13 reusable trip templates
+feat: add v0.1.14 calendar interoperability
 ```
 
 7. Open **Actions** and wait for the green check mark.

@@ -1,79 +1,71 @@
-# Architecture — V0.1.13
+# Architecture — V0.1.14
 
-## Template domain boundary
+## Calendar domain boundary
 
-Reusable planning assets are separated from journeys:
+Calendar interoperability is split into a pure domain utility and a browser
+adapter:
 
-- `TripService` owns real trip instances and schema migrations;
-- `TemplateService` owns reusable trip and day templates;
-- `TemplateContext` keeps React synchronized with the template repository;
-- `builtInTemplates.js` generates translated starter templates.
+- `calendarInterop.js` builds and parses ICS content, computes event end times,
+  detects conflicts and converts imported events into itinerary activities;
+- `CalendarInteropService.js` handles browser downloads and provider links;
+- `tripCalendar.js` maps itinerary activities and reservations to one stable
+  calendar-event representation;
+- `CalendarPanel.jsx` orchestrates the user interface without containing the
+  calendar file-format rules.
 
-This separation prevents templates from inheriting private trip data and allows
-a future template marketplace or cloud library to replace LocalStorage without
-rewriting trip pages.
+This boundary allows a future CalDAV, Microsoft Graph or Google Calendar API
+integration without rewriting itinerary and reservation components.
 
-## Stored template types
-
-### Trip template
-
-```js
-{
-  id,
-  name,
-  description,
-  category,
-  durationDays,
-  travelers,
-  budget,
-  currency,
-  destinationCurrency,
-  accent,
-  summary,
-  itineraryDays: [{ title, items }],
-  checklist: [{ label, category }]
-}
-```
-
-Dates, reservation data, documents, discussions, participant balances and
-attachments are deliberately excluded.
-
-### Day template
+## Calendar event model
 
 ```js
 {
   id,
-  name,
-  description,
-  category,
-  items: [{ time, type, title, location, durationMinutes, estimatedCost }]
+  sourceId,
+  source,                 // activity | reservation
+  date,
+  time,
+  endDate,
+  endTime,
+  title,
+  location,
+  notes,
+  durationMinutes,
+  reminderMinutes,
+  externalCalendarUid
 }
 ```
 
-When inserted, every activity receives a new identifier and is attached to the
-selected date. Existing activities on that date are preserved.
+## Trip schema 14
 
-## Trip schema 13
-
-Trips now retain optional provenance fields:
+Activities and reservations now store optional calendar metadata:
 
 ```js
 {
-  sourceTemplateId,
-  sourceTemplateName
+  reminderMinutes: null | number,
+  externalCalendarUid: string
 }
 ```
 
-They are informational only and do not create a live dependency on the source
-template. Editing or deleting a template never changes trips already created
-from it.
+`externalCalendarUid` prevents duplicate imports when the same ICS event is
+selected again. It is cleared when a trip is duplicated so each copied journey
+remains independent.
 
-## Local persistence
+## Conflict analysis
 
-- Real trips: `tripflow:trips`
-- Personal trip templates: `tripflow:trip-templates`
-- Personal day templates: `tripflow:day-templates`
-- Binary document files: IndexedDB through `AttachmentStorageService`
+The local conflict engine checks:
 
-Template import/export uses a dedicated versioned JSON format and does not alter
-trip backups.
+- overlapping timed events;
+- missing event dates;
+- missing event times;
+- end times before start times;
+- events outside the trip date range.
+
+The analysis is advisory and never changes the itinerary automatically.
+
+## Privacy
+
+- No calendar credentials are stored.
+- Exported ICS files are generated in the browser.
+- Imported ICS files are parsed locally.
+- Google Calendar and Outlook links contain only the selected event details.

@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.14] - 2026-08-01
+
+### Added
+
+- Full-trip and selected-day ICS calendar export.
+- Individual event links for Google Calendar and Outlook.
+- Apple Calendar and generic ICS event downloads.
+- Selective ICS import with duplicate prevention.
+- Per-event reminders for activities and reservations.
+- Conflict, missing-date, missing-time and out-of-range calendar checks.
+
+### Changed
+
+- Trip schema upgraded from 13 to 14 with calendar metadata.
+- Calendar workspace now includes import, export and provider actions.
+- Service-worker cache updated to `tripflow-v0.1.14`.
+
 ## [0.1.13] - 2026-07-31
 
 ### Added

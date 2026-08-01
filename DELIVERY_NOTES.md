@@ -1,42 +1,44 @@
-# V0.1 — Part 14 delivery notes
+# V0.1 — Part 15 delivery notes
 
 ## Version
 
-- Application: `0.1.13`
-- Trip schema: `13`
-- Template library format: `1`
+- Application: `0.1.14`
+- Trip schema: `14`
+- Calendar interchange format: `ICS / iCalendar`
 
 ## Added
 
-- Dedicated **Templates** page in the main navigation.
-- Four translated built-in trip templates:
-  - three-day city break;
-  - five-day road trip;
-  - four-day beach escape;
-  - three-day business trip.
-- Trip creation from a template with generated itinerary dates.
-- Personal trip-template creation from existing journeys.
-- Selective inclusion of itinerary, checklist and example budget.
-- Reusable day-plan library.
-- Save an existing itinerary day as a personal template.
-- Insert a day template into any date of an active trip.
-- Checklist presets for city, road, beach and business travel.
-- Duplicate checklist prevention when applying presets.
-- Personal template-library JSON import and export.
-- Responsive template cards and dialogs for Chrome, Safari and mobile.
-
-## Privacy rules
-
-Personal templates do not include:
-
-- reservations or confirmation numbers;
-- documents or attachment metadata;
-- binary files;
-- comments or collaboration history;
-- group-expense balances and settlements.
+- Full-trip calendar export in `.ics` format.
+- Selected-day export for lighter calendar sharing.
+- Individual event export for Apple Calendar and other ICS applications.
+- Direct event links for Google Calendar and Outlook Calendar.
+- Per-event reminders stored on activities and reservations.
+- ICS import preview with selective event import.
+- Duplicate prevention through external calendar identifiers.
+- Calendar conflict detection for overlapping timed events.
+- Warnings for missing dates, missing times, invalid ranges and events outside trip dates.
+- Responsive calendar connection controls for Chrome, Safari, tablet and mobile.
 
 ## Data migration
 
-Existing trips are normalized to schema 13 with optional
-`sourceTemplateId` and `sourceTemplateName` fields. No existing trip data is
-removed or rewritten beyond normalization.
+Existing trips are normalized to schema 14. Activities and reservations receive:
+
+```js
+{
+  reminderMinutes: null,
+  externalCalendarUid: ""
+}
+```
+
+No existing itinerary, reservation or document data is deleted.
+
+## Technical boundary
+
+Calendar generation and parsing are isolated in:
+
+- `src/utils/calendarInterop.js`
+- `src/services/calendar/CalendarInteropService.js`
+
+The UI does not depend directly on a specific calendar provider. Google Calendar,
+Outlook and downloadable ICS files are adapters around the same travel-event
+model.

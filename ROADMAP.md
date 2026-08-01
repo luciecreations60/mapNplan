@@ -11,25 +11,26 @@
 - Part 12: Chrome workspace corrections and travel-day companion.
 - Part 13: local document vault, IndexedDB files and attachment backups.
 - Part 14: reusable trip templates, checklist presets and day-plan library.
+- Part 15: calendar export/import, provider links, reminders and conflict checks.
 
 ## Next planned milestones
 
-### Part 15 — Backend preparation
+### Part 16 — Backend-ready data layer
 
-- repository interfaces for local and remote data;
-- authentication boundary and account model;
-- Supabase schema proposal;
-- remote/local synchronization strategy;
-- object-storage adapter for document files;
-- environment-based feature configuration.
+- formal repository interfaces for local and remote persistence;
+- account and authentication boundary;
+- Supabase schema proposal without enabling paid infrastructure;
+- local-to-remote synchronization strategy;
+- conflict resolution rules;
+- remote object-storage adapter contract for documents.
 
-### Part 16 — Commercial preparation
+### Part 17 — Commercial preparation
 
-- affiliate provider configuration;
-- non-intrusive booking calls to action;
+- affiliate-provider configuration;
+- non-intrusive reservation calls to action;
 - click-attribution boundary;
 - SEO destination-page structure;
-- consent and privacy preparation.
+- consent, privacy and legal preparation.
 
 ## Later milestones
 
