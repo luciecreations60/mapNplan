@@ -1,44 +1,33 @@
-# Product roadmap
+# Roadmap
 
-## Delivered V0.1 foundation
+## Completed — V0.1 foundation
 
-- Parts 1–5: architecture, dashboard, trip workspace, maps, tools, backups,
-  responsive design and bilingual interface.
-- Parts 6–8: editing, lifecycle, search, reporting, sharing and collaboration.
-- Part 9: smart place autocomplete and coordinates.
-- Part 10: itinerary optimization and route estimates.
-- Part 11: group expenses, balances, settlements and CSV export.
-- Part 12: Chrome workspace corrections and travel-day companion.
-- Part 13: local document vault, IndexedDB files and attachment backups.
-- Part 14: reusable trip templates, checklist presets and day-plan library.
-- Part 15: calendar export/import, provider links, reminders and conflict checks.
-- Part 16: saved places, custom inspiration lists and itinerary insertion.
-- Part 17: booking comparison, provider configuration and affiliate preparation.
-- Part 18: SEO content studio, destination-page preview and static exports.
+- travel dashboard and trip lifecycle;
+- itinerary, map and route optimisation;
+- reservations, documents and local attachments;
+- budgets and shared expenses;
+- travel-day companion;
+- templates and calendar interoperability;
+- saved places and inspiration library;
+- booking comparison and affiliate preparation;
+- SEO content studio;
+- static SEO publication pipeline and Search Console guide.
 
-## Next planned milestones
+## Next — V0.2 product hardening
 
-### Part 19 — Backend-ready data layer
+- automated accessibility regression checks;
+- browser end-to-end smoke tests;
+- analytics consent and privacy architecture;
+- landing page separate from the private planner;
+- multilingual public content relationships and `hreflang`;
+- image optimisation and social preview generation;
+- custom domain migration checklist.
 
-- formal repository interfaces for local and remote persistence;
-- account and authentication boundary;
-- Supabase-compatible schema proposal without requiring paid infrastructure;
-- local-to-remote synchronization strategy;
-- conflict resolution rules;
-- remote object-storage adapter contract for documents.
+## Later
 
-### Part 20 — Legal and commercial preparation
-
-- privacy and cookie-consent foundations;
-- affiliate disclosure page;
-- terms and legal-page templates;
-- data-retention controls;
-- verified conversion-reporting adapter contract.
-
-## Later milestones
-
-- optional premium features;
-- AI itinerary assistance;
+- authenticated accounts and cloud synchronisation;
 - real-time collaboration;
-- community and commercial template marketplace;
-- native mobile packaging if validated by usage.
+- secure server-side affiliate redirection and conversion reporting;
+- CMS-backed editorial publication;
+- itinerary assistance using optional AI providers;
+- mobile application packaging.

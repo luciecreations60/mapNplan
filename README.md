@@ -1,42 +1,44 @@
-# TripFlow — V0.1.17
+# TripFlow — Every journey starts here.
 
-> Every journey starts here.
+TripFlow is a modular travel planning application built with React and Vite. It currently runs without a paid backend and stores private trip data locally in the browser.
 
-TripFlow is a responsive, bilingual travel-planning application built with
-React and Vite. It runs without a paid backend and keeps planning data in the
-browser while the architecture remains ready for remote services later.
+## V0.1.18 highlights
 
-## SEO content studio
+- complete trip planning workspace;
+- responsive French/English interface;
+- itinerary, map, reservations, budgets, shared expenses and documents;
+- local collaboration, templates, saved places and booking comparison;
+- SEO content studio;
+- automatic generation of public static destination guides;
+- `sitemap.xml`, `robots.txt`, structured data and build-time SEO audit.
 
-Part 18 adds an editorial workspace for the future organic-acquisition and
-affiliate strategy:
-
-- create destination guides in French or English;
-- manage drafts and locally published content;
-- assess title length, meta description, keyword placement, content depth,
-  URL slug, image alternative text, FAQ and required sections;
-- preview destination pages without leaving the application;
-- export a standalone HTML page with canonical metadata, Open Graph fields,
-  Twitter card metadata and JSON-LD structured data;
-- export `sitemap.xml` and `robots.txt` for a future production domain;
-- export and import the local editorial library as JSON;
-- include commercial blocks only for partner providers explicitly enabled in
-  Settings.
-
-The in-app preview is a local product tool. Search engines will only index a
-page after its exported HTML is deployed on a public, crawlable URL.
-
-## Run locally
+## Main commands
 
 ```bash
 npm install
 npm run dev
-```
-
-## Production build
-
-```bash
+npm run seo:generate
+npm run seo:audit
 npm run build
 ```
 
-GitHub Actions deploys the generated `dist` directory to GitHub Pages.
+`npm run build` automatically regenerates public SEO pages from:
+
+```text
+content/seo-pages.json
+```
+
+## Public SEO outputs
+
+```text
+public/guides/
+public/sitemap.xml
+public/robots.txt
+public/seo-status.json
+```
+
+See [SEO_GUIDE.md](SEO_GUIDE.md) for the complete publication and Google Search Console workflow.
+
+## Deployment
+
+The repository deploys automatically to GitHub Pages through `.github/workflows/deploy.yml` whenever `main` changes.

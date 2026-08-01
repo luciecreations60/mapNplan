@@ -1,31 +1,33 @@
-# Upload V0.1 Part 18 to GitHub
+# Installation — V0.1 Partie 19
 
-1. Extract `travel-planner-v0.1-part18.zip`.
-2. Open the `travel-planner` repository on GitHub.
-3. Select **Add file → Upload files**.
-4. Upload the complete contents of the extracted folder.
-5. Allow GitHub to replace existing files.
-6. Commit directly to `main` with:
-
-```text
-feat: add v0.1.17 SEO content studio
-```
-
-7. Open **Actions** and wait for the deployment workflow to finish.
-8. Refresh the deployed site:
+1. Décompresser `travel-planner-v0.1-part19.zip`.
+2. Ouvrir le dépôt GitHub `travel-planner`.
+3. Choisir **Add file → Upload files**.
+4. Déposer tout le contenu du dossier extrait.
+5. Autoriser le remplacement des fichiers existants.
+6. Utiliser le message :
 
 ```text
-Chrome: Ctrl + F5
-Safari: Cmd + Option + R
+feat: add v0.1.18 static SEO publishing workflow
 ```
 
-## Test path
+7. Valider directement dans `main`.
+8. Attendre la coche verte dans **Actions**.
+9. Ouvrir :
 
-1. Open **Content studio** from the sidebar.
-2. Edit the starter Paris draft.
-3. Review its SEO score.
-4. Open the local preview.
-5. Download its standalone HTML file.
-6. Set a temporary base URL and export `sitemap.xml` and `robots.txt`.
-7. Verify that no partner link appears unless a provider was enabled first in
-   **Settings → Partners and affiliation**.
+```text
+https://luciecreations60.github.io/travel-planner/guides/
+https://luciecreations60.github.io/travel-planner/sitemap.xml
+https://luciecreations60.github.io/travel-planner/robots.txt
+https://luciecreations60.github.io/travel-planner/seo-status.json
+```
+
+## Publication suivante depuis l’application
+
+Le fichier téléchargé par **Studio de contenu → Télécharger le fichier de publication** doit remplacer :
+
+```text
+content/seo-pages.json
+```
+
+GitHub Actions générera ensuite les pages publiques automatiquement.

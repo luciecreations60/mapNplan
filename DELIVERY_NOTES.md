@@ -1,55 +1,37 @@
-# V0.1 Part 18 — Delivery notes
+# V0.1 — Partie 19 — Publication SEO réelle
 
 ## Version
 
-- Application: `0.1.17`
-- Trip schema: unchanged at `16`
-- SEO content schema: `1`
-- Service-worker cache: `tripflow-v0.1.17`
+- Application : `0.1.18`
+- Schéma de contenu SEO : `2`
+- Format de publication SEO : `1`
+- Schéma voyage : inchangé (`16`)
 
-## Added
+## Principales évolutions
 
-- Content studio page in the main navigation.
-- Local French/English destination-guide library.
-- Draft and published statuses.
-- Live SEO score with nine checks.
-- Search, language and status filters.
-- Article duplication and deletion.
-- JSON import/export.
-- Local public preview route: `#/guides/:slug`.
-- Standalone HTML export.
-- Canonical, Open Graph, Twitter and JSON-LD metadata.
-- Sitemap and robots exports.
-- Optional affiliate categories resolved through enabled provider settings.
+- génération statique des guides pendant le build GitHub Actions ;
+- URLs publiques sans hash ;
+- génération automatique du sitemap, du robots.txt et du rapport SEO ;
+- export `seo-pages.json` depuis le Studio de contenu ;
+- audit de publication dans l’interface et dans le build ;
+- URL GitHub Pages centralisée dans `project.config.js` ;
+- prise en charge de la balise de vérification Google Search Console ;
+- schémas Article, BreadcrumbList et FAQPage ;
+- suppression de la balise `meta keywords` ;
+- guide SEO complet en français.
 
-## Important behaviour
+## Workflow de publication
 
-- The code name and placeholder domain remain configurable.
-- The default base URL is `https://example.com` and must be changed before
-  production exports.
-- Local previews are not public SEO pages.
-- Partner links only appear when a provider is enabled and has a valid URL.
-- Content remains on the current device until exported.
+1. passer les guides relus au statut Publiée ;
+2. télécharger `seo-pages.json` depuis le Studio ;
+3. remplacer `content/seo-pages.json` sur GitHub ;
+4. attendre GitHub Actions ;
+5. contrôler `/guides/`, `/sitemap.xml` et `/seo-status.json` ;
+6. envoyer le sitemap dans Search Console.
 
-## Main files added
+## Limites
 
-```text
-src/config/seo.config.js
-src/data/builtInSeoContent.js
-src/utils/seoContent.js
-src/services/content/ContentStudioService.js
-src/contexts/ContentStudioContext.jsx
-src/hooks/useContentStudio.js
-src/pages/ContentStudioPage.jsx
-src/pages/PublicDestinationPage.jsx
-```
-
-## Validation performed
-
-- TypeScript parser check over every JavaScript and JSX source file.
-- Direct Node syntax checks for the new non-JSX modules.
-- Translation dictionary import and French/English section-count comparison.
-- Content-service creation, normalization and static-HTML generation test with
-  an isolated LocalStorage mock.
-- Relative import resolution check.
-- JSON parsing and ZIP integrity checks.
+- Search Console reste un service externe à configurer manuellement ;
+- une page publiée et indexable n’est pas nécessairement indexée ou bien classée ;
+- le score SEO interne est un contrôle éditorial, pas un score fourni par Google ;
+- la propriété Search Console doit être vérifiée avec une valeur réellement fournie par Google.

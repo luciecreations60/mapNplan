@@ -1,0 +1,51 @@
+{
+  "format": "tripflow-seo-publication",
+  "formatVersion": 1,
+  "exportedAt": "2026-08-01T08:00:00.000Z",
+  "articles": [
+    {
+      "id": "seo-paris-three-days",
+      "slug": "three-days-in-paris",
+      "language": "en",
+      "status": "published",
+      "title": "Three days in Paris: a practical first-time itinerary",
+      "metaTitle": "3 Days in Paris: Practical Itinerary and Planning Guide",
+      "metaDescription": "Plan three balanced days in Paris with a flexible itinerary, neighbourhood ideas, realistic travel tips and useful booking checkpoints.",
+      "destination": "Paris",
+      "country": "France",
+      "primaryKeyword": "3 days in Paris",
+      "secondaryKeywords": [
+        "Paris itinerary",
+        "Paris travel planner",
+        "weekend in Paris"
+      ],
+      "heroImageUrl": "",
+      "heroAlt": "Three-day Paris itinerary organised by neighbourhood",
+      "excerpt": "A calm and flexible framework for organising a first visit to Paris without trying to fit the whole city into one weekend.",
+      "introduction": "Planning 3 days in Paris is easier when each day focuses on a compact part of the city. This reduces unnecessary transport, leaves time for meals and queues, and makes the itinerary more resilient when the weather changes. The aim is not to visit every landmark. It is to create a balanced first experience with a few priorities, realistic travel times and free space for discoveries.\n\nBefore fixing every hour, choose the places that matter most to you. Check their opening days, decide which tickets are genuinely time-sensitive and keep at least one flexible period each day. Paris is well served by public transport, but walking between nearby neighbourhoods is often part of the experience. A good plan therefore combines confirmed reservations with optional ideas saved nearby.",
+      "itineraryBody": "Day 1 — Historic centre and the Seine. Start with a gentle orientation around the Île de la Cité and the river. Continue towards the Latin Quarter or the Marais depending on your interests. Keep the first afternoon flexible, especially if you arrive the same morning. An evening walk along the Seine can provide a memorable introduction without another timed reservation.\n\nDay 2 — Museums, gardens and the west of central Paris. Reserve one major museum only if it is a priority, then combine it with a nearby garden and neighbourhood. Trying to visit several large museums in one day usually creates fatigue rather than value. Add a café break and leave enough time to reach any evening booking.\n\nDay 3 — A local neighbourhood and final viewpoint. Choose an area that offers a different atmosphere, such as Montmartre, Canal Saint-Martin or a market district. Use the final hours for a viewpoint, shopping or a relaxed lunch close to your departure route. If your train or flight leaves early, move the most important activity to the previous day rather than creating a stressful final schedule.",
+      "practicalTips": "Group activities by neighbourhood and check the actual entrance address before deciding the order. Allow extra time around major attractions because security queues can be unpredictable. Save booking confirmations, transport details and ticket files in the same trip workspace so they remain available during the journey.\n\nUse a daily plan with three levels: confirmed, preferred and optional. Confirmed items have a fixed time. Preferred items should happen that day but can move. Optional items are nearby alternatives for spare time or bad weather. This approach prevents a delayed activity from ruining the whole itinerary.\n\nFor budgeting, separate accommodation and transport from daily spending. Record what has already been paid and what remains due. If several people travel together, note who paid each shared expense. Finally, check official sources shortly before departure for opening hours, transport disruptions and entry requirements, as these details can change.",
+      "faq": [
+        {
+          "id": "faq-paris-enough",
+          "question": "Is three days enough for a first visit to Paris?",
+          "answer": "Three days can provide a useful introduction when activities are grouped by area and the itinerary remains realistic. It is better to experience a few neighbourhoods well than to rush between too many landmarks."
+        },
+        {
+          "id": "faq-paris-booking",
+          "question": "Should every Paris attraction be booked in advance?",
+          "answer": "Book only the time-sensitive priorities and keep some free periods. Flexible time makes the itinerary easier to adapt to weather, queues and unexpected discoveries."
+        },
+        {
+          "id": "faq-paris-location",
+          "question": "What is the simplest way to organise each day?",
+          "answer": "Choose one main area per day, add one priority activity, then save nearby restaurants and optional places. This reduces transport and makes the schedule easier to follow."
+        }
+      ],
+      "affiliateCategories": [],
+      "createdAt": "2026-08-01T08:00:00.000Z",
+      "updatedAt": "2026-08-01T08:00:00.000Z",
+      "publishedAt": "2026-08-01T08:00:00.000Z"
+    }
+  ]
+}

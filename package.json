@@ -1,14 +1,17 @@
 {
   "name": "travel-planner",
   "private": true,
-  "version": "0.1.17",
+  "version": "0.1.18",
   "type": "module",
   "description": "A modern, extensible travel planning application.",
   "scripts": {
     "dev": "vite",
+    "seo:generate": "node scripts/generate-seo-pages.mjs",
+    "seo:audit": "node scripts/audit-seo.mjs",
+    "prebuild": "npm run seo:generate && npm run seo:audit",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "vite build"
+    "check": "npm run seo:generate && npm run seo:audit && vite build"
   },
   "engines": {
     "node": ">=22.12.0"

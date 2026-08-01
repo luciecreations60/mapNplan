@@ -1,9 +1,10 @@
 {
-  "version": "0.1.17",
+  "version": "0.1.18",
   "tripSchemaVersion": 16,
-  "seoContentSchemaVersion": 1,
-  "generatedFor": "V0.1 Part 18",
-  "fileCount": 143,
+  "seoContentSchemaVersion": 2,
+  "seoPublicationFormatVersion": 1,
+  "generatedFor": "V0.1 Part 19",
+  "fileCount": 153,
   "files": [
     {
       "path": ".env.example",
@@ -22,48 +23,58 @@
     },
     {
       "path": "ARCHITECTURE.md",
-      "size": 4424,
-      "sha256": "3fe831e0fe16ce1c9a4cff42f2a9b1ab0bfd71448a42cb20bf6c763281842416"
+      "size": 2410,
+      "sha256": "bb6c134a98e5dddb827d4297ac135144b3451241086fc32725d3baf3d4897127"
     },
     {
       "path": "CHANGELOG.md",
-      "size": 9702,
-      "sha256": "4e9001bb3556af78befc9364bd381bf3ec222afa6d7b85a583512f564334f786"
+      "size": 10423,
+      "sha256": "d8a4550e17456b407796fa38cdc74bd0acce7cfbf0a7de52a8e8d18ce1ea5db9"
     },
     {
       "path": "DELIVERY_NOTES.md",
-      "size": 1748,
-      "sha256": "04cb42967029bd05487dabd93889af7aedf13d2960cc277022ab8de66efc6bf4"
+      "size": 1441,
+      "sha256": "9325466bc0bc56412f36949e04d638f0df0bb8be7f95172a71d2c39aa12220ec"
     },
     {
       "path": "README.md",
-      "size": 1362,
-      "sha256": "df3ac096572ca817cf47fb9b98913b76c84eee93f83067445a1b958dff8869bf"
+      "size": 1164,
+      "sha256": "9e1eba11d01bdd50595b352e51cf1d8060c69ff7476ae26315e896f66948c308"
     },
     {
       "path": "ROADMAP.md",
-      "size": 1771,
-      "sha256": "6c78283b30ba8d7f55d282fc0e81168d125c7770a9bd70dbd14909bbbd73ca3d"
+      "size": 1082,
+      "sha256": "edf7efea5472f8d835992521e0c89787c7103a5faa5795ef5370e6290948088d"
+    },
+    {
+      "path": "SEO_GUIDE.md",
+      "size": 8454,
+      "sha256": "ca73230250ae1abf43610c3246eedac53bc7bdf29486360a45fcea1fbae76b37"
     },
     {
       "path": "UPLOAD_TO_GITHUB.md",
-      "size": 888,
-      "sha256": "83151826204c4106eba6f232f680c19b1c41ce7e871c58b4a08173c0196cfe24"
+      "size": 985,
+      "sha256": "822ecfa22773c2e27fdde820b60bc3f058eb139294d471a68c7797d2bea15e64"
+    },
+    {
+      "path": "content/seo-pages.json",
+      "size": 5213,
+      "sha256": "123912d0764fb62f537aa90896db74f0b3272a13366b76ee739d1e9e85da9fbc"
     },
     {
       "path": "index.html",
-      "size": 773,
-      "sha256": "1161956c545a53e269bc5ebb96c7a259f00dccfb23b75956f1251259896cb56a"
+      "size": 1143,
+      "sha256": "f0ceab45e8b4b650630476a3269fa4c23caeafd5b8209689dd09557745f237a8"
     },
     {
       "path": "package.json",
-      "size": 577,
-      "sha256": "8ccb7e311c6e0209a7a67caa8c8778e5ff7aa904e20dc4bf1c6ef6d9318887a4"
+      "size": 789,
+      "sha256": "2b292df3409c04a94e93dc03b18a2f62bcb11db4fc8e456f044c47bf78c03559"
     },
     {
       "path": "project.config.js",
-      "size": 441,
-      "sha256": "3b4e84c7cf86773467755c56818a5ba65e2176e6c311551e6054c19cda1bdf89"
+      "size": 628,
+      "sha256": "5cd0e7fd7a1f4c847df2c1408e069362e3b6c0a0b989ade67e7aa92428c0d053"
     },
     {
       "path": "public/favicon.svg",
@@ -71,14 +82,54 @@
       "sha256": "514d5c86c0a44489e174184f2e88a667deaf1a8377ece4e026a751c00b29adc8"
     },
     {
+      "path": "public/guides/index.html",
+      "size": 2163,
+      "sha256": "da3956ca227efc219fe33ee5230f0b12c24d4984fcc8a1dd1efd9b2f09c7923b"
+    },
+    {
+      "path": "public/guides/three-days-in-paris/index.html",
+      "size": 10389,
+      "sha256": "8d5f4e426402f91758e2c033cff4260298e0a10f2e4968a815aff3cdd1b99e81"
+    },
+    {
+      "path": "public/robots.txt",
+      "size": 95,
+      "sha256": "8595a7f98ee6002509f2847626452220638dc417245827ea1dfd94429caa3d09"
+    },
+    {
+      "path": "public/seo-status.json",
+      "size": 2081,
+      "sha256": "cd46dd675d0ccc38d23f22975eb04f398f112640055be0d240ac24eaf2b77906"
+    },
+    {
       "path": "public/service-worker.js",
       "size": 1419,
-      "sha256": "88c6ab22907b799a859e9153c8e7481fb2bf5f946a220b242348617234a2b51c"
+      "sha256": "232a643e3bb0f3929c5cf6cbe07e573f22066bf9eebacb2107d7315d5b6792e0"
     },
     {
       "path": "public/site.webmanifest",
       "size": 356,
       "sha256": "8a6290d65f0adde90af778c1875f15ba97cebfe8d3e2c345b36f30a289aa9caa"
+    },
+    {
+      "path": "public/sitemap.xml",
+      "size": 495,
+      "sha256": "17e21af47bf4028205e5156670151318f359084e05b0371983cf0eba5305523e"
+    },
+    {
+      "path": "scripts/audit-seo.mjs",
+      "size": 981,
+      "sha256": "85bd33de1db82c97ebc8f55b66b60d095a83bfe6c9b4b0117a79b454299025e8"
+    },
+    {
+      "path": "scripts/generate-seo-pages.mjs",
+      "size": 2262,
+      "sha256": "89227c4e732b340df8150f68313faf2fa6b9d6d912b52cc64a8dcf75fc72869c"
+    },
+    {
+      "path": "scripts/seo-shared.mjs",
+      "size": 12209,
+      "sha256": "452889554ebfd7d5cdbc117f08bb84dfc2739be5bc865cf031909aa4497dc5c8"
     },
     {
       "path": "src/App.jsx",
@@ -357,8 +408,8 @@
     },
     {
       "path": "src/config/seo.config.js",
-      "size": 774,
-      "sha256": "60006c5993693409f1fb0ec60a39ec952670d53232e4bcd4748f263459992f1c"
+      "size": 1044,
+      "sha256": "a9bfdb6da0755d13106a18e2e09fa9fa8b2b07c1f9adb90ac70de85c2bb8212a"
     },
     {
       "path": "src/contexts/AffiliateContext.jsx",
@@ -367,8 +418,8 @@
     },
     {
       "path": "src/contexts/ContentStudioContext.jsx",
-      "size": 2034,
-      "sha256": "a5e905976b126eb0871896a7d6038c8ac9a2635700cf8121e46fabbccf6dba8f"
+      "size": 2188,
+      "sha256": "e28507b7a2a8ed06f4ac99e0b074c3d8cb3041b5bd906c76601ac59d70415f48"
     },
     {
       "path": "src/contexts/LocalizationContext.jsx",
@@ -437,8 +488,8 @@
     },
     {
       "path": "src/i18n/translations.js",
-      "size": 141319,
-      "sha256": "d913378cd2fd7e34f288d979fe26fe4490ce304ffb1bcf17b386f4187f8503c1"
+      "size": 144019,
+      "sha256": "27cbf073b2c7cc4a9aee3df636a3f149633fc1f49e5b380d746bc63bfb7fab83"
     },
     {
       "path": "src/layouts/AppLayout.jsx",
@@ -452,8 +503,8 @@
     },
     {
       "path": "src/pages/ContentStudioPage.jsx",
-      "size": 19778,
-      "sha256": "ea0f91602e2b17f97b2cac14a79d7f6c887b3174062fef6ddd74b908b7f365cf"
+      "size": 21882,
+      "sha256": "366330826cba02f315d3246d81ea33ca99752ee5cd7354f3570a0cf376111245"
     },
     {
       "path": "src/pages/DashboardPage.jsx",
@@ -517,8 +568,8 @@
     },
     {
       "path": "src/services/content/ContentStudioService.js",
-      "size": 12480,
-      "sha256": "c08e60c4671eb59121e2ae8f6a952220c235d732c813a18322e2467c3b964b7b"
+      "size": 13104,
+      "sha256": "5d9d6d339d8a4d048ec28f0066c6216f7dfd2ab6a3fd59bd4f1272c22e8726f0"
     },
     {
       "path": "src/services/currency/CurrencyService.js",
@@ -602,8 +653,8 @@
     },
     {
       "path": "src/styles/pages.css",
-      "size": 149856,
-      "sha256": "30de8a52ff64c5174fd9a8684657fb53d429a9ca6c58860e43f55de8858b843b"
+      "size": 153014,
+      "sha256": "c59b78270382cac3ef1a8e7c123237efc826c9bbce447651b0419e9848e4e773"
     },
     {
       "path": "src/styles/print.css",
@@ -662,8 +713,8 @@
     },
     {
       "path": "src/utils/seoContent.js",
-      "size": 4309,
-      "sha256": "1d01a067d77f3a04335448ae3ee151acec92e9a48cf411bd90c8f16fff5ba7e8"
+      "size": 7157,
+      "sha256": "daa16d52ddd1422e3d3db792fd0d8b0090d1c9782782b016fcbc104af84c7b46"
     },
     {
       "path": "src/utils/sharedExpenses.js",
@@ -712,8 +763,8 @@
     },
     {
       "path": "vite.config.js",
-      "size": 483,
-      "sha256": "29ccc4fceec7484e180bc53ef09d27d96d42d7ba229a20ddb0ba2e0cefccb837"
+      "size": 1466,
+      "sha256": "c47b54c2c023621a4ce3c5647d969506b8a6960ab67c93c22f7f536b27d489cd"
     }
   ]
 }

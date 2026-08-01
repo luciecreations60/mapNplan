@@ -296,3 +296,24 @@ All notable changes to this project are documented here.
 - Initial React and Vite application foundation.
 - Dashboard, trip library, explore and settings pages.
 - Themes, local persistence, PWA foundation and GitHub Pages deployment.
+
+## [0.1.18] — 2026-08-01
+
+### Added
+
+- build-time generation of public crawlable destination guides;
+- `content/seo-pages.json` publication contract;
+- guide collection page;
+- automatic sitemap, robots and SEO status report;
+- browser publication export workflow;
+- publication audit in the SEO studio;
+- Google Search Console verification configuration;
+- `SEO_GUIDE.md` with testing and monitoring instructions;
+- Article and BreadcrumbList structured data.
+
+### Changed
+
+- centralised the current GitHub Pages URL in `project.config.js`;
+- updated the service-worker cache to `0.1.18`;
+- removed the unused `meta keywords` tag from exported pages;
+- `npm run build` now executes SEO generation and auditing first.

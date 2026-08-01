@@ -1,176 +1,90 @@
-# Architecture — V0.1.17
+# Architecture — TripFlow V0.1.18
 
-## Commercial preparation boundary
+## Runtime application
 
-Part 17 keeps trip-owned booking comparisons separate from global partner
-configuration.
-
-### Trip-owned booking options
-
-```js
-{
-  id,
-  category,       // hotels | flights | activities | cars | esim | insurance
-  providerId,
-  providerName,
-  title,
-  price,
-  currency,
-  url,
-  status,         // saved | shortlisted | booked | rejected
-  notes,
-  createdAt,
-  updatedAt,
-  bookedAt
-}
-```
-
-Booking options belong to a trip because they are part of the planning record,
-normal backup and future remote-sync boundary.
-
-### Global provider configuration
-
-Provider credentials and URL templates are not duplicated inside trips. They
-are stored under a dedicated LocalStorage key through `AffiliateService`:
-
-```js
-{
-  schemaVersion: 1,
-  disclosureEnabled,
-  providers: [{
-    id,
-    name,
-    category,
-    enabled,
-    affiliateCapable,
-    homepageUrl,
-    searchUrlTemplate,
-    affiliateParameter,
-    affiliateValue
-  }]
-}
-```
-
-Every built-in provider is disabled by default. This is an intentional safety
-rule: source code never implies an active programme or inserts an invented
-tracking identifier.
-
-## URL template tokens
-
-The service supports these encoded variables:
+The private planning application is a React/Vite single-page application using `HashRouter`, local browser storage and service boundaries.
 
 ```text
-{{destination}} {{country}} {{startDate}} {{endDate}}
-{{travelers}} {{currency}} {{locale}} {{category}}
+src/
+├── components/
+├── config/
+├── contexts/
+├── data/
+├── hooks/
+├── layouts/
+├── pages/
+├── services/
+├── styles/
+└── utils/
 ```
 
-The provider adapter validates HTTP/HTTPS output through `normalizeExternalUrl`
-before exposing a link. The affiliate parameter is appended only when the
-provider is affiliate-capable and both configuration fields are present.
+Private trip information remains in LocalStorage and IndexedDB until a future authenticated backend is introduced.
 
-## Local analytics
+## Static SEO publication pipeline
 
-`AffiliateService` records a maximum of 1,000 lightweight local events:
-
-- provider clicks;
-- bookings explicitly marked by the user;
-- declared booking value.
-
-These values are product-development indicators, not verified commission or
-conversion reports. A future backend can replace this adapter without changing
-the booking workspace.
-
-## Trip schema 16
-
-Trip schema 16 adds:
-
-```js
-{
-  bookingOptions: BookingOption[]
-}
-```
-
-Legacy trips receive an empty collection. Demonstration trips can receive
-sample comparisons. Duplication regenerates identifiers and turns a previously
-booked option back into a saved comparison.
-
-## Main boundaries
-
-- `affiliate.config.js`: categories, built-in providers and template tokens.
-- `AffiliateService.js`: settings persistence, URL generation and analytics.
-- `AffiliateContext.jsx`: React synchronization boundary.
-- `BookingPanel.jsx`: provider discovery and per-trip comparison UI.
-- `AffiliateSettingsCard.jsx`: central provider administration.
-- `bookingOptions.js`: domain normalization and summaries.
-- `TripService.js`: schema migration, persistence and duplication.
-
-## V0.1.17 — SEO content studio
-
-Editorial content is deliberately separated from trips and partner settings.
-It uses its own local repository boundary:
+Search engines must not depend on the browser's private LocalStorage. Public editorial pages therefore use a separate build-time pipeline.
 
 ```text
-ContentStudioPage
-        ↓
-ContentStudioContext
-        ↓
-ContentStudioService
-        ↓
-LocalStorageService
+Content Studio in browser
+        │
+        ├── exports seo-pages.json
+        ▼
+content/seo-pages.json
+        │
+        ├── npm run seo:generate
+        ▼
+public/guides/<slug>/index.html
+public/guides/index.html
+public/sitemap.xml
+public/robots.txt
+public/seo-status.json
+        │
+        ├── vite build
+        ▼
+dist/ → GitHub Pages
 ```
 
-The service owns normalization, slug uniqueness, JSON import/export, static
-HTML generation, sitemap generation and robots-file generation. React pages do
-not write editorial content directly to browser storage.
+## Key SEO files
 
-### Editorial article model
+### `project.config.js`
 
-```js
-{
-  id,
-  slug,
-  language,          // en | fr
-  status,            // draft | published
-  title,
-  metaTitle,
-  metaDescription,
-  destination,
-  country,
-  primaryKeyword,
-  secondaryKeywords,
-  heroImageUrl,
-  heroAlt,
-  excerpt,
-  introduction,
-  itineraryBody,
-  practicalTips,
-  faq,
-  affiliateCategories,
-  createdAt,
-  updatedAt,
-  publishedAt
-}
-```
+Single source of truth for brand, version, production URL and optional Search Console verification value.
 
-### Static export boundary
+### `src/config/seo.config.js`
 
-`ContentStudioService.generateHtml()` produces one self-contained HTML page
-with:
+SEO thresholds, public path, languages and publication format.
 
-- title and meta description;
-- canonical URL;
-- Open Graph and Twitter metadata;
-- TravelAction and FAQPage JSON-LD;
-- escaped user-authored content;
-- optional partner links resolved through `AffiliateService`;
-- a small embedded responsive stylesheet.
+### `content/seo-pages.json`
 
-No disabled provider appears in exported HTML. A selected category alone never
-creates a commercial link.
+Versioned source file containing only reviewed public editorial content.
 
-### Indexation limitation
+### `scripts/generate-seo-pages.mjs`
 
-Hash-routed, LocalStorage-backed previews are not independently crawlable
-public pages. The exported HTML must be committed or published to a real route
-before a search engine can index it. The future CMS/backend layer can replace
-the local adapter while retaining the editor and export contracts.
+Creates crawlable HTML, guide index, sitemap, robots and build report.
+
+### `scripts/audit-seo.mjs`
+
+Checks HTTPS, placeholder domains, duplicate slugs, page availability and minimum editorial score.
+
+### `src/services/content/ContentStudioService.js`
+
+Maintains local drafts and exports a publication file without coupling the React page to storage details.
+
+## Structured data
+
+Generated guide pages include:
+
+- `Article`;
+- `BreadcrumbList`;
+- `FAQPage` when questions are available.
+
+Structured data is generated from the same normalized article model as the visible page to reduce inconsistencies.
+
+## Design constraints
+
+- draft content is never published automatically;
+- only articles marked `published` enter the static build;
+- duplicate public slugs are blocking build errors;
+- partner links remain separate from SEO publication data;
+- a future custom domain is changed centrally;
+- generated public pages work without JavaScript.
