@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
 import { formatCurrency } from '../../utils/currency.js';
+import { formatLocalizedDate } from '../../utils/date.js';
 import { createId } from '../../utils/id.js';
 import {
   EXPENSE_CATEGORIES,
@@ -239,6 +240,5 @@ function formatMoneyInput(value) {
 }
 
 function formatExpenseDate(date, locale) {
-  return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' })
-    .format(new Date(`${date}T12:00:00`));
+  return formatLocalizedDate(date, locale, 'dayMonth');
 }

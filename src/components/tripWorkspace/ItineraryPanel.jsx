@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
+import { formatLocalizedDate } from '../../utils/date.js';
 import { createId } from '../../utils/id.js';
 import { estimateRouteSegment } from '../../utils/routeOptimization.js';
 import { ACTIVITY_TYPES, getCategoryLabel } from '../../utils/tripWorkspace.js';
@@ -25,7 +26,7 @@ import { LocationAutocomplete } from '../common/LocationAutocomplete.jsx';
 const EMPTY_FORM = Object.freeze({
   date: '', time: '09:00', type: 'map', title: '', location: '', latitude: '', longitude: '',
   departureLocation: '', departureLatitude: '', departureLongitude: '', transportMode: 'driving',
-  durationHours: 1, durationRemainderMinutes: 0, estimatedCost: 0, notes: '',
+  durationHours: 1, durationRemainderMinutes: 0, estimatedCost: 0, notes: '', titleAutofilled: false,
 });
 
 export function ItineraryPanel({ trip, onUpdate }) {
@@ -38,7 +39,7 @@ export function ItineraryPanel({ trip, onUpdate }) {
 
   function updateField(event) {
     const { name, value } = event.target;
-    setForm((current) => ({ ...current, [name]: value }));
+    setForm((current) => ({ ...current, [name]: value, ...(name === 'title' ? { titleAutofilled: false } : {}) }));
   }
 
   function scrollToForm() {
@@ -71,9 +72,44 @@ export function ItineraryPanel({ trip, onUpdate }) {
       durationRemainderMinutes: duration.minutes,
       estimatedCost: activity.estimatedCost || 0,
       notes: activity.notes || '',
+      titleAutofilled: false,
     });
     setFormOpen(true);
     scrollToForm();
+  }
+
+
+  function selectActivityPlace(place, kind = 'arrival') {
+    if (!place) return;
+    setForm((current) => {
+      if (kind === 'departure') {
+        const suggestedTitle = current.location && (current.titleAutofilled || !current.title.trim())
+          ? `${place.name || place.primaryLabel} → ${current.location}`
+          : current.title;
+        return {
+          ...current,
+          departureLocation: place.label,
+          departureLatitude: place.latitude,
+          departureLongitude: place.longitude,
+          title: suggestedTitle,
+          titleAutofilled: suggestedTitle !== current.title || current.titleAutofilled,
+        };
+      }
+
+      const arrivalLabel = place.name || place.primaryLabel || place.label;
+      const suggestedTitle = current.type === 'car' && current.departureLocation
+        ? `${current.departureLocation} → ${arrivalLabel}`
+        : arrivalLabel;
+      const shouldAutofill = !current.title.trim() || current.titleAutofilled;
+      return {
+        ...current,
+        location: place.label,
+        latitude: place.latitude,
+        longitude: place.longitude,
+        title: shouldAutofill ? suggestedTitle : current.title,
+        titleAutofilled: shouldAutofill,
+      };
+    });
   }
 
   function closeForm() {
@@ -217,14 +253,14 @@ export function ItineraryPanel({ trip, onUpdate }) {
 
                 {form.type === 'car' && (
                   <>
-                    <LocationAutocomplete id="itinerary-departure-location" variant="workspace" className="workspace-form__wide" label={t('itinerary.departureLocation')} value={form.departureLocation} placeholder={t('itinerary.departurePlaceholder')} bias={{ latitude: trip.destinationLatitude, longitude: trip.destinationLongitude }} hint={t('placeSearch.locationHint')} onValueChange={(value) => setForm((current) => ({ ...current, departureLocation: value, departureLatitude: '', departureLongitude: '' }))} onPlaceSelect={(place) => place && setForm((current) => ({ ...current, departureLocation: place.label, departureLatitude: place.latitude, departureLongitude: place.longitude }))} />
-                    <LocationAutocomplete id="itinerary-arrival-location" variant="workspace" className="workspace-form__wide" label={t('itinerary.arrivalLocation')} value={form.location} placeholder={t('itinerary.arrivalPlaceholder')} bias={{ latitude: trip.destinationLatitude, longitude: trip.destinationLongitude }} hint={t('placeSearch.locationHint')} onValueChange={(value) => setForm((current) => ({ ...current, location: value, latitude: '', longitude: '' }))} onPlaceSelect={(place) => place && setForm((current) => ({ ...current, location: place.label, latitude: place.latitude, longitude: place.longitude }))} />
+                    <LocationAutocomplete id="itinerary-departure-location" variant="workspace" className="workspace-form__wide" label={t('itinerary.departureLocation')} value={form.departureLocation} placeholder={t('itinerary.departurePlaceholder')} bias={{ latitude: trip.destinationLatitude, longitude: trip.destinationLongitude }} hint={t('placeSearch.locationHint')} onValueChange={(value) => setForm((current) => ({ ...current, departureLocation: value, departureLatitude: '', departureLongitude: '' }))} onPlaceSelect={(place) => selectActivityPlace(place, 'departure')} />
+                    <LocationAutocomplete id="itinerary-arrival-location" variant="workspace" className="workspace-form__wide" label={t('itinerary.arrivalLocation')} value={form.location} placeholder={t('itinerary.arrivalPlaceholder')} bias={{ latitude: trip.destinationLatitude, longitude: trip.destinationLongitude }} hint={t('placeSearch.locationHint')} onValueChange={(value) => setForm((current) => ({ ...current, location: value, latitude: '', longitude: '' }))} onPlaceSelect={(place) => selectActivityPlace(place, 'arrival')} />
                     <Field label={t('itinerary.transportMode')}><select name="transportMode" value={form.transportMode} onChange={updateField}>{TRANSPORT_MODES.map((mode) => <option key={mode.id} value={mode.id}>{t(mode.labelKey)}</option>)}</select></Field>
                     <div className="workspace-field itinerary-estimate-action"><span>{t('itinerary.automaticEstimate')}</span><Button size="small" variant="secondary" icon="clock" disabled={!hasTransportCoordinates} onClick={calculateTransportDuration}>{t('itinerary.calculateDuration')}</Button></div>
                   </>
                 )}
 
-                {form.type !== 'car' && <LocationAutocomplete id="itinerary-location" variant="workspace" className="workspace-form__wide" label={t('itinerary.location')} value={form.location} placeholder={t('itinerary.locationPlaceholder')} bias={{ latitude: trip.destinationLatitude, longitude: trip.destinationLongitude }} hint={t('placeSearch.locationHint')} onValueChange={(value) => setForm((current) => ({ ...current, location: value, latitude: '', longitude: '' }))} onPlaceSelect={(place) => place && setForm((current) => ({ ...current, location: place.label, latitude: place.latitude, longitude: place.longitude }))} />}
+                {form.type !== 'car' && <LocationAutocomplete id="itinerary-location" variant="workspace" className="workspace-form__wide" label={t('itinerary.location')} value={form.location} placeholder={t('itinerary.locationPlaceholder')} bias={{ latitude: trip.destinationLatitude, longitude: trip.destinationLongitude }} hint={t('placeSearch.locationHint')} onValueChange={(value) => setForm((current) => ({ ...current, location: value, latitude: '', longitude: '' }))} onPlaceSelect={(place) => selectActivityPlace(place, 'arrival')} />}
 
                 <Field label={t('common.latitude')}><input name="latitude" type="number" min="-90" max="90" step="any" value={form.latitude} onChange={updateField} placeholder="35.6762" title={t('itinerary.latitudeHelp')} /></Field>
                 <Field label={t('common.longitude')}><input name="longitude" type="number" min="-180" max="180" step="any" value={form.longitude} onChange={updateField} placeholder="139.6503" title={t('itinerary.longitudeHelp')} /></Field>
@@ -243,7 +279,7 @@ export function ItineraryPanel({ trip, onUpdate }) {
           <Card key={day.id} className={day.items.length ? 'itinerary-day' : 'itinerary-day itinerary-day--empty'}>
             <header className="itinerary-day__header">
               <span>{t('itinerary.day', { count: dayIndex + 1 })}</span>
-              <div><h3>{formatWorkspaceDate(day.date, locale, t)}</h3><p>{day.title || t(day.items.length === 1 ? 'itinerary.plannedItem' : 'itinerary.plannedItems', { count: day.items.length })}</p></div>
+              <div><h3>{formatLocalizedDate(day.date, locale, 'long', t('itinerary.dateToDefine'))}</h3><p>{day.title || t(day.items.length === 1 ? 'itinerary.plannedItem' : 'itinerary.plannedItems', { count: day.items.length })}</p></div>
               <Button size="small" variant="secondary" icon="plus" onClick={() => openCreateForm(day.date)}>{t('itinerary.addForDay')}</Button>
             </header>
             {day.items.length > 0 ? (
@@ -284,10 +320,6 @@ export function ItineraryPanel({ trip, onUpdate }) {
 }
 
 function Field({ label, className = '', children }) { return <label className={`workspace-field ${className}`.trim()}><span>{label}</span>{children}</label>; }
-function formatWorkspaceDate(date, locale, t) {
-  if (!date) return t('itinerary.dateToDefine');
-  return new Intl.DateTimeFormat(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(`${date}T12:00:00`));
-}
 function addMinutesToDateTime(date, time, durationMinutes) {
   if (!date || !time || durationMinutes <= 0) return { date: date || '', time: '' };
   const value = new Date(`${date}T${time}:00`);

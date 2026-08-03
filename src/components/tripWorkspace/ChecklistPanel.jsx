@@ -11,19 +11,23 @@ export function ChecklistPanel({ trip, onUpdate }) {
   const { t } = useI18n();
   const [label, setLabel] = useState('');
   const [category, setCategory] = useState('documents');
+  const [customListTitle, setCustomListTitle] = useState('');
   const progress = trip.checklistTotal > 0 ? (trip.checklistCompleted / trip.checklistTotal) * 100 : 0;
 
   const groupedItems = useMemo(() => {
     const groups = new Map();
     trip.checklist.forEach((item) => {
-      const currentItems = groups.get(item.category) || [];
-      groups.set(item.category, [...currentItems, item]);
+      const groupId = item.listTitle ? `custom:${item.listTitle}` : item.category;
+      const currentItems = groups.get(groupId) || [];
+      groups.set(groupId, [...currentItems, item]);
     });
 
     return [...groups.entries()]
       .map(([categoryId, items]) => ({
         id: categoryId,
-        label: getCategoryLabel(CHECKLIST_CATEGORIES, categoryId, t),
+        label: categoryId.startsWith('custom:')
+          ? categoryId.slice('custom:'.length)
+          : getCategoryLabel(CHECKLIST_CATEGORIES, categoryId, t),
         items,
       }))
       .sort((left, right) => left.label.localeCompare(right.label));
@@ -33,9 +37,10 @@ export function ChecklistPanel({ trip, onUpdate }) {
     event.preventDefault();
     if (!label.trim()) return;
     onUpdate({
-      checklist: [...trip.checklist, { id: createId('check'), label: label.trim(), category, completed: false }],
+      checklist: [...trip.checklist, { id: createId('check'), label: label.trim(), category, listTitle: customListTitle.trim(), completed: false }],
     });
     setLabel('');
+    setCustomListTitle('');
   }
 
   function toggleItem(itemId) {
@@ -83,6 +88,10 @@ export function ChecklistPanel({ trip, onUpdate }) {
               <option key={item.id} value={item.id}>{t(item.labelKey)}</option>
             ))}
           </select>
+          <label className="checklist-add-form__custom-list">
+            <span className="sr-only">{t('checklist.customListTitle')}</span>
+            <input value={customListTitle} onChange={(event) => setCustomListTitle(event.target.value)} placeholder={t('checklist.customListPlaceholder')} />
+          </label>
           <Button type="submit" icon="plus">{t('common.add')}</Button>
         </form>
       </Card>

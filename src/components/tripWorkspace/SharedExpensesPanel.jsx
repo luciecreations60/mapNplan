@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
+import { formatLocalizedDate } from '../../utils/date.js';
 import { formatCurrency } from '../../utils/currency.js';
 import { createId } from '../../utils/id.js';
 import { buildTripDateRange } from '../../utils/itinerary.js';
@@ -636,5 +637,6 @@ function getInitials(name) {
 }
 
 function formatDate(date, locale) {
-  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(new Date(`${date}T12:00:00`));
+  return formatLocalizedDate(date, locale, 'short');
 }
+

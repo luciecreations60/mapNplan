@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
 import { routePlanningService } from '../../services/routing/RoutePlanningService.js';
+import { formatLocalizedDate } from '../../utils/date.js';
 import { hasValidCoordinates } from '../../utils/map.js';
 import { formatDurationMinutes, TRAVEL_MODES } from '../../utils/routeOptimization.js';
 import { Button } from '../common/Button.jsx';
@@ -125,7 +126,7 @@ export function RouteOptimizerPanel({ trip, onUpdate, onOpenTab }) {
           <select id="route-day" value={selectedDay?.id || ''} onChange={(event) => setSelectedDayId(event.target.value)}>
             {days.map((day, index) => (
               <option key={day.id} value={day.id}>
-                {t('itinerary.day', { count: index + 1 })} · {formatDate(day.date, locale)}
+                {t('itinerary.day', { count: index + 1 })} · {formatLocalizedDate(day.date, locale, 'compact')}
               </option>
             ))}
           </select>
@@ -194,7 +195,7 @@ export function RouteOptimizerPanel({ trip, onUpdate, onOpenTab }) {
           <header className="workspace-panel__header">
             <div>
               <p className="eyebrow">{t('routeOptimizer.preview')}</p>
-              <h2>{selectedDay ? formatDate(selectedDay.date, locale) : ''}</h2>
+              <h2>{selectedDay ? formatLocalizedDate(selectedDay.date, locale, 'compact') : ''}</h2>
             </div>
           </header>
           {mapPoints.length > 0 ? (
@@ -253,12 +254,6 @@ function SummaryCard({ icon, value, label }) {
       <div><strong>{value}</strong><small>{label}</small></div>
     </Card>
   );
-}
-
-function formatDate(date, locale) {
-  if (!date) return '—';
-  return new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short' })
-    .format(new Date(`${date}T12:00:00`));
 }
 
 function formatDistance(value, locale) {

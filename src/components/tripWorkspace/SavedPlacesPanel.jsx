@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
+import { formatLocalizedDate } from '../../utils/date.js';
 import {
   addSavedPlaceToItinerary,
   createSavedPlace,
@@ -48,11 +49,11 @@ const CATEGORY_ICONS = {
 };
 
 export function SavedPlacesPanel({ trip, onUpdate, onOpenTab }) {
-  const { t } = useI18n();
-  const formRef = useRef(null);
+  const { locale, t } = useI18n();
   const importRef = useRef(null);
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [editingId, setEditingId] = useState(null);
+  const [isFormOpen, setFormOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [listFilter, setListFilter] = useState('all');
@@ -149,6 +150,13 @@ export function SavedPlacesPanel({ trip, onUpdate, onOpenTab }) {
   function resetForm() {
     setForm({ ...EMPTY_FORM });
     setEditingId(null);
+    setFormOpen(false);
+  }
+
+  function openCreateForm() {
+    setEditingId(null);
+    setForm({ ...EMPTY_FORM });
+    setFormOpen(true);
   }
 
   function savePlace(event) {
@@ -179,7 +187,7 @@ export function SavedPlacesPanel({ trip, onUpdate, onOpenTab }) {
   function editPlace(place) {
     setEditingId(place.id);
     setForm({ ...place, tags: (place.tags || []).join(', ') });
-    window.requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    setFormOpen(true);
   }
 
   function changeStatus(place, status) {
@@ -257,6 +265,7 @@ export function SavedPlacesPanel({ trip, onUpdate, onOpenTab }) {
           <p>{t('places.intro')}</p>
         </div>
         <div className="saved-places-heading__actions">
+          <Button icon="plus" onClick={openCreateForm}>{t('places.newAction')}</Button>
           <input ref={importRef} className="sr-only" type="file" accept="application/json,.json" onChange={importPlaces} />
           <Button variant="secondary" icon="upload" onClick={() => importRef.current?.click()}>{t('places.import')}</Button>
           <Button variant="secondary" icon="download" disabled={places.length === 0} onClick={() => downloadSavedPlaces(trip)}>{t('places.export')}</Button>
@@ -279,16 +288,13 @@ export function SavedPlacesPanel({ trip, onUpdate, onOpenTab }) {
         ))}
       </div>
 
-      <Card className="workspace-form-card workspace-form-anchor" ref={formRef}>
-        <form className="workspace-form" onSubmit={savePlace}>
-          <div className="workspace-form__title-row">
-            <div>
-              <p className="eyebrow">{t(editingId ? 'places.editEyebrow' : 'places.newEyebrow')}</p>
-              <h3>{t(editingId ? 'places.editTitle' : 'places.newTitle')}</h3>
-            </div>
-            {editingId && <Button variant="ghost" size="small" onClick={resetForm}>{t('common.cancel')}</Button>}
-          </div>
-
+      <Modal
+        isOpen={isFormOpen}
+        title={t(editingId ? 'places.editTitle' : 'places.newTitle')}
+        description={t(editingId ? 'places.editModalText' : 'places.newModalText')}
+        onClose={resetForm}
+      >
+        <form className="workspace-form saved-place-modal-form" onSubmit={savePlace}>
           <div className="workspace-form__grid">
             <label className="workspace-field workspace-form__wide">
               <span>{t('places.name')}</span>
@@ -335,16 +341,17 @@ export function SavedPlacesPanel({ trip, onUpdate, onOpenTab }) {
               <span>{t('places.tags')}</span>
               <input value={form.tags} placeholder={t('places.tagsPlaceholder')} onChange={(event) => updateForm('tags', event.target.value)} />
             </label>
-            <label className="workspace-field workspace-form__wide">
+            <label className="workspace-field workspace-form__full">
               <span>{t('places.notes')}</span>
-              <textarea value={form.notes} placeholder={t('places.notesPlaceholder')} onChange={(event) => updateForm('notes', event.target.value)} />
+              <textarea rows="3" value={form.notes} placeholder={t('places.notesPlaceholder')} onChange={(event) => updateForm('notes', event.target.value)} />
             </label>
           </div>
           <div className="workspace-form__actions">
+            <Button variant="ghost" onClick={resetForm}>{t('common.cancel')}</Button>
             <Button type="submit" icon="save">{t(editingId ? 'places.saveChanges' : 'places.savePlace')}</Button>
           </div>
         </form>
-      </Card>
+      </Modal>
 
       <Card className="saved-places-filters">
         <label className="saved-places-filter saved-places-filter--search">
@@ -388,9 +395,9 @@ export function SavedPlacesPanel({ trip, onUpdate, onOpenTab }) {
               {place.notes && <p className="saved-place-card__notes">{place.notes}</p>}
               <footer className="saved-place-card__actions">
                 <Button size="small" icon="calendarDays" onClick={() => openPlanDialog(place)}>{t('places.addToItinerary')}</Button>
-                <button className="icon-button icon-button--small" type="button" aria-label={t('places.editAria', { name: place.name })} onClick={() => editPlace(place)}><Icon name="edit" size={15} /></button>
-                <button className="icon-button icon-button--small" type="button" aria-label={t('places.markVisitedAria', { name: place.name })} onClick={() => changeStatus(place, place.status === 'visited' ? 'idea' : 'visited')}><Icon name={place.status === 'visited' ? 'undo' : 'check'} size={15} /></button>
-                <button className="icon-button icon-button--small" type="button" aria-label={t('places.deleteAria', { name: place.name })} onClick={() => setDeleteTarget(place)}><Icon name="trash" size={15} /></button>
+                <button className="icon-button icon-button--small" type="button" aria-label={t('places.editAria', { name: place.name })} title={t('places.editTooltip')} onClick={() => editPlace(place)}><Icon name="edit" size={15} /></button>
+                <button className="icon-button icon-button--small" type="button" aria-label={t('places.markVisitedAria', { name: place.name })} title={t(place.status === 'visited' ? 'places.markIdeaTooltip' : 'places.markVisitedTooltip')} onClick={() => changeStatus(place, place.status === 'visited' ? 'idea' : 'visited')}><Icon name={place.status === 'visited' ? 'undo' : 'check'} size={15} /></button>
+                <button className="icon-button icon-button--small" type="button" aria-label={t('places.deleteAria', { name: place.name })} title={t('places.deleteTooltip')} onClick={() => setDeleteTarget(place)}><Icon name="trash" size={15} /></button>
               </footer>
             </Card>
           ))}
@@ -409,7 +416,7 @@ export function SavedPlacesPanel({ trip, onUpdate, onOpenTab }) {
             <label className="workspace-field workspace-form__wide">
               <span>{t('places.planDate')}</span>
               <select required value={planDate} onChange={(event) => setPlanDate(event.target.value)}>
-                {dateOptions.map((date) => <option key={date} value={date}>{date}</option>)}
+                {dateOptions.map((date) => <option key={date} value={date}>{formatLocalizedDate(date, locale, 'compact')}</option>)}
                 {dateOptions.length === 0 && <option value="">{t('places.noDates')}</option>}
               </select>
             </label>

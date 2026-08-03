@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
+import { formatLocalizedDate, formatLocalizedDateTime } from '../../utils/date.js';
 import { formatCurrency } from '../../utils/currency.js';
 import { createId } from '../../utils/id.js';
 import { normalizeExternalUrl } from '../../utils/url.js';
@@ -322,15 +323,15 @@ function getAlertIcon(id) {
 
 function formatLongDate(date, locale) {
   if (!date) return '';
-  return new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(`${date}T12:00:00`));
+  return formatLocalizedDate(date, locale, 'long');
 }
 
 function formatShortDate(date, locale) {
   if (!date) return '';
-  return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(`${date}T12:00:00`));
+  return formatLocalizedDate(date, locale, 'short');
 }
 
 function formatDateTime(date, locale) {
   if (!date) return '—';
-  return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(date));
+  return formatLocalizedDateTime(date, locale);
 }

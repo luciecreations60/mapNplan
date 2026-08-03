@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
+import { formatLocalizedDate } from '../../utils/date.js';
 import { calendarInteropService } from '../../services/calendar/CalendarInteropService.js';
 import {
   analyseCalendarEvents,
@@ -367,14 +368,7 @@ function reminderLabel(minutes, t) {
 }
 
 function formatSelectedDate(value, locale) {
-  if (!value) return '';
-  const [year, month, day] = value.split('-').map(Number);
-  const date = new Date(year, month - 1, day, 12);
-  return new Intl.DateTimeFormat(locale, {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  }).format(date);
+  return formatLocalizedDate(value, locale, 'long', '');
 }
 
 function monthFromDateKey(value) {

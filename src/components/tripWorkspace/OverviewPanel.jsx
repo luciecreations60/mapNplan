@@ -1,5 +1,6 @@
 import { useI18n } from '../../hooks/useI18n.js';
 import { formatCurrency } from '../../utils/currency.js';
+import { formatLocalizedDate, formatLocalizedTime } from '../../utils/date.js';
 import { getTripMapPoints } from '../../utils/map.js';
 import {
   RESERVATION_STATUSES,
@@ -60,7 +61,7 @@ export function OverviewPanel({ trip, onOpenTab }) {
             <div className="overview-timeline">
               {upcomingItems.map((item) => (
                 <article key={item.id} className="overview-timeline__item">
-                  <span className="overview-timeline__time"><strong>{formatPreviewDate(item.date, locale)}</strong><small>{item.time || t('overview.anyTime')}</small></span>
+                  <span className="overview-timeline__time"><strong>{formatLocalizedDate(item.date, locale, 'compact')}</strong><small>{formatLocalizedTime(item.time, t('overview.anyTime'))}</small></span>
                   <span className="overview-timeline__marker"><Icon name={item.type} size={17} /></span>
                   <div>
                     <strong>{item.title}</strong>
@@ -125,7 +126,7 @@ export function OverviewPanel({ trip, onOpenTab }) {
                   <span><Icon name={getReservationIcon(reservation.type)} size={17} /></span>
                   <div>
                     <strong>{reservation.title}</strong>
-                    <small>{reservation.startDate || t('overview.dateToConfirm')}{reservation.provider ? ` · ${reservation.provider}` : ''}</small>
+                    <small>{formatLocalizedDate(reservation.startDate, locale, 'short', t('overview.dateToConfirm'))}{reservation.provider ? ` · ${reservation.provider}` : ''}</small>
                   </div>
                   <em>{getCategoryLabel(RESERVATION_STATUSES, reservation.status, t)}</em>
                 </article>
@@ -176,12 +177,6 @@ function WorkspaceEmptyState({ icon, title, copy, action, onAction }) {
       <button className="text-link" type="button" onClick={onAction}>{action} <Icon name="arrowRight" size={16} /></button>
     </div>
   );
-}
-
-function formatPreviewDate(date, locale) {
-  if (!date) return '—';
-  return new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short' })
-    .format(new Date(`${date}T12:00:00`));
 }
 
 function getReservationIcon(type) {

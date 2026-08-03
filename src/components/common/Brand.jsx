@@ -1,8 +1,9 @@
+import { Link } from 'react-router-dom';
 import { APP_CONFIG } from '../../config/app.config.js';
 
 export function Brand({ compact = false }) {
   return (
-    <div className="brand" aria-label={APP_CONFIG.brandName}>
+    <Link className="brand" to="/dashboard" aria-label={APP_CONFIG.brandName} title={APP_CONFIG.brandName}>
       <span className="brand__mark" aria-hidden="true">
         <span />
         <span />
@@ -14,6 +15,6 @@ export function Brand({ compact = false }) {
           <small>{APP_CONFIG.tagline}</small>
         </span>
       )}
-    </div>
+    </Link>
   );
 }

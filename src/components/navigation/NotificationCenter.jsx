@@ -5,6 +5,7 @@ import { useI18n } from '../../hooks/useI18n.js';
 import { useTrips } from '../../hooks/useTrips.js';
 import { localStorageService } from '../../services/storage/LocalStorageService.js';
 import { getCollaborationTabForEntity } from '../../utils/collaboration.js';
+import { formatLocalizedDateTime } from '../../utils/date.js';
 import { Icon } from '../common/Icon.jsx';
 
 const LAST_READ_STORAGE_KEY = 'notifications:lastReadAt';
@@ -85,7 +86,7 @@ export function NotificationCenter() {
                   <span><Icon name={getActivityIcon(entry.action)} size={16} /></span>
                   <div>
                     <p>{translateActivity(entry, t)}</p>
-                    <small>{entry.tripName} · {new Intl.DateTimeFormat(locale, { dateStyle: 'short', timeStyle: 'short' }).format(new Date(entry.createdAt))}</small>
+                    <small>{entry.tripName} · {formatLocalizedDateTime(entry.createdAt, locale)}</small>
                   </div>
                 </Link>
               ))}

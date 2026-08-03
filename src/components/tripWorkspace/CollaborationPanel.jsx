@@ -2,6 +2,7 @@
 import { useMemo, useState } from 'react';
 import { APP_CONFIG } from '../../config/app.config.js';
 import { useI18n } from '../../hooks/useI18n.js';
+import { formatLocalizedDateTime } from '../../utils/date.js';
 import { tripShareService } from '../../services/share/TripShareService.js';
 import { appendActivityEntry, createActivityEntry, getCurrentActorName } from '../../utils/collaboration.js';
 import { createId } from '../../utils/id.js';
@@ -271,7 +272,7 @@ export function CollaborationPanel({ trip, onUpdate }) {
                 <span><Icon name={getActivityIcon(entry.action)} size={17} /></span>
                 <div>
                   <p>{translateActivity(entry, t)}</p>
-                  <time dateTime={entry.createdAt}>{new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(entry.createdAt))}</time>
+                  <time dateTime={entry.createdAt}>{formatLocalizedDateTime(entry.createdAt, locale)}</time>
                 </div>
               </article>
             ))}

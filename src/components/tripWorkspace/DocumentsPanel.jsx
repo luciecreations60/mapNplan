@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
 import { attachmentStorageService } from '../../services/storage/AttachmentStorageService.js';
 import { createId } from '../../utils/id.js';
+import { formatLocalizedDate, formatLocalizedDateTime } from '../../utils/date.js';
 import { DOCUMENT_TYPES, getCategoryLabel } from '../../utils/tripWorkspace.js';
 import { normalizeExternalUrl } from '../../utils/url.js';
 import { Button } from '../common/Button.jsx';
@@ -24,13 +25,23 @@ export function DocumentsPanel({ trip, onUpdate }) {
   const [busyAttachmentId, setBusyAttachmentId] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [query, setQuery] = useState('');
   const formAnchorRef = useRef(null);
   const fileInputRef = useRef(null);
 
   const documents = useMemo(
-    () => [...trip.documents].sort((left, right) => left.title.localeCompare(right.title)),
-    [trip.documents],
+    () => [...trip.documents].sort((left, right) => left.title.localeCompare(right.title, locale, { sensitivity: 'base' })),
+    [locale, trip.documents],
   );
+  const filteredDocuments = useMemo(() => {
+    const normalized = query.trim().toLocaleLowerCase(locale);
+    if (!normalized) return documents;
+    return documents.filter((document) => [
+      document.title, document.reference, document.notes, document.expiryDate,
+      trip.reservations.find((reservation) => reservation.id === document.linkedReservationId)?.title,
+      ...(attachmentsByDocument[document.id] || []).map((attachment) => attachment.name),
+    ].some((value) => String(value || '').toLocaleLowerCase(locale).includes(normalized)));
+  }, [attachmentsByDocument, documents, locale, query, trip.reservations]);
 
   const refreshAttachments = useCallback(async () => {
     try {
@@ -277,6 +288,14 @@ export function DocumentsPanel({ trip, onUpdate }) {
         onChange={uploadFiles}
       />
 
+      <Card className="document-search-card">
+        <label className="document-search">
+          <Icon name="search" size={17} />
+          <input type="search" value={query} placeholder={t('documents.searchPlaceholder')} aria-label={t('documents.searchPlaceholder')} onChange={(event) => setQuery(event.target.value)} />
+          {query && <button type="button" aria-label={t('search.clear')} onClick={() => setQuery('')}><Icon name="close" size={15} /></button>}
+        </label>
+      </Card>
+
       {isFormOpen && (
         <>
           <div ref={formAnchorRef} className="workspace-form-anchor" />
@@ -329,9 +348,9 @@ export function DocumentsPanel({ trip, onUpdate }) {
         </>
       )}
 
-      {documents.length > 0 ? (
+      {filteredDocuments.length > 0 ? (
         <div className="document-grid document-grid--vault">
-          {documents.map((document) => {
+          {filteredDocuments.map((document) => {
             const safeUrl = normalizeExternalUrl(document.url);
             const attachments = attachmentsByDocument[document.id] || [];
             const linkedReservation = trip.reservations.find((reservation) => reservation.id === document.linkedReservationId);
@@ -342,7 +361,7 @@ export function DocumentsPanel({ trip, onUpdate }) {
                   <small>{getCategoryLabel(DOCUMENT_TYPES, document.type, t)}</small>
                   <h3>{document.title}</h3>
                   {document.reference && <p>{t('documents.reference')} <strong>{document.reference}</strong></p>}
-                  {document.expiryDate && <p><Icon name="calendar" size={14} /> {t('documents.expires', { date: formatDate(document.expiryDate, locale) })}</p>}
+                  {document.expiryDate && <p><Icon name="calendar" size={14} /> {t('documents.expires', { date: formatLocalizedDate(document.expiryDate, locale, 'short') })}</p>}
                   {linkedReservation && <p><Icon name="receipt" size={14} /> {t('documents.linkedTo', { name: linkedReservation.title })}</p>}
                   {document.notes && <span>{document.notes}</span>}
                 </div>
@@ -387,7 +406,7 @@ export function DocumentsPanel({ trip, onUpdate }) {
                           <span className="attachment-item__icon"><Icon name={getAttachmentIcon(attachment.type)} size={18} /></span>
                           <div className="attachment-item__copy">
                             <strong title={attachment.name}>{attachment.name}</strong>
-                            <small>{formatBytes(attachment.size, locale)} · {formatDateTime(attachment.createdAt, locale)}</small>
+                            <small>{formatBytes(attachment.size, locale)} · {formatLocalizedDateTime(attachment.createdAt, locale)}</small>
                           </div>
                           <div className="attachment-item__actions">
                             <button className="icon-button icon-button--small" type="button" disabled={busyAttachmentId === attachment.id} aria-label={t('documents.previewFile', { name: attachment.name })} onClick={() => previewAttachment(attachment)}>
@@ -414,6 +433,12 @@ export function DocumentsPanel({ trip, onUpdate }) {
             );
           })}
         </div>
+      ) : documents.length > 0 ? (
+        <section className="workspace-large-empty workspace-large-empty--compact">
+          <span><Icon name="search" size={28} /></span>
+          <h3>{t('documents.noMatchTitle')}</h3>
+          <p>{t('documents.noMatchText')}</p>
+        </section>
       ) : (
         <section className="workspace-large-empty">
           <span><Icon name="folder" size={28} /></span>
@@ -464,16 +489,6 @@ function downloadRecord(record) {
   anchor.click();
   anchor.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
-}
-
-function formatDate(date, locale) {
-  return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric', year: 'numeric' })
-    .format(new Date(`${date}T12:00:00`));
-}
-
-function formatDateTime(date, locale) {
-  if (!date) return '';
-  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(date));
 }
 
 function formatBytes(bytes, locale) {

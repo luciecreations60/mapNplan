@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
+import { formatLocalizedDateTime } from '../../utils/date.js';
 import { Button } from '../common/Button.jsx';
 import { Icon } from '../common/Icon.jsx';
 
@@ -40,7 +41,7 @@ export function DiscussionThread({ comments = [], currentUserName, onAdd, onRemo
                   <div>
                     <header>
                       <strong>{comment.authorName}</strong>
-                      <time dateTime={comment.createdAt}>{formatCommentDate(comment.createdAt, locale)}</time>
+                      <time dateTime={comment.createdAt}>{formatLocalizedDateTime(comment.createdAt, locale)}</time>
                     </header>
                     <p>{comment.message}</p>
                   </div>
@@ -90,12 +91,4 @@ function getInitials(name) {
     .map((part) => part[0])
     .join('')
     .toUpperCase();
-}
-
-function formatCommentDate(value, locale) {
-  if (!value) return '';
-  return new Intl.DateTimeFormat(locale, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(value));
 }
