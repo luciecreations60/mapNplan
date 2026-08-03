@@ -4,7 +4,7 @@ import { Icon } from '../components/common/Icon.jsx';
 import { useI18n } from '../hooks/useI18n.js';
 import { useTrips } from '../hooks/useTrips.js';
 import { formatCurrency } from '../utils/currency.js';
-import { formatDateRange } from '../utils/date.js';
+import { formatDateRange, formatLocalizedDate } from '../utils/date.js';
 import { buildTripStatistics } from '../utils/tripStatistics.js';
 import {
   DOCUMENT_TYPES,
@@ -82,7 +82,7 @@ export function PrintTripPage() {
             <article key={day.id} className="print-day">
               <header>
                 <span>{t('print.day', { count: index + 1 })}</span>
-                <div><h3>{day.title || day.date}</h3><small>{formatDate(day.date, locale)}</small></div>
+                <div><h3>{day.title || day.date}</h3><small>{formatLocalizedDate(day.date, locale, 'short', '')}</small></div>
               </header>
               {day.items?.length ? (
                 <div className="print-list">
@@ -115,7 +115,7 @@ export function PrintTripPage() {
                       <td>{getOptionLabel(RESERVATION_TYPES, reservation.type, t)}</td>
                       <td>{reservation.title}<small>{reservation.confirmationNumber}</small></td>
                       <td>{reservation.provider || '—'}</td>
-                      <td>{formatDate(reservation.startDate, locale)} {reservation.startTime}</td>
+                      <td>{formatLocalizedDate(reservation.startDate, locale, 'short', '')} {reservation.startTime}</td>
                       <td>{getOptionLabel(RESERVATION_STATUSES, reservation.status, t)}</td>
                       <td>{formatCurrency(reservation.amount, trip.currency, locale)}</td>
                     </tr>
@@ -157,7 +157,7 @@ export function PrintTripPage() {
             <div key={document.id} className="print-document-row">
               <div><strong>{document.title}</strong><span>{getOptionLabel(DOCUMENT_TYPES, document.type, t)}</span></div>
               <div><span>{t('common.reference')}</span><strong>{document.reference || '—'}</strong></div>
-              <div><span>{t('documents.expiry')}</span><strong>{formatDate(document.expiryDate, locale) || '—'}</strong></div>
+              <div><span>{t('documents.expiry')}</span><strong>{formatLocalizedDate(document.expiryDate, locale, 'short', '') || '—'}</strong></div>
             </div>
           )) : <p className="print-muted">{t('print.noDocuments')}</p>}
         </section>
@@ -171,15 +171,9 @@ export function PrintTripPage() {
 
         <footer className="print-footer">
           <span>TripFlow · Every journey starts here.</span>
-          <span>{t('print.generated', { date: new Intl.DateTimeFormat(locale, { dateStyle: 'long' }).format(new Date()) })}</span>
+          <span>{t('print.generated', { date: formatLocalizedDate(new Date(), locale, 'long') })}</span>
         </footer>
       </article>
     </main>
   );
-}
-
-function formatDate(value, locale) {
-  if (!value) return '';
-  const [year, month, day] = value.split('-').map(Number);
-  return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(year, month - 1, day, 12));
 }

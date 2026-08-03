@@ -10,6 +10,7 @@ import { SEO_CONFIG } from '../config/seo.config.js';
 import { useContentStudio } from '../hooks/useContentStudio.js';
 import { useI18n } from '../hooks/useI18n.js';
 import { createId } from '../utils/id.js';
+import { formatLocalizedDateTime } from '../utils/date.js';
 import { scoreSeoArticle, slugify } from '../utils/seoContent.js';
 
 const EMPTY_ARTICLE = Object.freeze({
@@ -276,7 +277,7 @@ function SeoArticleCard({ article, t, locale, onPreview, onEdit, onDownload, onD
       <div className="seo-article-card__meta">
         <span><Icon name="search" size={14} /> {article.primaryKeyword || t('seoStudio.keywordMissing')}</span>
         <span><Icon name="fileText" size={14} /> {t('seoStudio.words', { count: result.wordCount })}</span>
-        <span><Icon name="calendar" size={14} /> {new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(new Date(article.updatedAt))}</span>
+        <span><Icon name="calendar" size={14} /> {formatLocalizedDateTime(article.updatedAt, locale)}</span>
       </div>
       <div className="seo-article-card__actions">
         <Button size="small" icon="eye" onClick={onPreview}>{t('seoStudio.preview')}</Button>

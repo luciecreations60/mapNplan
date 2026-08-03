@@ -7,7 +7,7 @@ import { Icon } from '../components/common/Icon.jsx';
 import { useI18n } from '../hooks/useI18n.js';
 import { tripShareService } from '../services/share/TripShareService.js';
 import { formatCurrency } from '../utils/currency.js';
-import { formatDateRange } from '../utils/date.js';
+import { formatDateRange, formatLocalizedDate, formatLocalizedDateTime, formatLocalizedTime } from '../utils/date.js';
 
 export function SharedTripPage() {
   const [searchParams] = useSearchParams();
@@ -113,7 +113,7 @@ export function SharedTripPage() {
             <header><div><p className="eyebrow">{t('shared.bookingsEyebrow')}</p><h2>{t('shared.reservations')}</h2></div></header>
             <div className="shared-reservations">
               {trip.reservations.map((reservation) => (
-                <article key={reservation.id}><span><Icon name={getReservationIcon(reservation.type)} /></span><div><strong>{reservation.title}</strong><small>{[reservation.startDate, reservation.startTime, reservation.location, reservation.provider].filter(Boolean).join(' · ')}</small>{reservation.notes && <p>{reservation.notes}</p>}</div></article>
+                <article key={reservation.id}><span><Icon name={getReservationIcon(reservation.type)} /></span><div><strong>{reservation.title}</strong><small>{[formatLocalizedDate(reservation.startDate, locale, 'short', ''), formatLocalizedTime(reservation.startTime, ''), reservation.location, reservation.provider].filter(Boolean).join(' · ')}</small>{reservation.notes && <p>{reservation.notes}</p>}</div></article>
               ))}
             </div>
           </Card>
@@ -130,7 +130,7 @@ export function SharedTripPage() {
           <Card className="shared-trip-section"><header><div><p className="eyebrow">{t('shared.notesEyebrow')}</p><h2>{t('workspace.notes')}</h2></div></header><p className="shared-notes">{trip.notes}</p></Card>
         )}
 
-        <footer className="shared-trip-footer"><Brand compact /><p>{t('shared.generated', { date: new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeStyle: 'short' }).format(new Date(createdAt)) })}</p></footer>
+        <footer className="shared-trip-footer"><Brand compact /><p>{t('shared.generated', { date: formatLocalizedDateTime(createdAt, locale) })}</p></footer>
       </div>
     </main>
   );
@@ -138,7 +138,7 @@ export function SharedTripPage() {
 
 function formatSharedDate(value, locale, t) {
   if (!value) return t('shared.dateToConfirm');
-  return new Intl.DateTimeFormat(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(`${value}T12:00:00`));
+  return formatLocalizedDate(value, locale, 'long', t('shared.dateToConfirm'));
 }
 
 function getReservationIcon(type) {

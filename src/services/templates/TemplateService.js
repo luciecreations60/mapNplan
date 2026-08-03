@@ -156,6 +156,7 @@ class TemplateService {
           id: createId('check'),
           label: String(item.label || '').trim(),
           category: String(item.category || 'other').trim(),
+          listTitle: String(item.listTitle || '').trim(),
           completed: false,
         })),
       },
@@ -263,6 +264,7 @@ class TemplateService {
         ? template.checklist.map((item) => ({
             label: String(item.label || '').trim(),
             category: String(item.category || 'other').trim(),
+            listTitle: String(item.listTitle || '').trim(),
             completed: false,
           })).filter((item) => item.label)
         : [],

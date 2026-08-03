@@ -9,7 +9,7 @@ import { normalizeCompanionSettings } from '../../utils/travelCompanion.js';
 import { localStorageService } from '../storage/LocalStorageService.js';
 
 const STORAGE_KEY = 'trips';
-const CURRENT_TRIP_SCHEMA_VERSION = 17;
+const CURRENT_TRIP_SCHEMA_VERSION = 18;
 
 /**
  * Trip repository façade.
@@ -465,6 +465,7 @@ class TripService {
       id: item.id || createId('check'),
       label: String(item.label || 'Checklist item').trim(),
       category: String(item.category || 'other').trim(),
+      listTitle: String(item.listTitle || '').trim(),
       completed: Boolean(item.completed),
     }));
   }

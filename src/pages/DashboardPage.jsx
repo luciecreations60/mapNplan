@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/common/Button.jsx';
 import { Card } from '../components/common/Card.jsx';
 import { Icon } from '../components/common/Icon.jsx';
@@ -10,18 +11,15 @@ import { APP_CONFIG } from '../config/app.config.js';
 import { useI18n } from '../hooks/useI18n.js';
 import { useTrips } from '../hooks/useTrips.js';
 import { formatCurrency } from '../utils/currency.js';
-import { getTripStatus, sortTripsByStartDate } from '../utils/date.js';
+import { formatLocalizedDate, getTripStatus, sortTripsByStartDate } from '../utils/date.js';
 
 export function DashboardPage() {
   const [isCreateOpen, setCreateOpen] = useState(false);
+  const navigate = useNavigate();
   const { locale, t } = useI18n();
   const { trips, deleteTrip } = useTrips();
   const now = new Date();
-  const todayLabel = new Intl.DateTimeFormat(locale, {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  }).format(now);
+  const todayLabel = formatLocalizedDate(now, locale, 'long');
   const greeting = now.getHours() < 12
     ? t('dashboard.goodMorning')
     : now.getHours() < 18
@@ -41,6 +39,14 @@ export function DashboardPage() {
 
   function handleDelete(trip) {
     if (trip && window.confirm(t('trips.deleteConfirm', { name: trip.name }))) deleteTrip(trip.id);
+  }
+
+  function openTripTab(tab) {
+    if (!nextTrip) {
+      navigate('/trips');
+      return;
+    }
+    navigate(`/trips/${nextTrip.id}?tab=${tab}`);
   }
 
   return (
@@ -70,7 +76,9 @@ export function DashboardPage() {
               <p className="eyebrow">{t('dashboard.yourJourneys')}</p>
               <h2>{t('dashboard.tripsInProgress')}</h2>
             </div>
-            <button className="text-link" type="button">{t('dashboard.viewAll')} <Icon name="arrowRight" size={16} /></button>
+            <button className="text-link" type="button" onClick={() => navigate('/trips')}>
+              {t('dashboard.viewAll')} <Icon name="arrowRight" size={16} />
+            </button>
           </header>
 
           <div className="trip-grid trip-grid--dashboard">
@@ -88,10 +96,10 @@ export function DashboardPage() {
             </div>
           </header>
           <div className="quick-actions">
-            <button type="button"><span><Icon name="calendar" /></span><div><strong>{t('dashboard.buildItinerary')}</strong><small>{t('dashboard.organiseDay')}</small></div><Icon name="chevronRight" size={17} /></button>
-            <button type="button"><span><Icon name="wallet" /></span><div><strong>{t('dashboard.updateBudget')}</strong><small>{t('dashboard.trackCosts')}</small></div><Icon name="chevronRight" size={17} /></button>
-            <button type="button"><span><Icon name="check" /></span><div><strong>{t('dashboard.travelChecklist')}</strong><small>{t('dashboard.prepareStressFree')}</small></div><Icon name="chevronRight" size={17} /></button>
-            <button type="button"><span><Icon name="folder" /></span><div><strong>{t('dashboard.reservations')}</strong><small>{t('dashboard.keepDocuments')}</small></div><Icon name="chevronRight" size={17} /></button>
+            <button type="button" onClick={() => openTripTab('itinerary')}><span><Icon name="calendar" /></span><div><strong>{t('dashboard.buildItinerary')}</strong><small>{t('dashboard.organiseDay')}</small></div><Icon name="chevronRight" size={17} /></button>
+            <button type="button" onClick={() => openTripTab('budget')}><span><Icon name="wallet" /></span><div><strong>{t('dashboard.updateBudget')}</strong><small>{t('dashboard.trackCosts')}</small></div><Icon name="chevronRight" size={17} /></button>
+            <button type="button" onClick={() => openTripTab('checklist')}><span><Icon name="check" /></span><div><strong>{t('dashboard.travelChecklist')}</strong><small>{t('dashboard.prepareStressFree')}</small></div><Icon name="chevronRight" size={17} /></button>
+            <button type="button" onClick={() => openTripTab('reservations')}><span><Icon name="folder" /></span><div><strong>{t('dashboard.reservations')}</strong><small>{t('dashboard.keepDocuments')}</small></div><Icon name="chevronRight" size={17} /></button>
           </div>
         </Card>
       </div>

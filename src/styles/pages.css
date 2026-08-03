@@ -4894,3 +4894,232 @@
     left: 96px;
   }
 }
+
+/* ========================================================================== */
+/* V0.1.24 RC3 — navigation, legibility and daily planning corrections        */
+/* ========================================================================== */
+
+/* Dates in overview keep a readable single line with time underneath. */
+.overview-timeline__time {
+  width: 132px;
+  min-width: 132px;
+  align-items: flex-start;
+}
+.overview-timeline__time strong,
+.overview-timeline__time small {
+  display: block;
+  white-space: nowrap;
+}
+.overview-timeline__time strong { font-size: .76rem; line-height: 1.35; }
+.overview-timeline__time small { margin-top: 3px; font-size: .84rem; font-weight: 700; }
+
+/* Itinerary days are visually separated and empty-day actions stay compact. */
+.itinerary-day {
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--color-primary) 28%, var(--color-border));
+}
+.itinerary-day__header {
+  gap: 14px;
+  padding: 16px 18px;
+  background: color-mix(in srgb, var(--color-primary-soft) 78%, var(--color-surface));
+  border-bottom: 1px solid color-mix(in srgb, var(--color-primary) 18%, var(--color-border));
+}
+.itinerary-day__header > span {
+  color: #fff;
+  background: var(--color-primary);
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--color-primary) 28%, transparent);
+}
+.itinerary-day__header h3 { font-size: 1.04rem; }
+.itinerary-day--empty { padding-bottom: 0; }
+.itinerary-day__empty-action {
+  display: inline-flex;
+  width: auto;
+  max-width: calc(100% - 32px);
+  min-height: 42px;
+  margin: 12px 16px 16px;
+  padding: 9px 14px;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  border: 1px dashed color-mix(in srgb, var(--color-primary) 45%, var(--color-border));
+  border-radius: 10px;
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary-soft) 38%, var(--color-surface));
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.itinerary-day__empty-action:hover { background: var(--color-primary-soft); }
+
+/* Route optimisation cards get consistent inner spacing. */
+.route-workspace-grid { align-items: stretch; }
+.route-map-card,
+.route-segments-card { min-width: 0; overflow: hidden; }
+.route-map-card > .workspace-panel__header,
+.route-segments-card > .workspace-panel__header { padding: 16px 18px 12px; }
+.route-map-card .trip-map { border-radius: 0 0 var(--radius-large) var(--radius-large); }
+.route-segments { padding: 0 16px 10px; }
+.route-segments-card__empty { margin: 0; padding: 18px; }
+.route-estimate-note {
+  margin: 0;
+  padding: 12px 16px;
+  align-items: flex-start;
+  border-top: 1px solid var(--color-border);
+  line-height: 1.45;
+}
+.route-estimate-note p { margin: 0; }
+.map-language-note {
+  display: flex;
+  margin: -4px 0 0;
+  align-items: center;
+  gap: 7px;
+  color: var(--color-text-muted);
+  font-size: .78rem;
+}
+.map-add-form__actions { flex-wrap: wrap; }
+
+/* Saved places: forms open in a modal and cards cannot overlap. */
+.saved-places-grid { align-items: start; }
+.saved-place-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  height: auto;
+  flex-direction: column;
+  overflow: hidden;
+}
+.saved-place-card__header,
+.saved-place-card__header > div,
+.saved-place-card__meta { min-width: 0; }
+.saved-place-card__header h3,
+.saved-place-card__header p,
+.saved-place-card__notes,
+.saved-place-card__meta span {
+  overflow-wrap: anywhere;
+}
+.saved-place-card__actions {
+  margin-top: auto;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.saved-place-card__actions .button { margin-right: auto; }
+.saved-place-modal-form { max-height: min(68vh, 720px); overflow: auto; padding-right: 4px; }
+
+/* Unified budget tab. */
+.budget-hub { display: grid; gap: 16px; }
+.budget-hub__switch {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  padding: 4px;
+  gap: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+.budget-hub__button {
+  display: inline-flex;
+  min-height: 42px;
+  padding: 9px 14px;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 9px;
+  color: var(--color-text-muted);
+  background: transparent;
+  font-weight: 750;
+}
+.budget-hub__button--active { color: #fff; background: var(--color-primary); }
+
+/* Reservation search and inline editing. */
+.reservation-search-card,
+.document-search-card { padding: 10px 12px; }
+.reservation-search,
+.document-search {
+  display: flex;
+  min-height: 43px;
+  align-items: center;
+  gap: 9px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+  background: var(--color-surface-muted);
+}
+.reservation-search input,
+.document-search input {
+  width: 100%;
+  min-width: 0;
+  height: 41px;
+  border: 0;
+  outline: 0;
+  color: var(--color-text);
+  background: transparent;
+}
+.reservation-search button,
+.document-search button { display: grid; border: 0; place-items: center; color: var(--color-text-muted); background: transparent; }
+.reservation-card--editing { border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-border)); }
+.reservation-editor--inline {
+  margin: -8px 0 10px 54px;
+  border-top-left-radius: 8px;
+  box-shadow: 0 12px 28px rgba(30, 35, 68, .09);
+}
+.reservation-date-group {
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface-muted);
+}
+.reservation-date-group legend { padding: 0 6px; color: var(--color-text-muted); font-size: .76rem; font-weight: 800; }
+.reservation-date-group > div { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.reservation-documents-field { justify-content: center; }
+.reservation-documents-field > span { align-self: flex-start; }
+.reservation-documents-field input { padding-block: 9px; line-height: 1.3; }
+.reservation-documents-field small { display: block; margin-top: 5px; line-height: 1.35; }
+
+/* Custom checklist grouping. */
+.checklist-add-form { grid-template-columns: minmax(210px, 1.2fr) minmax(150px, .7fr) minmax(190px, .9fr) auto; }
+.checklist-add-form__custom-list { min-width: 0; }
+.checklist-add-form__custom-list input { width: 100%; }
+
+/* All-trips map. */
+.trip-library-view-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+.view-toggle { display: inline-flex; padding: 3px; gap: 3px; border: 1px solid var(--color-border); border-radius: 11px; background: var(--color-surface); }
+.view-toggle__button { display: inline-flex; min-height: 36px; padding: 7px 10px; align-items: center; gap: 6px; border: 0; border-radius: 8px; color: var(--color-text-muted); background: transparent; font-weight: 750; }
+.view-toggle__button--active { color: #fff; background: var(--color-primary); }
+.trips-map-view { position: relative; min-width: 0; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-large); background: var(--color-surface); box-shadow: var(--shadow-soft); }
+.trips-map-view__map { width: 100%; height: clamp(420px, 62vh, 680px); }
+.trips-map-view__legend { position: absolute; z-index: 500; top: 12px; right: 12px; display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 10px; border: 1px solid rgba(255,255,255,.65); border-radius: 10px; background: rgba(255,255,255,.92); box-shadow: 0 6px 18px rgba(31,35,66,.13); color: #20243c; font-size: .72rem; }
+.trips-map-view__legend span { display: inline-flex; align-items: center; gap: 5px; }
+.trips-map-view__legend i { width: 9px; height: 9px; border-radius: 50%; }
+.trips-map-view__hint { margin: 0; padding: 10px 14px; color: var(--color-text-muted); font-size: .76rem; }
+.trips-map-view__empty { position: absolute; z-index: 450; inset: 50% auto auto 50%; display: grid; min-width: 260px; padding: 20px; place-items: center; gap: 6px; transform: translate(-50%, -50%); border-radius: 14px; background: color-mix(in srgb, var(--color-surface) 92%, transparent); text-align: center; }
+.trips-map-popup { display: grid; min-width: 190px; gap: 4px; }
+.trips-map-popup small { color: var(--color-primary); font-weight: 800; text-transform: uppercase; }
+.trips-map-popup strong { font-size: .95rem; }
+.trips-map-popup span { color: #5c6477; font-size: .78rem; }
+.trips-map-popup button { margin-top: 6px; padding: 7px 9px; border: 0; border-radius: 8px; color: #fff; background: #5b5ce2; font-weight: 750; }
+
+.brand { color: inherit; text-decoration: none; }
+
+@media (max-width: 900px) {
+  .reservation-date-group > div { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .checklist-add-form { grid-template-columns: 1fr 1fr; }
+  .checklist-add-form > .button { width: 100%; }
+  .reservation-editor--inline { margin-left: 0; }
+}
+
+@media (max-width: 680px) {
+  .overview-timeline__time { width: 108px; min-width: 108px; }
+  .itinerary-day__header { grid-template-columns: auto minmax(0, 1fr); }
+  .itinerary-day__header .button { grid-column: 1 / -1; width: 100%; }
+  .itinerary-day__empty-action { width: calc(100% - 24px); max-width: none; margin: 10px 12px 14px; white-space: normal; }
+  .saved-places-heading__actions { grid-template-columns: 1fr; }
+  .budget-hub__switch { width: 100%; }
+  .budget-hub__button { flex: 1 1 0; justify-content: center; }
+  .reservation-date-group > div { grid-template-columns: 1fr; }
+  .checklist-add-form { grid-template-columns: 1fr; }
+  .trip-library-view-row { align-items: stretch; flex-direction: column; }
+  .trip-library-view-actions { justify-content: space-between; }
+  .trips-map-view__legend { right: 8px; left: 8px; justify-content: center; }
+}

@@ -6,6 +6,7 @@ import { InlineNotice } from '../components/feedback/InlineNotice.jsx';
 import { CreateTripDialog } from '../components/trips/CreateTripDialog.jsx';
 import { EditTripDialog } from '../components/trips/EditTripDialog.jsx';
 import { TripCard } from '../components/trips/TripCard.jsx';
+import { TripsMap } from '../components/trips/TripsMap.jsx';
 import { useI18n } from '../hooks/useI18n.js';
 import { useTrips } from '../hooks/useTrips.js';
 import { getTripStatus, parseLocalDate } from '../utils/date.js';
@@ -22,6 +23,7 @@ export function TripsPage() {
   const [editingTrip, setEditingTrip] = useState(null);
   const [pendingAction, setPendingAction] = useState(null);
   const [notice, setNotice] = useState(null);
+  const [viewMode, setViewMode] = useState('cards');
   const { locale, t } = useI18n();
   const {
     trips,
@@ -190,12 +192,19 @@ export function TripsPage() {
             </button>
           ))}
         </div>
-        <span className="trip-library-count">
-          {t(filteredTrips.length === 1 ? 'tripLibrary.resultOne' : 'tripLibrary.resultMany', { count: filteredTrips.length })}
-        </span>
+        <div className="trip-library-view-actions">
+          <span className="trip-library-count">
+            {t(filteredTrips.length === 1 ? 'tripLibrary.resultOne' : 'tripLibrary.resultMany', { count: filteredTrips.length })}
+          </span>
+          <div className="view-toggle" role="group" aria-label={t('tripMap.viewAria')}>
+            <button type="button" className={viewMode === 'cards' ? 'view-toggle__button view-toggle__button--active' : 'view-toggle__button'} aria-pressed={viewMode === 'cards'} onClick={() => setViewMode('cards')}><Icon name="trips" size={16} /> {t('tripMap.cards')}</button>
+            <button type="button" className={viewMode === 'map' ? 'view-toggle__button view-toggle__button--active' : 'view-toggle__button'} aria-pressed={viewMode === 'map'} onClick={() => setViewMode('map')}><Icon name="map" size={16} /> {t('tripMap.map')}</button>
+          </div>
+        </div>
       </div>
 
       {filteredTrips.length > 0 ? (
+        viewMode === 'map' ? <TripsMap trips={filteredTrips} /> : (
         <div className="trip-grid">
           {filteredTrips.map((trip) => (
             <TripCard
@@ -210,7 +219,7 @@ export function TripsPage() {
               onDelete={(item) => requestAction('delete', item)}
             />
           ))}
-        </div>
+        </div>)
       ) : (
         <section className="empty-state">
           <span>{activeFilter === 'archived' ? '▣' : '✈'}</span>

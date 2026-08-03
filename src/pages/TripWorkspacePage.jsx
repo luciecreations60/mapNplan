@@ -3,7 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { CollaborationPanel } from '../components/tripWorkspace/CollaborationPanel.jsx';
 import { CalendarPanel } from '../components/tripWorkspace/CalendarPanel.jsx';
 import { BookingPanel } from '../components/tripWorkspace/BookingPanel.jsx';
-import { BudgetPanel } from '../components/tripWorkspace/BudgetPanel.jsx';
+import { BudgetHubPanel } from '../components/tripWorkspace/BudgetHubPanel.jsx';
 import { ChecklistPanel } from '../components/tripWorkspace/ChecklistPanel.jsx';
 import { DocumentsPanel } from '../components/tripWorkspace/DocumentsPanel.jsx';
 import { ItineraryPanel } from '../components/tripWorkspace/ItineraryPanel.jsx';
@@ -13,7 +13,6 @@ import { OverviewPanel } from '../components/tripWorkspace/OverviewPanel.jsx';
 import { ReservationsPanel } from '../components/tripWorkspace/ReservationsPanel.jsx';
 import { RouteOptimizerPanel } from '../components/tripWorkspace/RouteOptimizerPanel.jsx';
 import { SavedPlacesPanel } from '../components/tripWorkspace/SavedPlacesPanel.jsx';
-import { SharedExpensesPanel } from '../components/tripWorkspace/SharedExpensesPanel.jsx';
 import { StatisticsPanel } from '../components/tripWorkspace/StatisticsPanel.jsx';
 import { TravelToolsPanel } from '../components/tripWorkspace/TravelToolsPanel.jsx';
 import { TripHero } from '../components/tripWorkspace/TripHero.jsx';
@@ -115,8 +114,7 @@ export function TripWorkspacePage() {
         {activeTab === 'tools' && <TravelToolsPanel trip={trip} onOpenTab={handleTabChange} />}
         {activeTab === 'booking' && <BookingPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'reservations' && <ReservationsPanel trip={trip} onUpdate={handleUpdate} />}
-        {activeTab === 'budget' && <BudgetPanel trip={trip} onUpdate={handleUpdate} />}
-        {activeTab === 'expenses' && <SharedExpensesPanel trip={trip} onUpdate={handleUpdate} />}
+        {activeTab === 'budget' && <BudgetHubPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'statistics' && <StatisticsPanel trip={trip} />}
         {activeTab === 'checklist' && <ChecklistPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'documents' && <DocumentsPanel trip={trip} onUpdate={handleUpdate} />}
