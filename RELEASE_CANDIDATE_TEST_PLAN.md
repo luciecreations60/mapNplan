@@ -1,27 +1,45 @@
-# Plan de test Release Candidate — V0.1.23 rc.2
+# Plan de test manuel — V0.1.24 RC3
 
-## Préparation
+## 1. Navigation générale
 
-Sauvegarder les données actuelles en JSON, envoyer la RC2 dans GitHub, attendre que toutes les étapes Actions soient vertes puis faire un rechargement forcé. Vérifier que la version affichée est `0.1.23` et que les voyages existants sont toujours présents.
+1. Depuis le tableau de bord, cliquer sur chacun des quatre raccourcis.
+2. Vérifier l’ouverture du prochain voyage dans le bon onglet.
+3. Cliquer sur « Tout afficher » puis sur le logo.
+4. Faire défiler Modèles vers le bas, ouvrir Explorer et vérifier le retour en haut de page.
 
-## Parcours itinéraire
+## 2. Mes voyages
 
-1. Créer un voyage de quatre jours et ouvrir Itinéraire.
-2. Vérifier que les quatre journées existent avant tout ajout.
-3. Ajouter une activité depuis le bouton du troisième jour et contrôler la date préremplie.
-4. Ajouter une autre activité avec le bouton du bas et contrôler qu’il reprend le troisième jour.
-5. Modifier la durée en `1 heure 20 minutes` et vérifier l’affichage `1 h 20 min`.
-6. Créer un transport avec départ, arrivée et mode voiture, puis lancer l’estimation.
-7. Créer une réservation depuis cette activité et contrôler l’onglet Réservations.
+1. Passer de Fiches à Carte.
+2. Vérifier les voyages à venir, en cours et passés.
+3. Cliquer sur un marqueur puis sur « Ouvrir le voyage ».
+4. Tester recherche, filtres et affichage de la carte.
 
-## Carte et météo
+## 3. Vue générale et itinéraire
 
-Cliquer sur plusieurs points de la carte, ajouter l’un d’eux à une date choisie et vérifier sa présence dans l’itinéraire. Ouvrir les outils météo et vérifier l’affichage horizontal étendu ainsi que l’indication de couverture des dates du voyage.
+1. Vérifier que chaque aperçu affiche la date sur une ligne et l’heure en dessous.
+2. Contrôler les mêmes dates en français puis en anglais.
+3. Vérifier le contraste des en-têtes de jours.
+4. Sur une journée vide, vérifier que « + Planifier cette journée » reste compact à 100 %, 125 % et 150 % de zoom.
 
-## Réservations, documents et dépenses
+## 4. Carte et optimisation
 
-Ajouter une réservation avec un PDF ou une image. Contrôler que le document lié apparaît dans Documents et peut être ouvert. Ajouter des dépenses avec décimales, modifier une dépense, sélectionner une date de l’itinéraire et tester les tris par date et par nom.
+1. Vérifier la langue des commandes et textes TripFlow.
+2. Contrôler les marges de la carte et du détail du trajet.
+3. Cliquer sur un point de la carte, puis l’ajouter aux Lieux enregistrés.
+4. Vérifier ensuite sa présence dans l’onglet correspondant.
 
-## Navigateurs
+## 5. Lieux, réservations et documents
 
-Exécuter le parcours principal sous Chrome et Safari. Contrôler aussi la mise en page avec une largeur mobile, le zoom navigateur à 125 % et 150 %, le thème sombre et la navigation clavier.
+1. Modifier Ghibli Museum dans le voyage Japon.
+2. Survoler ou focaliser l’action Visité et vérifier son infobulle.
+3. Créer une activité en sélectionnant un lieu, puis modifier le titre proposé.
+4. Rechercher une réservation, la modifier et vérifier que l’éditeur apparaît juste dessous.
+5. Rechercher un document par titre, référence et nom de fichier joint.
+
+## 6. Budget, checklist et stabilité
+
+1. Ouvrir Budget et basculer entre Vue d’ensemble et Dépenses de groupe.
+2. Vérifier que la répartition entre voyageurs est inchangée.
+3. Ajouter une tâche avec une liste personnalisée.
+4. Appliquer chaque modèle de checklist et vérifier sa richesse.
+5. Exporter une sauvegarde JSON avant toute réinitialisation de démonstration.

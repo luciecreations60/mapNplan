@@ -1,31 +1,7 @@
-# Travel planner — V0.1.23 rc.2
+# TripFlow — V0.1.24 RC3
 
-Cette Release Candidate corrige les problèmes pratiques observés lors des premiers tests Chrome, sans ouvrir un nouveau cycle d’ajout de fonctionnalités.
+TripFlow est une application locale de planification de voyages construite avec React, Vite, Leaflet et GitHub Pages.
 
-## Changements principaux
+Cette Release Candidate regroupe l’itinéraire, les réservations, les documents, les lieux, le budget, les dépenses de groupe, les checklists, les cartes et les outils de voyage. Les données sont conservées localement dans le navigateur. Le référencement public et les affiliations restent désactivés jusqu’au choix de la marque et du domaine définitifs.
 
-- toutes les dates du séjour sont visibles dans l’itinéraire ;
-- ajout d’une activité depuis chaque journée et depuis le bas de la page ;
-- sélection automatique du dernier jour utilisé ;
-- transports avec départ, arrivée, mode et estimation locale ;
-- durée saisie en heures et minutes ;
-- ajout d’une activité depuis un clic sur la carte ;
-- météo demandée sur la fenêtre maximale de 16 jours ;
-- documents ajoutables directement depuis une réservation ;
-- création d’une réservation depuis certaines activités ;
-- montants à deux décimales et tri des dépenses de groupe ;
-- dates visibles dans l’aperçu de l’itinéraire ;
-- corrections d’alignement, de densité et de lisibilité.
-
-Le référencement reste désactivé, la marque reste provisoire et les partenaires commerciaux restent désactivés par défaut.
-
-## Contrôles
-
-```bash
-npm run quality
-npm test
-npm run release:audit
-npm run build
-```
-
-Le build et l’audit avec `dist` sont obligatoires dans GitHub Actions avant tout déploiement.
+Consulter `UPLOAD_TO_GITHUB.md` pour l’installation, `RELEASE_CANDIDATE_TEST_PLAN.md` pour les tests et `KNOWN_LIMITATIONS.md` pour les limites actuelles.

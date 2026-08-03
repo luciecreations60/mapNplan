@@ -1,23 +1,20 @@
-# Rapport qualité — V0.1.23 rc.2
+# Rapport qualité — V0.1.24 RC3
 
 ## Résultats automatiques
 
-- 39 tests réussis ;
-- 0 test en échec ;
-- 1 606 clés de traduction françaises et anglaises synchronisées ;
-- audit Release Candidate : 35 contrôles sur 35 ;
-- fichiers JavaScript, JSX, MJS, JSON et imports relatifs vérifiés par `npm run quality` ;
-- référencement public toujours verrouillé.
+- 46 tests automatisés réussis.
+- 0 test en échec, ignoré ou désactivé.
+- 36 contrôles Release Candidate réussis sur 36.
+- 1 679 clés de traduction synchronisées en français et en anglais.
+- 154 fichiers JavaScript, JSX et MJS analysés par TypeScript sans erreur de syntaxe.
+- Imports relatifs et fichiers JSON contrôlés.
+- Référencement public toujours verrouillé.
+- Partenaires commerciaux toujours désactivés par défaut.
 
-## Couverture ajoutée
+## Scénarios couverts
 
-Les tests vérifient la génération de toutes les dates du séjour, le choix du dernier jour utilisé, l’insertion dans une journée vide, la conversion heures/minutes, une estimation plausible Blaincourt–Mâcon, le clic sur la carte, les pièces jointes de réservation, la météo seize jours et la correction CSS du champ Lieu.
+Les contrôles ajoutés couvrent les raccourcis du tableau de bord, le retour par le logo, le regroupement du budget, l’ordre des onglets, la recherche des réservations et documents, la modification des lieux, l’ajout d’un lieu depuis la carte, les formats de date, la carte de tous les voyages, l’enrichissement des checklists et la conservation des titres de listes personnalisées.
 
-## Point restant à confirmer
+## Build
 
-Le dossier `dist` ne peut être contrôlé qu’après le build Vite. GitHub Actions doit réussir les étapes qualité, tests, build, budget de taille et audit Release Candidate avant le déploiement.
-
-
-## Correctif GitHub Actions
-
-La configuration de découpage du build utilise désormais l’API Rolldown de Vite 8. Un test contractuel bloque le retour de la forme objet `manualChunks`.
+La configuration Vite 8 utilise toujours `rolldownOptions.output.codeSplitting`, correctif validé lors du dernier déploiement. Le build complet ne peut pas être exécuté dans ce conteneur car son accès au registre npm est indisponible. GitHub Actions doit donc confirmer `Production build`, `Build size audit` et `Release candidate audit` avant le déploiement.

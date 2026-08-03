@@ -1,21 +1,16 @@
-# Architecture — V0.1.23 rc.2
+# Architecture — V0.1.24 RC3
 
-## Identité technique
+L’application reste une SPA React/Vite hébergée sur GitHub Pages et fonctionne localement avec LocalStorage et IndexedDB.
 
-- version applicative : `0.1.23` ;
-- candidate : `rc.2` ;
-- schéma voyage : `17` ;
-- indexation publique : désactivée ;
-- cache PWA : `tripflow-v0.1.23`.
+## Évolutions structurelles RC3
 
-## Nouveaux éléments de domaine
+- `src/utils/date.js` centralise les formats de dates visibles.
+- `BudgetHubPanel` réunit budget classique et dépenses de groupe sans dupliquer les données.
+- `TripsMap` présente les voyages géolocalisés et utilise la même configuration Leaflet que les cartes de voyage.
+- `AppLayout` remet les nouvelles routes en haut de page.
+- `Brand` est un lien React Router vers le tableau de bord.
+- Les lieux enregistrés utilisent une modale d’édition afin d’isoler le formulaire de la grille.
+- Les réservations utilisent un éditeur contextuel sous la carte sélectionnée.
+- Le schéma 18 ajoute `checklist[].listTitle`.
 
-`src/utils/itinerary.js` centralise les plages de dates, l’insertion dans une journée vide, la dernière date utilisée et les conversions heures/minutes. Les activités peuvent désormais porter les champs `departureLocation`, `departureLatitude`, `departureLongitude`, `transportMode` et `linkedReservationId`. Les réservations peuvent conserver `sourceActivityId`.
-
-## Services
-
-Le service de géocodage expose maintenant une recherche inversée utilisée uniquement après un clic sur la carte. Le service météo inclut la profondeur de prévision dans sa clé de cache. Les pièces jointes ajoutées depuis une réservation utilisent le même `AttachmentStorageService` IndexedDB que l’onglet Documents.
-
-## Compatibilité
-
-Les nouvelles données sont normalisées par `TripService` lors du chargement. Les anciennes activités et réservations restent compatibles : les nouveaux champs reçoivent des valeurs neutres. Les duplications suppriment les associations privées afin de ne pas relier la copie à d’anciens fichiers ou réservations.
+Aucun backend, compte, domaine commercial ou mécanisme d’indexation publique n’est ajouté.

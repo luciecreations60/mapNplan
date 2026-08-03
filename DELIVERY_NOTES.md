@@ -1,24 +1,47 @@
-# Notes de livraison — V0.1.23 rc.2
+# V0.1.24 RC3 — Notes de livraison
 
-La Partie 24 correspond à une RC2 corrective issue de retours d’utilisation réels. Elle ne rajoute pas de prestataires d’affiliation et n’active pas le référencement.
+Cette candidate corrige les parcours observés pendant les tests Chrome de la RC2. Le référencement public reste désactivé et aucun prestataire commercial supplémentaire n’est activé.
 
-## Itinéraire
+## Navigation
 
-Les jours compris entre le départ et le retour sont affichés même lorsqu’ils sont vides. Chaque journée dispose de son propre bouton d’ajout, avec la date déjà sélectionnée. Le bouton situé en bas reprend le dernier jour de l’itinéraire contenant une activité. La durée est maintenant saisie en heures et minutes.
+- Les raccourcis du tableau de bord ouvrent maintenant l’onglet demandé du prochain voyage actif.
+- « Tout afficher » ouvre la bibliothèque complète des voyages.
+- Le logo renvoie toujours au tableau de bord.
+- Un changement de page replace automatiquement la fenêtre en haut, sans perturber la navigation entre les onglets d’un voyage.
 
-Les activités de transport peuvent enregistrer un lieu de départ, un lieu d’arrivée et un mode de transport. Une estimation locale est proposée lorsque les deux lieux possèdent des coordonnées. Le modèle longue distance a été corrigé pour éviter les durées irréalistes comme celle signalée entre Blaincourt et Mâcon.
+## Voyages et carte globale
 
-## Carte, météo et réservations
+La page Mes voyages propose une vue Fiches et une vue Carte. Les voyages actifs et passés disposant de coordonnées sont affichés sur la carte. Un clic sur le bouton de la fenêtre du marqueur ouvre directement le voyage. Les filtres restent applicables à la carte.
 
-Un clic sur la carte sélectionne un point, tente d’en retrouver le nom et ouvre un formulaire d’activité avec date, heure et type. La météo demande jusqu’à seize jours de prévisions et signale si les dates du voyage dépassent cette fenêtre.
+## Espace voyage
 
-Une réservation peut recevoir des fichiers lors de sa création ou modification. Un document lié est alors créé automatiquement et apparaît dans l’onglet Documents. Les activités hôtel, avion, transport et billet peuvent aussi générer une réservation afin d’éviter une double saisie.
+- Les dates visibles utilisent le formateur central FR/EN.
+- L’aperçu d’itinéraire place la date sur une ligne et l’heure juste dessous.
+- Les en-têtes de journées sont plus contrastés.
+- L’action d’une journée vide tient sur une ligne compacte.
+- L’onglet Statistiques est placé en dernier.
+- Budget et Dépenses de groupe sont regroupés dans un seul onglet Budget, avec deux sous-sections.
 
-## Présentation et dépenses
+## Carte et optimisation
 
-Le chevauchement entre l’icône et le texte des champs Lieu est corrigé avec une règle commune. La taille de base passe à 16 px et les espacements de formulaires sont resserrés. Les montants sont normalisés à deux décimales. Les dépenses de groupe peuvent être triées par date ou ordre alphabétique et leur date peut être choisie dans les journées du voyage.
+- Les commandes de zoom, marqueurs et textes TripFlow suivent la langue de l’interface.
+- Les libellés du fond OpenStreetMap restent ceux fournis localement par les données cartographiques.
+- Les cartes d’optimisation ont des marges et espacements homogènes.
+- Depuis la carte d’un voyage, un point sélectionné peut être ajouté soit à l’itinéraire, soit aux Lieux enregistrés.
 
+## Lieux, réservations et documents
 
-## Correctif après premier déploiement RC2
+- Le formulaire de lieu enregistré s’ouvre dans une fenêtre modale afin d’éviter le chevauchement avec les cartes.
+- Modifier fonctionne sur les lieux de démonstration et les actions disposent d’infobulles.
+- La sélection d’un lieu dans une activité ou réservation propose automatiquement un titre, qui reste modifiable.
+- Les réservations disposent d’une recherche, d’un ordre de champs cohérent et d’une édition insérée sous la réservation concernée.
+- Les documents disposent d’une recherche par titre, référence, note, réservation ou nom de fichier.
 
-Correction de la configuration Vite 8 : remplacement de `manualChunks` objet par `rolldownOptions.output.codeSplitting.groups`. Aucun changement métier ou de données.
+## Checklist
+
+- Un élément peut recevoir un titre de liste personnalisé, par exemple « Essentiels pour bébé ».
+- Les modèles City trip, Road trip, Plage et Professionnel ont été complétés avec les contrôles de documents, santé, paiements, réservations, technologie et bagages.
+
+## Données
+
+Le schéma de voyage passe de 17 à 18 pour conserver le titre personnalisé des listes de checklist. La migration est automatique et ne supprime aucune donnée existante.

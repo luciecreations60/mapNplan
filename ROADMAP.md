@@ -1,15 +1,11 @@
-# Roadmap après V0.1.23 rc.2
+# Roadmap après la RC3
 
-## Étape immédiate
+Le périmètre fonctionnel reste gelé. La priorité est maintenant le test réel de la V0.1.24 RC3.
 
-Tester la RC2 sur le site GitHub Pages avec les données réelles ou une copie de sauvegarde. Relever uniquement les anomalies, incompréhensions et lenteurs rencontrées dans un usage normal.
+## Prochaine décision
 
-## Décision suivante
+- Passage en V1.0 lorsque GitHub Actions, Chrome, Safari, les sauvegardes et les parcours principaux sont validés.
+- RC4 uniquement si les tests révèlent un bug bloquant, une perte de données, un problème majeur de navigation ou une incompatibilité navigateur.
+- Les évolutions futures seront discutées après la V1.0 et ajoutées uniquement lorsqu’elles répondent à un besoin utilisateur confirmé.
 
-- aucun défaut bloquant ou majeur : préparation de la V1.0 stable ;
-- défauts bloquants ou majeurs : RC3 corrective ciblée ;
-- demandes de confort non indispensables : consignées pour une évolution postérieure à la V1.0.
-
-## Après la V1.0
-
-Le nom définitif, le domaine, le lancement SEO, la création de société, les partenaires d’affiliation, les comptes et la synchronisation seront discutés séparément. Aucune de ces évolutions ne sera ajoutée automatiquement sans validation de leur utilité.
+Le référencement, la marque définitive, le domaine, l’affiliation réelle et la synchronisation cloud restent hors périmètre de stabilisation.

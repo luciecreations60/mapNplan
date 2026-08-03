@@ -26,7 +26,7 @@ test('release candidate supports the complete local trip lifecycle', () => {
     budget: 900,
   });
 
-  assert.equal(created.schemaVersion, 17);
+  assert.equal(created.schemaVersion, 18);
   assert.equal(created.travelParty.length, 2);
 
   const ownerId = created.travelParty.find((participant) => participant.isCurrentUser)?.id;
@@ -125,7 +125,7 @@ test('demonstration trips normalize into coherent release-candidate data', () =>
   assert.ok(normalized.length > 0);
 
   for (const trip of normalized) {
-    assert.equal(trip.schemaVersion, 17);
+    assert.equal(trip.schemaVersion, 18);
     assert.ok(trip.id);
     assert.ok(trip.name);
     assert.ok(trip.startDate <= trip.endDate);

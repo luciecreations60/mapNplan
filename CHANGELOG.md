@@ -360,3 +360,19 @@ All notable changes to this project are documented here.
 - updated the service-worker cache to `0.1.18`;
 - removed the unused `meta keywords` tag from exported pages;
 - `npm run build` now executes SEO generation and auditing first.
+
+## 0.1.24 — RC3
+
+- Correction des raccourcis du tableau de bord et du lien « Tout afficher ».
+- Logo cliquable vers l’accueil et retour en haut lors des changements de page.
+- Uniformisation des dates visibles.
+- Amélioration de l’itinéraire, de l’optimisation et de la lisibilité des cartes.
+- Correction et édition modale des lieux enregistrés, avec infobulles.
+- Ajout d’un lieu enregistré depuis la carte.
+- Recherche et édition contextuelle des réservations.
+- Recherche dans les documents.
+- Regroupement Budget/Dépenses de groupe.
+- Statistiques déplacées en dernier.
+- Listes de checklist personnalisées et modèles enrichis.
+- Carte globale des voyages passés et actifs.
+- Schéma de voyage 18 et 46 tests automatisés.
