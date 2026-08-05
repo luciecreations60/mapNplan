@@ -1,4 +1,5 @@
 import { useLocation } from 'react-router-dom';
+import { APP_CONFIG } from '../../config/app.config.js';
 import { PRIMARY_NAVIGATION, SECONDARY_NAVIGATION } from '../../config/navigation.config.js';
 import { useI18n } from '../../hooks/useI18n.js';
 import { useTheme } from '../../hooks/useTheme.js';
@@ -25,7 +26,7 @@ export function TopBar({ menuButtonRef, onOpenMenu }) {
       </div>
 
       <div className="topbar__title">
-        <span>{currentPage ? t(currentPage.labelKey) : 'TripFlow'}</span>
+        <span>{currentPage ? t(currentPage.labelKey) : APP_CONFIG.brandName}</span>
       </div>
 
       <div className="topbar__actions">

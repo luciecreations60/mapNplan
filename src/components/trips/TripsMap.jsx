@@ -9,7 +9,7 @@ import { Icon } from '../common/Icon.jsx';
 
 const STATUS_COLORS = Object.freeze({
   ongoing: '#1aa181',
-  upcoming: '#5b5ce2',
+  upcoming: '#1f90ad',
   past: '#697386',
   draft: '#c96574',
   archived: '#8a8f9d',

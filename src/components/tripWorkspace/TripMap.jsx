@@ -64,7 +64,7 @@ export function TripMap({ points, onMapClick = null, selection = null }) {
       const marker = L.circleMarker(coordinates, {
         radius: 8,
         weight: 3,
-        color: point.source === 'reservation' ? '#1aa181' : point.source === 'destination' ? '#c96574' : point.source === 'savedPlace' ? '#a46a15' : '#5b5ce2',
+        color: point.source === 'reservation' ? '#1aa181' : point.source === 'destination' ? '#c96574' : point.source === 'savedPlace' ? '#a46a15' : '#1f90ad',
         fillColor: point.source === 'reservation' ? '#29bea0' : point.source === 'destination' ? '#f08b78' : point.source === 'savedPlace' ? '#e0a33b' : '#7475ff',
         fillOpacity: 0.92,
       });
@@ -73,7 +73,7 @@ export function TripMap({ points, onMapClick = null, selection = null }) {
       marker.addTo(layerGroup);
     });
     if (itineraryCoordinates.length > 1) {
-      L.polyline(itineraryCoordinates, { color: '#5b5ce2', weight: 3, opacity: 0.65, dashArray: '8 9' }).addTo(layerGroup);
+      L.polyline(itineraryCoordinates, { color: '#1f90ad', weight: 3, opacity: 0.65, dashArray: '8 9' }).addTo(layerGroup);
     }
     if (bounds.length === 1) map.setView(bounds[0], MAP_CONFIG.focusedZoom);
     else map.fitBounds(bounds, { padding: [36, 36], maxZoom: MAP_CONFIG.focusedZoom });
