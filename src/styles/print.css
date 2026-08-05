@@ -30,7 +30,7 @@
   gap: 30px;
   padding: 48px;
   color: white;
-  background: linear-gradient(135deg, #5b5ce2, #8d8dfb);
+  background: linear-gradient(135deg, #1f90ad, #2cbb6b);
 }
 
 .print-cover--aqua { background: linear-gradient(135deg, #168f89, #52cbb2); }
@@ -69,7 +69,7 @@
 .print-key-value { display: flex; justify-content: space-between; gap: 15px; padding: 7px 0; border-bottom: 1px dashed #e5e7ef; font-size: .75rem; }
 .print-checklist-row { display: flex; align-items: center; gap: 9px; padding: 6px 0; font-size: .76rem; }
 .print-checkbox { display: grid; width: 18px; height: 18px; flex: 0 0 auto; place-items: center; border: 1px solid #cbd0dd; border-radius: 5px; }
-.print-checkbox--checked { color: white; border-color: #5b5ce2; background: #5b5ce2; }
+.print-checkbox--checked { color: white; border-color: #1f90ad; background: #1f90ad; }
 .print-document-row { display: grid; grid-template-columns: minmax(0,1fr) minmax(130px,.5fr) minmax(120px,.4fr); gap: 18px; padding: 11px 0; border-bottom: 1px solid #e5e7ef; }
 .print-document-row > div { display: grid; gap: 3px; }
 .print-document-row span { color: #7a8294; font-size: .66rem; }

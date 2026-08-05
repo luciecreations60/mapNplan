@@ -51,7 +51,7 @@ class DataPortabilityService {
 
   #buildFileName() {
     const timestamp = new Date().toISOString().replaceAll(':', '-').replace(/\.\d{3}Z$/, 'Z');
-    return `travel-planner-backup-${timestamp}.json`;
+    return `mapnplan-backup-${timestamp}.json`;
   }
 }
 

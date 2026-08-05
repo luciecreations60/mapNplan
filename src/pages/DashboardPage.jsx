@@ -51,7 +51,7 @@ export function DashboardPage() {
 
   return (
     <div className="page-stack">
-      <section className="page-heading">
+      <section className="page-heading dashboard-hero">
         <div>
           <p className="eyebrow">{todayLabel}</p>
           <h1>{greeting}, {APP_CONFIG.demoUserName} <span aria-hidden="true">👋</span></h1>

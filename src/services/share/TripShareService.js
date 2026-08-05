@@ -176,7 +176,7 @@ class TripShareService {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = `${safeName}.tripflow-share.json`;
+    anchor.download = `${safeName}.mapnplan-share.json`;
     anchor.click();
     URL.revokeObjectURL(url);
   }

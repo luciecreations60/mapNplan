@@ -16,6 +16,7 @@ import './styles/layout.css';
 import './styles/components.css';
 import './styles/pages.css';
 import './styles/print.css';
+import './styles/brand-mapnplan.css';
 
 document.documentElement.dataset.appVersion = PROJECT_CONFIG.version;
 diagnosticsService.installGlobalHandlers();

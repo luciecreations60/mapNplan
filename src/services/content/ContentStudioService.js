@@ -143,7 +143,7 @@ class ContentStudioService {
       exportedAt: nowIso(),
       articles: this.getArticles(),
     };
-    downloadText('tripflow-seo-content.json', `${JSON.stringify(payload, null, 2)}\n`, 'application/json');
+    downloadText('mapnplan-seo-content.json', `${JSON.stringify(payload, null, 2)}\n`, 'application/json');
     return payload;
   }
 

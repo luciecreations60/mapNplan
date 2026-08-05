@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Icon } from '../components/common/Icon.jsx';
+import { APP_CONFIG } from '../config/app.config.js';
 import { useI18n } from '../hooks/useI18n.js';
 import { useTrips } from '../hooks/useTrips.js';
 import { formatCurrency } from '../utils/currency.js';
@@ -51,7 +52,7 @@ export function PrintTripPage() {
       <article className="print-document">
         <header className={`print-cover print-cover--${trip.accent}`}>
           <div>
-            <p className="print-brand">TripFlow · {t('print.travelPlan')}</p>
+            <p className="print-brand">{APP_CONFIG.brandName} · {t('print.travelPlan')}</p>
             <h1>{trip.name}</h1>
             <p className="print-destination">{trip.destination}{trip.country ? ` · ${trip.country}` : ''}</p>
             <p>{formatDateRange(trip.startDate, trip.endDate, locale, t('trips.datesTbc'))}</p>
@@ -170,7 +171,7 @@ export function PrintTripPage() {
         )}
 
         <footer className="print-footer">
-          <span>TripFlow · Every journey starts here.</span>
+          <span>{APP_CONFIG.brandName} · {t('brand.tagline')}</span>
           <span>{t('print.generated', { date: formatLocalizedDate(new Date(), locale, 'long') })}</span>
         </footer>
       </article>

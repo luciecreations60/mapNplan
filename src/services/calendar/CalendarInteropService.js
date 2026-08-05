@@ -21,7 +21,7 @@ class CalendarInteropService {
     const content = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
-      'PRODID:-//TripFlow//Travel planner//EN',
+      'PRODID:-//mapNplan//Travel planner//EN',
       'CALSCALE:GREGORIAN',
       ...buildIcsEvent(event, trip),
       'END:VCALENDAR',
@@ -55,12 +55,12 @@ class CalendarInteropService {
   }
 
   #slugify(value) {
-    return String(value || 'tripflow')
+    return String(value || 'mapnplan')
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '') || 'tripflow';
+      .replace(/^-|-$/g, '') || 'mapnplan';
   }
 }
 

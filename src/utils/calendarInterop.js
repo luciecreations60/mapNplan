@@ -98,7 +98,7 @@ export function analyseCalendarEvents(events, trip) {
   return { conflicts, issues };
 }
 
-export function buildIcsCalendar({ trip, events, productId = '-//TripFlow//Travel planner//EN' }) {
+export function buildIcsCalendar({ trip, events, productId = '-//mapNplan//Travel planner//EN' }) {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
