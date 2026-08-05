@@ -1,19 +1,20 @@
 /**
  * Shared project configuration.
  *
- * Branding, deployment and release switches are centralized here so a future
- * domain/name change does not require edits throughout the application.
+ * The public brand is now mapNplan. The repository name and legacy local
+ * storage identifiers remain unchanged so existing installations and data keep
+ * working while the future production domain is still undecided.
  */
 export const PROJECT_CONFIG = Object.freeze({
   repositoryName: 'travel-planner',
-  codeName: 'TripFlow',
-  brandName: 'TripFlow',
-  tagline: 'Every journey starts here.',
-  version: '0.1.24',
+  codeName: 'mapNplan',
+  brandName: 'mapNplan',
+  tagline: 'Planifiez. Explorez. Profitez.',
+  version: '0.1.25',
   release: Object.freeze({
     stage: 'release-candidate',
-    candidate: 'rc.3',
-    brandFinalized: false,
+    candidate: 'rc.4',
+    brandFinalized: true,
     publicIndexingEnabled: false,
     productionDomain: '',
   }),

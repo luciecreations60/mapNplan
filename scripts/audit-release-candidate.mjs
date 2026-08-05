@@ -35,7 +35,8 @@ check('Version synchronization', packageJson.version === PROJECT_CONFIG.version,
 check('Release-candidate stage', PROJECT_CONFIG.release.stage === 'release-candidate', 'Release stage is not release-candidate.');
 check('Candidate identifier', /^rc\.\d+$/.test(PROJECT_CONFIG.release.candidate || ''), 'Release candidate identifier is invalid.');
 check('SEO lock', PROJECT_CONFIG.release.publicIndexingEnabled === false, 'Public indexing must remain disabled.');
-check('Provisional brand lock', PROJECT_CONFIG.release.brandFinalized === false, 'The provisional brand must not be marked final.');
+check('Brand identity selected', PROJECT_CONFIG.release.brandFinalized === true, 'The approved mapNplan identity must be marked final.');
+check('Brand name', PROJECT_CONFIG.brandName === 'mapNplan', 'The public brand name is not mapNplan.');
 check('No production domain', PROJECT_CONFIG.release.productionDomain === '', 'A production domain must not be set yet.');
 
 const rootHtml = await read('index.html');
@@ -82,7 +83,7 @@ if (distExists) {
 }
 
 const report = {
-  format: 'tripflow-release-readiness',
+  format: 'mapnplan-release-readiness',
   formatVersion: 1,
   version: PROJECT_CONFIG.version,
   candidate: PROJECT_CONFIG.release.candidate,

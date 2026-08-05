@@ -1,14 +1,14 @@
 {
-  "name": "TripFlow",
-  "short_name": "TripFlow",
-  "description": "Every journey starts here.",
+  "name": "mapNplan",
+  "short_name": "mapNplan",
+  "description": "Planifiez. Explorez. Profitez.",
   "start_url": "./#/",
   "display": "standalone",
-  "background_color": "#f5f6fb",
-  "theme_color": "#5b5ce2",
+  "background_color": "#F5F8F9",
+  "theme_color": "#1F90AD",
   "icons": [
     {
-      "src": "./favicon.svg",
+      "src": "./mapnplan-app-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"

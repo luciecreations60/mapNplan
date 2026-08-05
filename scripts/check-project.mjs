@@ -41,7 +41,8 @@ function relativeCandidates(filePath, specifier) {
 const packageJson = JSON.parse(await fs.readFile(path.join(root, 'package.json'), 'utf8'));
 if (packageJson.version !== PROJECT_CONFIG.version) errors.push(`Version mismatch: ${packageJson.version} vs ${PROJECT_CONFIG.version}`);
 if (PROJECT_CONFIG.release.publicIndexingEnabled !== false) errors.push('Public indexing must remain disabled during stabilization.');
-if (PROJECT_CONFIG.release.brandFinalized !== false) errors.push('The provisional brand must not be marked final.');
+if (PROJECT_CONFIG.release.brandFinalized !== true) errors.push('The approved mapNplan identity must be marked final.');
+if (PROJECT_CONFIG.brandName !== 'mapNplan') errors.push('The public brand name must be mapNplan.');
 
 const enKeys = flattenKeys(TRANSLATIONS.en).sort();
 const frKeys = flattenKeys(TRANSLATIONS.fr).sort();

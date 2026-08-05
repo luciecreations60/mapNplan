@@ -1,9 +1,9 @@
 {
-  "name": "travel-planner",
+  "name": "mapnplan",
   "private": true,
-  "version": "0.1.24",
+  "version": "0.1.25",
   "type": "module",
-  "description": "A modern, extensible travel planning application.",
+  "description": "mapNplan — a modern, local-first travel planning application.",
   "scripts": {
     "dev": "vite",
     "seo:generate": "node scripts/generate-seo-pages.mjs",

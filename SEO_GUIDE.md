@@ -1,4 +1,4 @@
-# Guide SEO pratique — TripFlow
+# Guide SEO pratique — mapNplan
 
 ## 1. À quoi sert le SEO ?
 
@@ -230,7 +230,7 @@ Une page utile contient généralement :
 - des informations régulièrement vérifiées ;
 - une date de mise à jour honnête.
 
-Le score interne TripFlow est un contrôle de cohérence, pas une promesse de classement.
+Le score interne mapNplan est un contrôle de cohérence, pas une promesse de classement.
 
 ## 14. Mots-clés
 

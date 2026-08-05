@@ -1,18 +1,18 @@
 {
-  "format": "tripflow-release-readiness",
+  "format": "mapnplan-release-readiness",
   "formatVersion": 1,
-  "version": "0.1.24",
-  "candidate": "rc.3",
+  "version": "0.1.25",
+  "candidate": "rc.4",
   "stage": "release-candidate",
-  "generatedAt": "2026-08-03T11:45:26.614Z",
+  "generatedAt": "2026-08-05T12:55:23.921Z",
   "buildChecked": false,
   "passed": true,
   "summary": {
-    "checks": 36,
-    "passed": 36,
+    "checks": 38,
+    "passed": 38,
     "errors": 0,
     "warnings": 1,
-    "automatedTestFiles": 15
+    "automatedTestFiles": 16
   },
   "checks": [
     {
@@ -32,7 +32,11 @@
       "passed": true
     },
     {
-      "name": "Provisional brand lock",
+      "name": "Brand identity selected",
+      "passed": true
+    },
+    {
+      "name": "Brand name",
       "passed": true
     },
     {
@@ -101,6 +105,10 @@
     },
     {
       "name": "No disabled tests: accessibility-contract.test.mjs",
+      "passed": true
+    },
+    {
+      "name": "No disabled tests: branding-contract.test.mjs",
       "passed": true
     },
     {

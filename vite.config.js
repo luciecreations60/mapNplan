@@ -9,7 +9,7 @@ const base = process.env.GITHUB_ACTIONS
 
 function rootMetadataPlugin() {
   return {
-    name: 'tripflow-root-metadata',
+    name: 'mapnplan-root-metadata',
     transformIndexHtml(html) {
       const siteBaseUrl = PROJECT_CONFIG.deployment.siteBaseUrl.replace(/\/+$/, '');
       const indexingEnabled = PROJECT_CONFIG.release.publicIndexingEnabled;

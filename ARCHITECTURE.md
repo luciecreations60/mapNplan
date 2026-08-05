@@ -1,16 +1,24 @@
-# Architecture — V0.1.24 RC3
+# Architecture — V0.1.25 RC4
 
-L’application reste une SPA React/Vite hébergée sur GitHub Pages et fonctionne localement avec LocalStorage et IndexedDB.
+## Identité
 
-## Évolutions structurelles RC3
+La configuration publique se trouve dans `project.config.js`. Les ressources de marque sont réparties entre :
 
-- `src/utils/date.js` centralise les formats de dates visibles.
-- `BudgetHubPanel` réunit budget classique et dépenses de groupe sans dupliquer les données.
-- `TripsMap` présente les voyages géolocalisés et utilise la même configuration Leaflet que les cartes de voyage.
-- `AppLayout` remet les nouvelles routes en haut de page.
-- `Brand` est un lien React Router vers le tableau de bord.
-- Les lieux enregistrés utilisent une modale d’édition afin d’isoler le formulaire de la grille.
-- Les réservations utilisent un éditeur contextuel sous la carte sélectionnée.
-- Le schéma 18 ajoute `checklist[].listTitle`.
+- `src/components/common/MapNPlanMark.jsx` ;
+- `src/components/common/Brand.jsx` ;
+- `src/styles/brand-mapnplan.css` ;
+- `public/mapnplan-mark.svg` ;
+- `public/mapnplan-logo.svg` ;
+- `public/mapnplan-app-icon.svg`.
 
-Aucun backend, compte, domaine commercial ou mécanisme d’indexation publique n’est ajouté.
+## Styles
+
+Les tokens de couleur, typographie, rayons et ombres sont centralisés dans `src/styles/tokens.css`. Le fichier `brand-mapnplan.css`, chargé en dernier, contient la déclinaison visuelle de la RC4 et limite les modifications risquées dans les composants stabilisés.
+
+## Compatibilité
+
+Le schéma de voyage reste en version 18. Les namespaces historiques LocalStorage et IndexedDB sont conservés. Le nom de marque affiché et les noms de fichiers exportés peuvent évoluer sans déplacer les données locales.
+
+## Publication
+
+Vite utilise le chemin GitHub Pages du dépôt `travel-planner`. Le référencement reste verrouillé avec `publicIndexingEnabled: false` et des métadonnées `noindex`.

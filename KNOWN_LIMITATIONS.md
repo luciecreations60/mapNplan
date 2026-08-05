@@ -1,8 +1,8 @@
-# Limites connues — V0.1.24 RC3
+# Limites connues — RC4
 
-- Le stockage reste local au navigateur : il n’existe pas encore de synchronisation entre appareils.
-- Les pièces jointes IndexedDB doivent être incluses dans les sauvegardes prévues par l’application pour être déplacées vers un autre navigateur.
-- Les durées de trajet sont des estimations locales et ne remplacent pas un moteur routier tenant compte du trafic, des horaires, travaux ou correspondances.
-- Les libellés du fond raster OpenStreetMap suivent les noms enregistrés dans les données cartographiques locales. Seuls les contrôles, messages et marqueurs TripFlow sont traduits.
-- Les prévisions météo sont limitées à la fenêtre proposée par le fournisseur et ne peuvent pas couvrir un voyage trop éloigné.
-- Le référencement, le domaine définitif, les comptes utilisateurs, la synchronisation cloud et les affiliations réelles restent volontairement désactivés.
+- Le domaine définitif n’est pas encore choisi ; le référencement reste désactivé.
+- Poppins est chargée depuis Google Fonts. En absence de réseau, l’interface utilise automatiquement une police système proche.
+- Le dépôt GitHub conserve le nom technique `travel-planner` pour le moment.
+- Les clés internes `tripflow:*` et la base `tripflow-attachments` sont conservées pour éviter toute perte de données. Elles ne sont pas visibles dans l’interface.
+- Les libellés du fond raster OpenStreetMap suivent les noms locaux présents dans les données cartographiques.
+- Le build de production définitif doit être confirmé par GitHub Actions.

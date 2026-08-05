@@ -1,5 +1,16 @@
 # Changelog
 
+## V0.1.25 RC4 — mapNplan identity
+
+- Replaced the provisional visible brand with **mapNplan**.
+- Added vector mark, horizontal logo, favicon and PWA application icon.
+- Applied the approved teal, green and navy palette.
+- Added Poppins with a system font fallback.
+- Restyled the dashboard, navigation, buttons, cards, forms, trip heroes and dark theme.
+- Preserved the legacy local-storage and IndexedDB identifiers so existing data remains available.
+- Kept public indexing disabled until the definitive domain is chosen.
+- Added automated brand, PWA and backward-compatibility contracts.
+
 ## 0.1.23 rc.2 — Correctifs d’usage réels
 
 - jours du séjour générés dans l’itinéraire ;
