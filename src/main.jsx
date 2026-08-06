@@ -3,13 +3,13 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 import { AffiliateProvider } from './contexts/AffiliateContext.jsx';
-import { ContentStudioProvider } from './contexts/ContentStudioContext.jsx';
 import { LocalizationProvider } from './contexts/LocalizationContext.jsx';
 import { ThemeProvider } from './contexts/ThemeContext.jsx';
 import { TemplateProvider } from './contexts/TemplateContext.jsx';
 import { TripProvider } from './contexts/TripContext.jsx';
 import { diagnosticsService } from './services/diagnostics/DiagnosticsService.js';
 import { registerServiceWorker } from './services/pwa/registerServiceWorker.js';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import './styles/tokens.css';
 import './styles/global.css';
 import './styles/layout.css';
@@ -28,9 +28,7 @@ createRoot(document.getElementById('root')).render(
         <TripProvider>
           <AffiliateProvider>
             <TemplateProvider>
-              <ContentStudioProvider>
-                <App />
-              </ContentStudioProvider>
+              <App />
             </TemplateProvider>
           </AffiliateProvider>
         </TripProvider>

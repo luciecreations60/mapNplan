@@ -54,7 +54,7 @@ export function DashboardPage() {
       <section className="page-heading dashboard-hero">
         <div>
           <p className="eyebrow">{todayLabel}</p>
-          <h1>{greeting}, {APP_CONFIG.demoUserName} <span aria-hidden="true">👋</span></h1>
+          <h1>{greeting}, {APP_CONFIG.localUserName} <span aria-hidden="true">👋</span></h1>
           <p>{t('dashboard.intro')}</p>
         </div>
         <Button icon="plus" onClick={() => setCreateOpen(true)}>{t('dashboard.planTrip')}</Button>

@@ -8,7 +8,7 @@ import { createId } from './id.js';
  */
 export function getCurrentActorName(trip) {
   return trip?.collaboration?.members?.find((member) => member.role === 'owner')?.name
-    || APP_CONFIG.demoUserName;
+    || APP_CONFIG.localUserName;
 }
 
 /**
@@ -19,7 +19,7 @@ export function createActivityEntry({ action, actorName, entityType, entityId = 
   return {
     id: createId('activity-log'),
     action,
-    actorName: String(actorName || APP_CONFIG.demoUserName).trim(),
+    actorName: String(actorName || APP_CONFIG.localUserName).trim(),
     entityType: String(entityType || 'trip').trim(),
     entityId: String(entityId || '').trim(),
     targetTitle: String(targetTitle || '').trim(),

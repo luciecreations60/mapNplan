@@ -1,5 +1,4 @@
 import { APP_CONFIG } from '../../config/app.config.js';
-import { DEMO_TRIPS } from '../../data/demoTrips.js';
 import { createId } from '../../utils/id.js';
 import { hasValidCoordinates } from '../../utils/map.js';
 import { normalizeExternalUrl } from '../../utils/url.js';
@@ -8,8 +7,9 @@ import { normalizeBookingOption } from '../../utils/bookingOptions.js';
 import { normalizeCompanionSettings } from '../../utils/travelCompanion.js';
 import { localStorageService } from '../storage/LocalStorageService.js';
 
-const STORAGE_KEY = 'trips';
-const CURRENT_TRIP_SCHEMA_VERSION = 18;
+const STORAGE_KEY = 'trip-library';
+const OBSOLETE_TEST_STORAGE_KEYS = Object.freeze(['trips', 'seo-content-library']);
+const CURRENT_TRIP_SCHEMA_VERSION = 19;
 
 /**
  * Trip repository façade.
@@ -20,22 +20,17 @@ const CURRENT_TRIP_SCHEMA_VERSION = 18;
  */
 class TripService {
   getAll() {
+    OBSOLETE_TEST_STORAGE_KEYS.forEach((key) => localStorageService.remove(key));
     const storedTrips = localStorageService.get(STORAGE_KEY);
 
     if (Array.isArray(storedTrips)) {
-      const normalizedTrips = storedTrips.map((trip) => (
-        this.#normalize(this.#migrateLegacyTrip(trip))
-      ));
+      const normalizedTrips = storedTrips.map((trip) => this.#normalize(trip));
       localStorageService.set(STORAGE_KEY, normalizedTrips);
       return normalizedTrips;
     }
 
-    const initialTrips = APP_CONFIG.features.demoData
-      ? DEMO_TRIPS.map((trip) => this.#normalize({ ...trip }))
-      : [];
-
-    localStorageService.set(STORAGE_KEY, initialTrips);
-    return initialTrips;
+    localStorageService.set(STORAGE_KEY, []);
+    return [];
   }
 
   getById(id) {
@@ -58,6 +53,7 @@ class TripService {
       settlements: [],
       travelParty: [],
       checklist: [],
+      checklistLists: [],
       reservations: [],
       documents: [],
       savedPlaces: [],
@@ -126,6 +122,12 @@ class TripService {
         splitBetweenIds: (expense.splitBetweenIds || [])
           .map((participantId) => participantIdMap.get(participantId))
           .filter(Boolean),
+        splitShares: (expense.splitShares || [])
+          .map((share) => ({
+            ...share,
+            participantId: participantIdMap.get(share.participantId),
+          }))
+          .filter((share) => Boolean(share.participantId)),
       })),
       settlements: sourceTrip.settlements.map((settlement) => ({
         ...settlement,
@@ -135,6 +137,7 @@ class TripService {
         createdAt: now,
       })),
       checklist: sourceTrip.checklist.map((item) => ({ ...item, id: createId('check') })),
+      checklistLists: (sourceTrip.checklistLists || []).map((list) => ({ ...list, id: createId('checklist-list') })),
       reservations: sourceTrip.reservations.map((reservation) => ({
         ...reservation,
         id: createId('reservation'),
@@ -173,7 +176,7 @@ class TripService {
         members: [{
           id: createId('member'),
           name: sourceTrip.collaboration?.members?.find((member) => member.role === 'owner')?.name
-            || APP_CONFIG.demoUserName,
+            || APP_CONFIG.localUserName,
           email: sourceTrip.collaboration?.members?.find((member) => member.role === 'owner')?.email || '',
           role: 'owner',
           addedAt: now,
@@ -213,7 +216,7 @@ class TripService {
       throw new Error('A trips array is required.');
     }
 
-    const normalizedTrips = trips.map((trip) => this.#normalize(this.#migrateLegacyTrip(trip)));
+    const normalizedTrips = trips.map((trip) => this.#normalize(trip));
     localStorageService.set(STORAGE_KEY, normalizedTrips);
     return normalizedTrips;
   }
@@ -225,52 +228,14 @@ class TripService {
     return nextTrips.length !== trips.length;
   }
 
-  resetDemoData() {
+  clearLocalTripData() {
     localStorageService.remove(STORAGE_KEY);
+    OBSOLETE_TEST_STORAGE_KEYS.forEach((key) => localStorageService.remove(key));
     return this.getAll();
   }
 
-  /**
-   * Enriches existing demonstration trips once without overwriting collections
-   * already created or edited by the user.
-   */
-  #migrateLegacyTrip(trip) {
-    const demoTrip = DEMO_TRIPS.find((item) => item.id === trip.id);
-    const migratedTrip = {
-      ...trip,
-      archivedAt: Object.hasOwn(trip, 'archivedAt') ? trip.archivedAt : null,
-      isFavorite: Object.hasOwn(trip, 'isFavorite') ? Boolean(trip.isFavorite) : false,
-      pinnedAt: Object.hasOwn(trip, 'pinnedAt') ? trip.pinnedAt : null,
-      destinationLatitude: Object.hasOwn(trip, 'destinationLatitude')
-        ? trip.destinationLatitude
-        : this.#findLegacyDestinationCoordinate(trip, 'latitude'),
-      destinationLongitude: Object.hasOwn(trip, 'destinationLongitude')
-        ? trip.destinationLongitude
-        : this.#findLegacyDestinationCoordinate(trip, 'longitude'),
-      sourceTemplateId: Object.hasOwn(trip, 'sourceTemplateId') ? trip.sourceTemplateId : null,
-      sourceTemplateName: Object.hasOwn(trip, 'sourceTemplateName') ? trip.sourceTemplateName : '',
-      savedPlaces: Object.hasOwn(trip, 'savedPlaces') ? trip.savedPlaces : [],
-      bookingOptions: Object.hasOwn(trip, 'bookingOptions') ? trip.bookingOptions : [],
-    };
-
-    if (!demoTrip) return migratedTrip;
-
-    return {
-      ...migratedTrip,
-      itinerary: Object.hasOwn(trip, 'itinerary') ? trip.itinerary : demoTrip.itinerary,
-      expenses: Object.hasOwn(trip, 'expenses') ? trip.expenses : demoTrip.expenses,
-      checklist: Object.hasOwn(trip, 'checklist') ? trip.checklist : demoTrip.checklist,
-      reservations: Object.hasOwn(trip, 'reservations') ? trip.reservations : demoTrip.reservations,
-      documents: Object.hasOwn(trip, 'documents') ? trip.documents : demoTrip.documents,
-      notes: Object.hasOwn(trip, 'notes') ? trip.notes : demoTrip.notes,
-      bookingOptions: Object.hasOwn(trip, 'bookingOptions') ? trip.bookingOptions : demoTrip.bookingOptions,
-      destinationCurrency: Object.hasOwn(trip, 'destinationCurrency')
-        ? trip.destinationCurrency
-        : demoTrip.destinationCurrency,
-    };
-  }
-
   #normalize(trip) {
+    const destinationCoordinates = this.#findDestinationCoordinates(trip);
     const collaboration = this.#normalizeCollaboration(trip.collaboration, trip);
     const travelParty = this.#normalizeTravelParty(
       trip.travelParty,
@@ -281,6 +246,7 @@ class TripService {
     const expenses = this.#normalizeExpenses(trip.expenses, travelParty);
     const settlements = this.#normalizeSettlements(trip.settlements, travelParty);
     const checklist = this.#normalizeChecklist(trip.checklist);
+    const checklistLists = this.#normalizeChecklistLists(trip.checklistLists, checklist);
     const itinerary = this.#normalizeItinerary(trip.itinerary);
     const reservations = this.#normalizeReservations(trip.reservations);
     const documents = this.#normalizeDocuments(trip.documents, reservations);
@@ -296,8 +262,8 @@ class TripService {
       id: trip.id,
       name: String(trip.name || 'Untitled trip').trim(),
       destination: String(trip.destination || '').trim(),
-      destinationLatitude: this.#normalizeLatitude(trip.destinationLatitude),
-      destinationLongitude: this.#normalizeLongitude(trip.destinationLongitude),
+      destinationLatitude: destinationCoordinates.latitude,
+      destinationLongitude: destinationCoordinates.longitude,
       country: String(trip.country || '').trim(),
       countryCode: String(trip.countryCode || '').trim().toUpperCase(),
       startDate: trip.startDate || '',
@@ -318,6 +284,7 @@ class TripService {
         ? checklist.length
         : Math.max(0, Number(trip.checklistTotal) || 0),
       accent: ['violet', 'aqua', 'coral'].includes(trip.accent) ? trip.accent : 'violet',
+      coverImageUrl: normalizeExternalUrl(trip.coverImageUrl, { allowDataUrl: true }),
       summary: String(trip.summary || '').trim(),
       sourceTemplateId: trip.sourceTemplateId ? String(trip.sourceTemplateId) : null,
       sourceTemplateName: String(trip.sourceTemplateName || '').trim(),
@@ -327,6 +294,7 @@ class TripService {
       settlements,
       travelParty,
       checklist,
+      checklistLists,
       reservations,
       documents,
       savedPlaces,
@@ -375,8 +343,34 @@ class TripService {
         splitBetweenIds: splitBetweenIds.length > 0
           ? splitBetweenIds
           : travelParty.map((participant) => participant.id),
+        splitShares: this.#normalizeSplitShares(
+          expense.splitShares,
+          splitBetweenIds.length > 0 ? splitBetweenIds : travelParty.map((participant) => participant.id),
+          amount,
+        ),
         notes: String(expense.notes || '').trim(),
       };
+    });
+  }
+
+  #normalizeSplitShares(splitShares, splitBetweenIds, amount) {
+    if (!Array.isArray(splitShares) || splitShares.length === 0) return [];
+    const validIds = new Set(splitBetweenIds);
+    const normalized = splitShares
+      .map((share) => ({
+        participantId: String(share?.participantId || ''),
+        amount: Math.max(0, Number(share?.amount) || 0),
+      }))
+      .filter((share) => validIds.has(share.participantId));
+    const total = normalized.reduce((sum, share) => sum + share.amount, 0);
+    if (normalized.length === 0 || total <= 0 || amount <= 0) return [];
+    let allocated = 0;
+    return normalized.map((share, index) => {
+      const shareAmount = index === normalized.length - 1
+        ? Math.round((amount - allocated) * 100) / 100
+        : Math.round(((share.amount / total) * amount) * 100) / 100;
+      allocated = Math.round((allocated + shareAmount) * 100) / 100;
+      return { participantId: share.participantId, amount: shareAmount };
     });
   }
 
@@ -418,7 +412,7 @@ class TripService {
     if (participants.length === 0) {
       participants = [{
         id: createId('traveller'),
-        name: APP_CONFIG.demoUserName,
+        name: APP_CONFIG.localUserName,
         email: '',
         isCurrentUser: true,
         createdAt: now,
@@ -468,6 +462,21 @@ class TripService {
       listTitle: String(item.listTitle || '').trim(),
       completed: Boolean(item.completed),
     }));
+  }
+
+  #normalizeChecklistLists(checklistLists, checklist) {
+    const configured = Array.isArray(checklistLists) ? checklistLists : [];
+    const inferredTitles = checklist.map((item) => item.listTitle).filter(Boolean);
+    const titles = new Set();
+    return [
+      ...configured.map((list) => ({ id: list?.id || createId('checklist-list'), title: String(list?.title || '').trim() })),
+      ...inferredTitles.map((title) => ({ id: createId('checklist-list'), title })),
+    ].filter((list) => {
+      const key = list.title.toLocaleLowerCase();
+      if (!list.title || titles.has(key)) return false;
+      titles.add(key);
+      return true;
+    });
   }
 
   #normalizeItinerary(itinerary) {
@@ -639,7 +648,7 @@ class TripService {
     return comments
       .map((comment) => ({
         id: comment.id || createId('comment'),
-        authorName: String(comment.authorName || APP_CONFIG.demoUserName).trim(),
+        authorName: String(comment.authorName || APP_CONFIG.localUserName).trim(),
         message: String(comment.message || '').trim().slice(0, 500),
         createdAt: comment.createdAt || new Date().toISOString(),
       }))
@@ -651,7 +660,7 @@ class TripService {
     const sourceMembers = Array.isArray(collaboration?.members) ? collaboration.members : [];
     let members = sourceMembers.map((member) => ({
       id: member.id || createId('member'),
-      name: String(member.name || APP_CONFIG.demoUserName).trim(),
+      name: String(member.name || APP_CONFIG.localUserName).trim(),
       email: String(member.email || '').trim().toLowerCase(),
       role: ['owner', 'editor', 'viewer'].includes(member.role) ? member.role : 'viewer',
       addedAt: member.addedAt || trip.createdAt || now,
@@ -660,7 +669,7 @@ class TripService {
     if (!members.some((member) => member.role === 'owner')) {
       members = [{
         id: createId('member'),
-        name: APP_CONFIG.demoUserName,
+        name: APP_CONFIG.localUserName,
         email: '',
         role: 'owner',
         addedAt: trip.createdAt || now,
@@ -671,7 +680,7 @@ class TripService {
       ? collaboration.activityLog.map((entry) => ({
           id: entry.id || createId('activity-log'),
           action: String(entry.action || 'tripUpdated').trim(),
-          actorName: String(entry.actorName || APP_CONFIG.demoUserName).trim(),
+          actorName: String(entry.actorName || APP_CONFIG.localUserName).trim(),
           entityType: String(entry.entityType || 'trip').trim(),
           entityId: String(entry.entityId || '').trim(),
           targetTitle: String(entry.targetTitle || '').trim(),
@@ -690,22 +699,28 @@ class TripService {
   }
 
 
-  #findLegacyDestinationCoordinate(trip, key) {
-    const firstActivity = Array.isArray(trip.itinerary)
-      ? trip.itinerary
-          .flatMap((day) => day.items || [])
-          .find((item) => hasValidCoordinates(item.latitude, item.longitude))
-      : null;
+  #findDestinationCoordinates(trip) {
+    const explicitLatitude = this.#normalizeLatitude(trip.destinationLatitude);
+    const explicitLongitude = this.#normalizeLongitude(trip.destinationLongitude);
+    if (hasValidCoordinates(explicitLatitude, explicitLongitude)) {
+      return { latitude: explicitLatitude, longitude: explicitLongitude };
+    }
 
-    if (firstActivity) return firstActivity[key];
+    const candidates = [
+      ...(Array.isArray(trip.itinerary)
+        ? trip.itinerary.flatMap((day) => day.items || [])
+        : []),
+      ...(Array.isArray(trip.savedPlaces) ? trip.savedPlaces : []),
+      ...(Array.isArray(trip.reservations) ? trip.reservations : []),
+    ];
+    const firstLocatedItem = candidates.find((item) => (
+      hasValidCoordinates(item?.latitude, item?.longitude)
+    ));
 
-    const firstReservation = Array.isArray(trip.reservations)
-      ? trip.reservations.find((reservation) => (
-          hasValidCoordinates(reservation.latitude, reservation.longitude)
-        ))
-      : null;
-
-    return firstReservation?.[key] ?? null;
+    return {
+      latitude: firstLocatedItem ? this.#normalizeLatitude(firstLocatedItem.latitude) : null,
+      longitude: firstLocatedItem ? this.#normalizeLongitude(firstLocatedItem.longitude) : null,
+    };
   }
 
   #normalizeLatitude(value) {

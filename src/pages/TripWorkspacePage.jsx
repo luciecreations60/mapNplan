@@ -30,8 +30,7 @@ export function TripWorkspacePage() {
   const { t } = useI18n();
   const { getTripById, updateTrip } = useTrips();
   const requestedTab = searchParams.get('tab');
-  const initialTab = TRIP_TABS.some((tab) => tab.id === requestedTab) ? requestedTab : 'overview';
-  const [activeTab, setActiveTab] = useState(initialTab);
+  const activeTab = TRIP_TABS.some((tab) => tab.id === requestedTab) ? requestedTab : 'overview';
   const [isEditOpen, setEditOpen] = useState(false);
   const [notice, setNotice] = useState(null);
   const tabsRef = useRef(null);
@@ -55,14 +54,6 @@ export function TripWorkspacePage() {
     });
   }, [activeTab]);
 
-  useEffect(() => {
-    const tab = searchParams.get('tab');
-    if (TRIP_TABS.some((item) => item.id === tab) && tab !== activeTab) {
-      shouldFocusTabsRef.current = true;
-      setActiveTab(tab);
-    }
-  }, [activeTab, searchParams]);
-
   if (!trip) {
     return (
       <section className="empty-state empty-state--page">
@@ -81,10 +72,12 @@ export function TripWorkspacePage() {
   }
 
   function handleTabChange(tab) {
+    if (!TRIP_TABS.some((item) => item.id === tab)) return;
     shouldFocusTabsRef.current = true;
-    setActiveTab(tab);
-    if (tab === 'overview') setSearchParams({}, { replace: true });
-    else setSearchParams({ tab }, { replace: true });
+    const nextParams = new URLSearchParams(searchParams);
+    if (tab === 'overview') nextParams.delete('tab');
+    else nextParams.set('tab', tab);
+    setSearchParams(nextParams, { replace: true });
   }
 
   return (

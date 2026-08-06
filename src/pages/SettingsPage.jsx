@@ -14,7 +14,7 @@ import { storageHealthService } from '../services/storage/StorageHealthService.j
 export function SettingsPage() {
   const { language, locale, setLanguage, supportedLanguages, t } = useI18n();
   const { theme, setTheme } = useTheme();
-  const { resetDemoData, exportBackup, importBackup, trips } = useTrips();
+  const { clearLocalTripData, exportBackup, importBackup, trips } = useTrips();
   const fileInputRef = useRef(null);
   const [feedback, setFeedback] = useState(null);
   const [isImporting, setIsImporting] = useState(false);
@@ -78,7 +78,7 @@ export function SettingsPage() {
     if (!confirmed) return;
     setIsResetting(true);
     try {
-      await resetDemoData();
+      await clearLocalTripData();
       showFeedback('success', t('settings.resetSuccessTitle'), t('settings.resetSuccessText'));
       await refreshStorageUsage();
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -365,7 +365,7 @@ export function SettingsPage() {
 
       <AffiliateSettingsCard />
 
-      <Card className="settings-card settings-card--danger" id="reset-demo-data">
+      <Card className="settings-card settings-card--danger" id="clear-local-trip-data">
         <header>
           <span className="settings-card__icon"><Icon name="trash" /></span>
           <div>

@@ -20,7 +20,6 @@ export const SEO_CONFIG = Object.freeze({
   description: Object.freeze({ minimum: 120, recommendedMaximum: 160 }),
   minimumArticleWords: 300,
   recommendedArticleWords: 700,
-  storageKey: 'seo-content-library',
   exportFormatVersion: 1,
   publicPathPrefix: '/guides',
   publicationFilePath: 'content/seo-pages.json',

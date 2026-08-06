@@ -1,18 +1,16 @@
 /**
- * Central map configuration.
+ * Vector-map configuration.
  *
- * The application currently uses the public OpenStreetMap tile layer for the
- * demonstration version. Replace the provider here before large-scale traffic
- * or commercial launch without changing map components.
+ * MapLibre + OpenFreeMap is used in the test version because it does not need a
+ * Google billing account or a public API key. Vector labels can be switched to
+ * the language selected in mapNplan, unlike fixed raster tiles.
  */
 export const MAP_CONFIG = Object.freeze({
-  defaultCenter: Object.freeze([20, 0]),
+  defaultCenter: Object.freeze([0, 20]), // [longitude, latitude]
   defaultZoom: 2,
-  focusedZoom: 13,
+  focusedZoom: 14,
+  tripOverviewZoom: 6,
   maxZoom: 19,
-  tileUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  attribution: '&copy; OpenStreetMap contributors',
-  tileOptions: Object.freeze({
-    maxZoom: 19,
-  }),
+  styleUrl: 'https://tiles.openfreemap.org/styles/bright',
+  attribution: 'OpenFreeMap · © OpenStreetMap contributors',
 });

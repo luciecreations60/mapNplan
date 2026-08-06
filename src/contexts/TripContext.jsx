@@ -126,11 +126,11 @@ export function TripProvider({ children }) {
     return { trips: normalizedTrips, attachmentCount: validAttachments.length };
   }, []);
 
-  const resetDemoData = useCallback(async () => {
+  const clearLocalTripData = useCallback(async () => {
     await attachmentStorageService.clear();
-    const demoTrips = tripService.resetDemoData();
-    setTrips(demoTrips);
-    return demoTrips;
+    const emptyTripLibrary = tripService.clearLocalTripData();
+    setTrips(emptyTripLibrary);
+    return emptyTripLibrary;
   }, []);
 
   const value = useMemo(
@@ -145,7 +145,7 @@ export function TripProvider({ children }) {
       archiveTrip,
       restoreTrip,
       deleteTrip,
-      resetDemoData,
+      clearLocalTripData,
       exportBackup,
       importBackup,
       refreshTrips,
@@ -161,7 +161,7 @@ export function TripProvider({ children }) {
       archiveTrip,
       restoreTrip,
       deleteTrip,
-      resetDemoData,
+      clearLocalTripData,
       exportBackup,
       importBackup,
       refreshTrips,

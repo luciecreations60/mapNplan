@@ -40,6 +40,25 @@ export function getExpenseShares(expense, participants = []) {
   const splitIds = getExpenseSplitIds(expense, participants);
   if (paidAmount <= 0 || splitIds.length === 0) return [];
 
+  const configuredShares = Array.isArray(expense?.splitShares)
+    ? expense.splitShares
+        .map((share) => ({ participantId: String(share.participantId || ''), amount: Math.max(0, roundMoney(share.amount)) }))
+        .filter((share) => splitIds.includes(share.participantId) && share.amount > 0)
+    : [];
+  const configuredTotal = roundMoney(configuredShares.reduce((sum, share) => sum + share.amount, 0));
+
+  if (configuredShares.length > 0 && configuredTotal > 0) {
+    let allocated = 0;
+    return configuredShares.map((share, index) => {
+      const isLast = index === configuredShares.length - 1;
+      const proportionalAmount = isLast
+        ? roundMoney(paidAmount - allocated)
+        : roundMoney((paidAmount * share.amount) / configuredTotal);
+      allocated = roundMoney(allocated + proportionalAmount);
+      return { participantId: share.participantId, amount: proportionalAmount };
+    });
+  }
+
   const baseShare = Math.floor((paidAmount * MONEY_PRECISION) / splitIds.length) / MONEY_PRECISION;
   let allocated = 0;
 
@@ -48,6 +67,26 @@ export function getExpenseShares(expense, participants = []) {
     const amount = isLast ? roundMoney(paidAmount - allocated) : baseShare;
     allocated = roundMoney(allocated + amount);
     return { participantId, amount };
+  });
+}
+
+export function getConfiguredExpenseShares(expense, participants = []) {
+  const splitIds = getExpenseSplitIds(expense, participants);
+  const amount = Math.max(0, roundMoney(expense?.amount));
+  const configuredShares = Array.isArray(expense?.splitShares)
+    ? expense.splitShares
+        .map((share) => ({ participantId: String(share.participantId || ''), amount: Math.max(0, roundMoney(share.amount)) }))
+        .filter((share) => splitIds.includes(share.participantId))
+    : [];
+  if (configuredShares.length > 0) return configuredShares;
+  if (splitIds.length === 0) return [];
+
+  const baseShare = Math.floor((amount * MONEY_PRECISION) / splitIds.length) / MONEY_PRECISION;
+  let allocated = 0;
+  return splitIds.map((participantId, index) => {
+    const shareAmount = index === splitIds.length - 1 ? roundMoney(amount - allocated) : baseShare;
+    allocated = roundMoney(allocated + shareAmount);
+    return { participantId, amount: shareAmount };
   });
 }
 
