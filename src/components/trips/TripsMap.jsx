@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import maplibregl from 'maplibre-gl';
 import { MAP_CONFIG } from '../../config/map.config.js';
 import { useI18n } from '../../hooks/useI18n.js';
 import { formatLocalizedDate, getTripStatus } from '../../utils/date.js';
+import { applyMapLanguage, createMapMarkerElement } from '../../utils/mapLanguage.js';
 import { Icon } from '../common/Icon.jsx';
 
 const STATUS_COLORS = Object.freeze({
@@ -16,11 +16,11 @@ const STATUS_COLORS = Object.freeze({
 });
 
 export function TripsMap({ trips }) {
-  const { locale, t } = useI18n();
+  const { language, locale, t } = useI18n();
   const navigate = useNavigate();
   const containerRef = useRef(null);
   const mapRef = useRef(null);
-  const layersRef = useRef(null);
+  const markersRef = useRef([]);
 
   const mappedTrips = useMemo(() => trips.filter((trip) => (
     Number.isFinite(Number(trip.destinationLatitude))
@@ -29,65 +29,76 @@ export function TripsMap({ trips }) {
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return undefined;
-    const map = L.map(containerRef.current, {
+    const map = new maplibregl.Map({
+      container: containerRef.current,
+      style: MAP_CONFIG.styleUrl,
       center: MAP_CONFIG.defaultCenter,
       zoom: MAP_CONFIG.defaultZoom,
-      zoomControl: false,
+      maxZoom: MAP_CONFIG.maxZoom,
+      attributionControl: true,
     });
-    L.control.zoom({
-      zoomInTitle: t('map.zoomIn'),
-      zoomOutTitle: t('map.zoomOut'),
-    }).addTo(map);
-    L.tileLayer(MAP_CONFIG.tileUrl, {
-      ...MAP_CONFIG.tileOptions,
-      attribution: MAP_CONFIG.attribution,
-    }).addTo(map);
-    layersRef.current = L.layerGroup().addTo(map);
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+    map.on('load', () => applyMapLanguage(map, language));
+    map.on('styledata', () => applyMapLanguage(map, language));
     mapRef.current = map;
-    const observer = new ResizeObserver(() => map.invalidateSize());
+
+    const observer = new ResizeObserver(() => map.resize());
     observer.observe(containerRef.current);
     return () => {
       observer.disconnect();
+      markersRef.current.forEach((marker) => marker.remove());
+      markersRef.current = [];
       map.remove();
       mapRef.current = null;
-      layersRef.current = null;
     };
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     const map = mapRef.current;
-    const layer = layersRef.current;
-    if (!map || !layer) return;
-    layer.clearLayers();
+    if (!map) return;
+    const updateLanguage = () => applyMapLanguage(map, language);
+    if (map.isStyleLoaded()) updateLanguage();
+    else map.once('load', updateLanguage);
+  }, [language]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    markersRef.current.forEach((marker) => marker.remove());
+    markersRef.current = [];
 
     if (mappedTrips.length === 0) {
-      map.setView(MAP_CONFIG.defaultCenter, MAP_CONFIG.defaultZoom);
+      map.easeTo({ center: MAP_CONFIG.defaultCenter, zoom: MAP_CONFIG.defaultZoom, duration: 350 });
       return;
     }
 
-    const bounds = [];
+    const bounds = new maplibregl.LngLatBounds();
     mappedTrips.forEach((trip) => {
-      const coordinates = [Number(trip.destinationLatitude), Number(trip.destinationLongitude)];
+      const coordinates = [Number(trip.destinationLongitude), Number(trip.destinationLatitude)];
       const status = trip.archivedAt ? 'archived' : getTripStatus(trip);
-      bounds.push(coordinates);
-      const marker = L.circleMarker(coordinates, {
-        radius: 10,
-        weight: 3,
-        color: '#ffffff',
-        fillColor: STATUS_COLORS[status] || STATUS_COLORS.draft,
-        fillOpacity: 0.96,
+      bounds.extend(coordinates);
+      const element = createMapMarkerElement({ color: STATUS_COLORS[status] || STATUS_COLORS.draft, size: 22, label: trip.name });
+      element.addEventListener('click', (event) => {
+        event.stopPropagation();
+        map.flyTo({ center: coordinates, zoom: MAP_CONFIG.tripOverviewZoom, essential: true });
       });
-      marker.bindTooltip(trip.name, { direction: 'top', offset: [0, -8] });
-      marker.bindPopup(createTripPopup(trip, status, locale, t));
-      marker.on('click', () => {
-        marker.openPopup();
+      element.addEventListener('dblclick', (event) => {
+        event.stopPropagation();
+        navigate(`/trips/${trip.id}`);
       });
-      marker.on('dblclick', () => navigate(`/trips/${trip.id}`));
-      marker.addTo(layer);
+
+      const marker = new maplibregl.Marker({ element, anchor: 'center' })
+        .setLngLat(coordinates)
+        .setPopup(new maplibregl.Popup({ offset: 20 }).setDOMContent(createTripPopup(trip, status, locale, t)))
+        .addTo(map);
+      markersRef.current.push(marker);
     });
 
-    if (bounds.length === 1) map.setView(bounds[0], 6);
-    else map.fitBounds(bounds, { padding: [44, 44], maxZoom: 6 });
+    if (mappedTrips.length === 1) {
+      map.easeTo({ center: bounds.getCenter(), zoom: MAP_CONFIG.tripOverviewZoom, duration: 450 });
+    } else {
+      map.fitBounds(bounds, { padding: 64, maxZoom: MAP_CONFIG.tripOverviewZoom, duration: 550 });
+    }
   }, [locale, mappedTrips, navigate, t]);
 
   useEffect(() => {

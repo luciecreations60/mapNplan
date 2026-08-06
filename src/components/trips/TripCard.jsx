@@ -35,10 +35,13 @@ export function TripCard({
   const { locale, t } = useI18n();
   const status = trip.archivedAt ? 'archived' : getTripStatus(trip);
   const budgetProgress = trip.budget > 0 ? (trip.spent / trip.budget) * 100 : 0;
+  const coverStyle = trip.coverImageUrl ? {
+    backgroundImage: `linear-gradient(135deg, rgba(8, 38, 49, .26), rgba(8, 38, 49, .58)), url(${JSON.stringify(trip.coverImageUrl)})`,
+  } : undefined;
 
   return (
     <article className={`trip-card trip-card--${trip.accent}${trip.archivedAt ? ' trip-card--archived' : ''}${trip.pinnedAt ? ' trip-card--pinned' : ''}`}>
-      <div className="trip-card__visual">
+      <div className={trip.coverImageUrl ? "trip-card__visual trip-card__visual--cover" : "trip-card__visual"} style={coverStyle}>
         <div className="trip-card__visual-grid" />
         <span className="trip-card__country">{trip.countryCode || '✦'}</span>
         <Badge tone={STATUS_TONES[status]}>{t(STATUS_KEYS[status])}</Badge>

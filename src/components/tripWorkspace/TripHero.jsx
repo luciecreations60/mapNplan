@@ -18,9 +18,12 @@ export function TripHero({ trip, onEdit }) {
   const daysUntil = getDaysUntil(trip.startDate);
   const remainingBudget = Math.max(0, trip.budget - trip.spent);
   const statusLabel = t(STATUS_KEYS[status]);
+  const coverStyle = trip.coverImageUrl ? {
+    backgroundImage: `linear-gradient(125deg, rgba(7, 45, 57, .68), rgba(11, 67, 58, .55)), url(${JSON.stringify(trip.coverImageUrl)})`,
+  } : undefined;
 
   return (
-    <section className={`trip-workspace-hero trip-workspace-hero--${trip.accent}`}>
+    <section className={`trip-workspace-hero trip-workspace-hero--${trip.accent}${trip.coverImageUrl ? ' trip-workspace-hero--cover' : ''}`} style={coverStyle}>
       <div className="trip-workspace-hero__grid" aria-hidden="true" />
 
       <div className="trip-workspace-hero__content">

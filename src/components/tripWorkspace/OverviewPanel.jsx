@@ -36,13 +36,13 @@ export function OverviewPanel({ trip, onOpenTab }) {
   return (
     <div className="trip-overview">
       <section className="workspace-stat-grid">
-        <OverviewStat icon="calendarDays" label={t('overview.activities')} value={itineraryCount} />
-        <OverviewStat icon="ticket" tone="aqua" label={t('overview.bookings')} value={confirmedReservations} />
-        <OverviewStat icon="map" tone="green" label={t('overview.mapped')} value={mapPointCount} />
-        <OverviewStat icon="wallet" tone="aqua" label={t('overview.paid')} value={formatCurrency(paidTotal, trip.currency, locale)} />
-        <OverviewStat icon="checklist" tone="coral" label={t('overview.checklist')} value={`${Math.round(checklistProgress)}%`} />
-        <OverviewStat icon="folder" tone="green" label={t('overview.documents')} value={trip.documents.length} />
-        <OverviewStat icon="externalLink" label={t('overview.bookingOptions')} value={trip.bookingOptions.length} />
+        <OverviewStat icon="calendarDays" label={t('overview.activities')} value={itineraryCount} onClick={() => onOpenTab('itinerary')} />
+        <OverviewStat icon="ticket" tone="aqua" label={t('overview.bookings')} value={confirmedReservations} onClick={() => onOpenTab('reservations')} />
+        <OverviewStat icon="map" tone="green" label={t('overview.mapped')} value={mapPointCount} onClick={() => onOpenTab('map')} />
+        <OverviewStat icon="wallet" tone="aqua" label={t('overview.paid')} value={formatCurrency(paidTotal, trip.currency, locale)} onClick={() => onOpenTab('budget')} />
+        <OverviewStat icon="checklist" tone="coral" label={t('overview.checklist')} value={`${Math.round(checklistProgress)}%`} onClick={() => onOpenTab('checklist')} />
+        <OverviewStat icon="folder" tone="green" label={t('overview.documents')} value={trip.documents.length} onClick={() => onOpenTab('documents')} />
+        <OverviewStat icon="externalLink" label={t('overview.bookingOptions')} value={trip.bookingOptions.length} onClick={() => onOpenTab('booking')} />
       </section>
 
       <div className="trip-overview__grid">
@@ -61,7 +61,7 @@ export function OverviewPanel({ trip, onOpenTab }) {
             <div className="overview-timeline">
               {upcomingItems.map((item) => (
                 <article key={item.id} className="overview-timeline__item">
-                  <span className="overview-timeline__time"><strong>{formatLocalizedDate(item.date, locale, 'compact')}</strong><small>{formatLocalizedTime(item.time, t('overview.anyTime'))}</small></span>
+                  <span className="overview-timeline__time"><strong>{formatLocalizedDate(item.date, locale, 'numeric')}</strong><small>{formatLocalizedTime(item.time, t('overview.anyTime'))}</small></span>
                   <span className="overview-timeline__marker"><Icon name={item.type} size={17} /></span>
                   <div>
                     <strong>{item.title}</strong>
@@ -159,12 +159,13 @@ export function OverviewPanel({ trip, onOpenTab }) {
   );
 }
 
-function OverviewStat({ icon, tone = '', label, value }) {
+function OverviewStat({ icon, tone = '', label, value, onClick }) {
   return (
-    <Card className="workspace-stat">
+    <button className="card workspace-stat workspace-stat--interactive" type="button" onClick={onClick} aria-label={`${label}: ${value}`}>
       <span className={`workspace-stat__icon${tone ? ` workspace-stat__icon--${tone}` : ''}`}><Icon name={icon} /></span>
       <div><small>{label}</small><strong>{value}</strong></div>
-    </Card>
+      <Icon name="arrowRight" size={16} />
+    </button>
   );
 }
 

@@ -9,6 +9,7 @@ import {
   buildSettlementSuggestions,
   calculateSharedExpenseSummary,
   downloadExpensesCsv,
+  getConfiguredExpenseShares,
   getExpensePaidAmount,
   getExpenseStatus,
   getExpenseStatusTone,
@@ -68,6 +69,16 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
     [trip.startDate, trip.endDate],
   );
 
+  const categoryTotals = useMemo(() => EXPENSE_CATEGORIES
+    .map((category) => ({
+      ...category,
+      total: (trip.expenses || [])
+        .filter((expense) => expense.category === category.id)
+        .reduce((sum, expense) => sum + Number(expense.amount || 0), 0),
+    }))
+    .filter((category) => category.total > 0)
+    .sort((left, right) => right.total - left.total), [trip.expenses]);
+
   const filteredExpenses = useMemo(() => {
     const query = filters.search.trim().toLocaleLowerCase(locale);
     return [...(trip.expenses || [])]
@@ -97,6 +108,7 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
   }
 
   function openEditExpense(expense) {
+    const configuredShares = getConfiguredExpenseShares(expense, participants);
     setExpenseForm({
       id: expense.id,
       label: expense.label,
@@ -106,6 +118,8 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
       date: expense.date || TODAY,
       paidById: expense.paidById || participants[0]?.id || '',
       splitBetweenIds: [...(expense.splitBetweenIds || participants.map((participant) => participant.id))],
+      splitMode: Array.isArray(expense.splitShares) && expense.splitShares.length > 0 ? 'custom' : 'equal',
+      shareAmounts: Object.fromEntries(configuredShares.map((share) => [share.participantId, Number(share.amount || 0).toFixed(2)])),
       notes: expense.notes || '',
     });
     setExpenseModalOpen(true);
@@ -120,13 +134,23 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
     setExpenseForm((current) => ({ ...current, [fieldName]: normalizeMoney(current[fieldName]) }));
   }
 
+  function updateShareAmount(participantId, value) {
+    setExpenseForm((current) => ({
+      ...current,
+      shareAmounts: { ...current.shareAmounts, [participantId]: value },
+    }));
+  }
+
   function toggleSplitParticipant(participantId) {
     setExpenseForm((current) => {
       const selected = current.splitBetweenIds.includes(participantId);
       const nextIds = selected
         ? current.splitBetweenIds.filter((id) => id !== participantId)
         : [...current.splitBetweenIds, participantId];
-      return { ...current, splitBetweenIds: nextIds };
+      const nextAmounts = { ...current.shareAmounts };
+      if (selected) delete nextAmounts[participantId];
+      else if (!(participantId in nextAmounts)) nextAmounts[participantId] = '';
+      return { ...current, splitBetweenIds: nextIds, shareAmounts: nextAmounts };
     });
   }
 
@@ -134,9 +158,30 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
     event.preventDefault();
     const amount = Math.max(0, Number(expenseForm.amount) || 0);
     const paidAmount = Math.min(amount, Math.max(0, Number(expenseForm.paidAmount) || 0));
+    const selectedIds = expenseForm.splitBetweenIds.length > 0
+      ? expenseForm.splitBetweenIds
+      : participants.length === 1
+        ? [participants[0].id]
+        : [];
 
-    if (!expenseForm.label.trim() || amount <= 0 || expenseForm.splitBetweenIds.length === 0) {
+    if (!expenseForm.label.trim() || amount <= 0 || selectedIds.length === 0) {
       showNotice('danger', t('sharedExpenses.validationTitle'), t('sharedExpenses.validationExpense'));
+      return;
+    }
+
+    const splitShares = expenseForm.splitMode === 'custom'
+      ? selectedIds.map((participantId) => ({
+          participantId,
+          amount: Math.max(0, Number(expenseForm.shareAmounts[participantId]) || 0),
+        }))
+      : [];
+    const customTotal = splitShares.reduce((sum, share) => sum + share.amount, 0);
+    if (expenseForm.splitMode === 'custom' && Math.abs(customTotal - amount) > 0.009) {
+      showNotice(
+        'danger',
+        t('sharedExpenses.validationTitle'),
+        t('sharedExpenses.validationShares', { amount: formatCurrency(amount, trip.currency, locale) }),
+      );
       return;
     }
 
@@ -149,7 +194,8 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
       paid: paidAmount >= amount,
       date: expenseForm.date,
       paidById: expenseForm.paidById || participants[0]?.id || null,
-      splitBetweenIds: expenseForm.splitBetweenIds,
+      splitBetweenIds: selectedIds,
+      splitShares,
       notes: expenseForm.notes.trim(),
     };
 
@@ -320,11 +366,31 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
       )}
 
       <section className="shared-expense-kpis">
-        <SummaryCard label={t('sharedExpenses.planned')} value={formatCurrency(summary.plannedTotal, trip.currency, locale)} hint={t('sharedExpenses.expenseCount', { count: trip.expenses.length })} />
-        <SummaryCard label={t('sharedExpenses.paidToProviders')} value={formatCurrency(summary.paidTotal, trip.currency, locale)} hint={t('sharedExpenses.paidAndPartial', { paid: summary.paidCount, partial: summary.partialCount })} />
-        <SummaryCard label={t('sharedExpenses.stillToPay')} value={formatCurrency(summary.outstandingTotal, trip.currency, locale)} hint={t('sharedExpenses.providerBalance')} />
-        <SummaryCard label={t('sharedExpenses.reimbursements')} value={formatCurrency(summary.settlementsTotal, trip.currency, locale)} hint={t('sharedExpenses.recordedPayments', { count: trip.settlements.length })} primary />
+        <SummaryCard label={t('budget.tripBudget')} value={formatCurrency(trip.budget, trip.currency, locale)} hint={t('budget.maxPlanned')} />
+        <SummaryCard label={t('budget.paid')} value={formatCurrency(summary.paidTotal, trip.currency, locale)} hint={t('sharedExpenses.paidAndPartial', { paid: summary.paidCount, partial: summary.partialCount })} />
+        <SummaryCard label={t('budget.remaining')} value={formatCurrency(summary.outstandingTotal, trip.currency, locale)} hint={t('sharedExpenses.providerBalance')} />
+        <SummaryCard label={t('budget.plannedTotal')} value={formatCurrency(summary.plannedTotal, trip.currency, locale)} hint={t('sharedExpenses.expenseCount', { count: trip.expenses.length })} primary />
       </section>
+
+      <Card className="workspace-panel budget-category-card">
+        <header className="workspace-panel__header">
+          <div><p className="eyebrow">{t('budget.breakdown')}</p><h3>{t('budget.byCategory')}</h3></div>
+        </header>
+        {categoryTotals.length > 0 ? (
+          <div className="category-breakdown">
+            {categoryTotals.map((category) => {
+              const percentage = summary.plannedTotal > 0 ? (category.total / summary.plannedTotal) * 100 : 0;
+              const categoryLabel = t(category.labelKey);
+              return (
+                <div key={category.id} className="category-breakdown__row">
+                  <div><span>{categoryLabel}</span><strong>{formatCurrency(category.total, trip.currency, locale)}</strong></div>
+                  <ProgressBar value={percentage} label={categoryLabel} />
+                </div>
+              );
+            })}
+          </div>
+        ) : <p className="workspace-muted-copy">{t('budget.noBreakdown')}</p>}
+      </Card>
 
       <div className="shared-expenses__main-grid">
         <Card className="workspace-panel shared-balance-card">
@@ -346,23 +412,25 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
             ))}
           </div>
 
-          <div className="settlement-suggestions">
-            <h4>{t('sharedExpenses.suggestionsTitle')}</h4>
-            {suggestions.length > 0 ? suggestions.map((suggestion) => (
-              <article key={`${suggestion.fromParticipantId}-${suggestion.toParticipantId}`} className="settlement-suggestion">
-                <div>
-                  <Icon name="exchange" size={18} />
-                  <p>{t('sharedExpenses.owes', { from: suggestion.fromName, to: suggestion.toName })}</p>
-                </div>
-                <strong>{formatCurrency(suggestion.amount, trip.currency, locale)}</strong>
-                <Button size="small" variant="secondary" onClick={() => recordSuggestion(suggestion)}>
-                  {t('sharedExpenses.recordPayment')}
-                </Button>
-              </article>
-            )) : (
-              <p className="workspace-muted-copy">{t('sharedExpenses.allSettled')}</p>
-            )}
-          </div>
+          {participants.length > 1 && (
+            <div className="settlement-suggestions">
+              <h4>{t('sharedExpenses.suggestionsTitle')}</h4>
+              {suggestions.length > 0 ? suggestions.map((suggestion) => (
+                <article key={`${suggestion.fromParticipantId}-${suggestion.toParticipantId}`} className="settlement-suggestion">
+                  <div>
+                    <Icon name="exchange" size={18} />
+                    <p>{t('sharedExpenses.owes', { from: suggestion.fromName, to: suggestion.toName })}</p>
+                  </div>
+                  <strong>{formatCurrency(suggestion.amount, trip.currency, locale)}</strong>
+                  <Button size="small" variant="secondary" onClick={() => recordSuggestion(suggestion)}>
+                    {t('sharedExpenses.recordPayment')}
+                  </Button>
+                </article>
+              )) : (
+                <p className="workspace-muted-copy">{t('sharedExpenses.allSettled')}</p>
+              )}
+            </div>
+          )}
         </Card>
 
         <Card className="workspace-panel travel-party-card">
@@ -433,6 +501,7 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
               const splitNames = (expense.splitBetweenIds || [])
                 .map((participantId) => participantsById.get(participantId)?.name)
                 .filter(Boolean);
+              const configuredShares = getConfiguredExpenseShares(expense, participants);
               return (
                 <article key={expense.id} className="shared-expense-row">
                   <div className="shared-expense-row__icon"><Icon name="receipt" size={19} /></div>
@@ -443,6 +512,13 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
                     </div>
                     <small>{getCategoryLabel(EXPENSE_CATEGORIES, expense.category, t)}{expense.date ? ` · ${formatDate(expense.date, locale)}` : ''}</small>
                     <p>{t('sharedExpenses.paidByAndSplit', { payer: payer?.name || t('common.none'), count: splitNames.length })}</p>
+                    {configuredShares.length > 0 && (
+                      <div className="shared-expense-row__shares">
+                        {configuredShares.map((share) => (
+                          <span key={share.participantId}>{participantsById.get(share.participantId)?.name || t('common.none')}: {formatCurrency(share.amount, trip.currency, locale)}</span>
+                        ))}
+                      </div>
+                    )}
                     {expense.notes && <p className="shared-expense-row__notes">{expense.notes}</p>}
                     <ProgressBar value={expense.amount > 0 ? (paidAmount / expense.amount) * 100 : 0} label={t('sharedExpenses.paymentProgress')} />
                   </div>
@@ -461,7 +537,8 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
         ) : <div className="workspace-empty workspace-empty--compact"><span><Icon name="receipt" size={24} /></span><h3>{t('sharedExpenses.noExpenses')}</h3><p>{t('sharedExpenses.noExpensesText')}</p></div>}
       </Card>
 
-      <Card className="workspace-panel settlement-history-card">
+      {participants.length > 1 && (
+        <Card className="workspace-panel settlement-history-card">
         <header className="workspace-panel__header">
           <div><p className="eyebrow">{t('sharedExpenses.settlementsEyebrow')}</p><h3>{t('sharedExpenses.settlementsTitle')}</h3></div>
           <span>{trip.settlements.length}</span>
@@ -494,7 +571,8 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
             ))}
           </div>
         ) : <p className="workspace-muted-copy">{t('sharedExpenses.noSettlements')}</p>}
-      </Card>
+        </Card>
+      )}
 
       <ExpenseDialog
         isOpen={isExpenseModalOpen}
@@ -508,6 +586,7 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
         onFieldChange={updateExpenseField}
         onMoneyBlur={normalizeMoneyField}
         onToggleParticipant={toggleSplitParticipant}
+        onShareAmountChange={updateShareAmount}
         onSubmit={submitExpense}
       />
 
@@ -524,7 +603,13 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
   );
 }
 
-function ExpenseDialog({ isOpen, form, participants, currency, itineraryDates, locale, t, onClose, onFieldChange, onMoneyBlur, onToggleParticipant, onSubmit }) {
+function ExpenseDialog({ isOpen, form, participants, currency, itineraryDates, locale, t, onClose, onFieldChange, onMoneyBlur, onToggleParticipant, onShareAmountChange, onSubmit }) {
+  const customTotal = form.splitBetweenIds.reduce(
+    (sum, participantId) => sum + Math.max(0, Number(form.shareAmounts[participantId]) || 0),
+    0,
+  );
+  const expectedTotal = Math.max(0, Number(form.amount) || 0);
+
   return (
     <Modal
       isOpen={isOpen}
@@ -545,14 +630,62 @@ function ExpenseDialog({ isOpen, form, participants, currency, itineraryDates, l
           <label className="workspace-field"><span>{t('sharedExpenses.paidBy')}</span><select name="paidById" value={form.paidById} onChange={onFieldChange}>{participants.map((participant) => <option key={participant.id} value={participant.id}>{participant.name}</option>)}</select></label>
           <fieldset className="participant-split-field workspace-form__wide">
             <legend>{t('sharedExpenses.splitBetween')}</legend>
-            <div className="participant-split-options">
-              {participants.map((participant) => (
-                <label key={participant.id} className="share-option">
-                  <input type="checkbox" checked={form.splitBetweenIds.includes(participant.id)} onChange={() => onToggleParticipant(participant.id)} />
-                  <span><Icon name={form.splitBetweenIds.includes(participant.id) ? 'checkCircle' : 'circle'} size={18} /> {participant.name}</span>
+            {participants.length > 1 && (
+              <div className="expense-split-mode" role="radiogroup" aria-label={t('sharedExpenses.splitMode')}>
+                <label>
+                  <input type="radio" name="splitMode" value="equal" checked={form.splitMode === 'equal'} onChange={onFieldChange} />
+                  <span>{t('sharedExpenses.equalSplit')}</span>
                 </label>
-              ))}
+                <label>
+                  <input type="radio" name="splitMode" value="custom" checked={form.splitMode === 'custom'} onChange={onFieldChange} />
+                  <span>{t('sharedExpenses.customSplit')}</span>
+                </label>
+              </div>
+            )}
+            <div className="participant-split-options">
+              {participants.map((participant) => {
+                const isSelected = form.splitBetweenIds.includes(participant.id);
+                return (
+                  <div key={participant.id} className={isSelected ? 'share-option-row share-option-row--selected' : 'share-option-row'}>
+                    <label className="share-option">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        disabled={participants.length === 1}
+                        onChange={() => onToggleParticipant(participant.id)}
+                      />
+                      <span><Icon name={isSelected ? 'checkCircle' : 'circle'} size={18} /> {participant.name}</span>
+                    </label>
+                    {form.splitMode === 'custom' && isSelected && (
+                      <label className="share-amount-field">
+                        <span className="sr-only">{t('sharedExpenses.shareAmountFor', { name: participant.name })}</span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={form.shareAmounts[participant.id] ?? ''}
+                          onChange={(event) => onShareAmountChange(participant.id, event.target.value)}
+                          aria-label={t('sharedExpenses.shareAmountFor', { name: participant.name })}
+                        />
+                        <span>{currency}</span>
+                      </label>
+                    )}
+                  </div>
+                );
+              })}
             </div>
+            {participants.length === 1 ? (
+              <p className="field-hint">{t('sharedExpenses.singleTravellerHint')}</p>
+            ) : form.splitMode === 'custom' ? (
+              <p className={Math.abs(customTotal - expectedTotal) <= 0.009 ? 'share-total share-total--valid' : 'share-total'}>
+                {t('sharedExpenses.customSplitTotal', {
+                  current: formatCurrency(customTotal, currency, locale),
+                  expected: formatCurrency(expectedTotal, currency, locale),
+                })}
+              </p>
+            ) : (
+              <p className="field-hint">{t('sharedExpenses.equalSplitHint')}</p>
+            )}
           </fieldset>
           <label className="workspace-field workspace-form__wide"><span>{t('common.notes')}</span><textarea name="notes" rows="3" value={form.notes} onChange={onFieldChange} placeholder={t('sharedExpenses.notesPlaceholder')} /></label>
         </div>
@@ -614,6 +747,8 @@ function createEmptyExpenseForm(participants) {
     date: TODAY,
     paidById: currentParticipant?.id || '',
     splitBetweenIds: participants.map((participant) => participant.id),
+    splitMode: 'equal',
+    shareAmounts: Object.fromEntries(participants.map((participant) => [participant.id, ''])),
     notes: '',
   };
 }

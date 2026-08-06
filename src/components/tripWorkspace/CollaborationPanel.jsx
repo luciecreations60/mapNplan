@@ -314,7 +314,7 @@ function getActivityIcon(action) {
 
 function translateActivity(entry, t) {
   return t(`collaboration.activityActions.${entry.action}`, {
-    actor: entry.actorName || APP_CONFIG.demoUserName,
+    actor: entry.actorName || APP_CONFIG.localUserName,
     target: entry.targetTitle || t('collaboration.thisTrip'),
   });
 }
