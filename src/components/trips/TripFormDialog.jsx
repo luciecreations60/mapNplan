@@ -21,6 +21,7 @@ const EMPTY_FORM = Object.freeze({
   destinationCurrency: 'EUR',
   accent: 'violet',
   summary: '',
+  coverImageUrl: '',
 });
 
 const ACCENTS = Object.freeze(['violet', 'aqua', 'coral']);
@@ -84,6 +85,7 @@ export function TripFormDialog({ isOpen, mode = 'create', trip = null, onSubmit,
       travelers: Math.max(1, Number(form.travelers) || 1),
       budget: Math.max(0, Number(form.budget) || 0),
       summary: form.summary.trim(),
+      coverImageUrl: form.coverImageUrl.trim(),
     });
     handleClose();
   }
@@ -163,6 +165,11 @@ export function TripFormDialog({ isOpen, mode = 'create', trip = null, onSubmit,
           </div>
 
           <div className="field trip-form__full">
+            <label className="field__label" htmlFor="trip-cover-image">{t('editTrip.coverImage')}</label>
+            <input id="trip-cover-image" className="field__input" name="coverImageUrl" type="url" value={form.coverImageUrl} onChange={updateField} placeholder={t('editTrip.coverImagePlaceholder')} />
+          </div>
+
+          <div className="field trip-form__full">
             <label className="field__label" htmlFor="trip-summary">{t('editTrip.summary')}</label>
             <textarea id="trip-summary" className="field__input" name="summary" rows="3" value={form.summary} onChange={updateField} placeholder={t('editTrip.summaryPlaceholder')} />
           </div>
@@ -196,5 +203,6 @@ function buildForm(trip) {
     destinationCurrency: trip.destinationCurrency || trip.currency || 'EUR',
     accent: trip.accent || 'violet',
     summary: trip.summary || '',
+    coverImageUrl: trip.coverImageUrl || '',
   };
 }

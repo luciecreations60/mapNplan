@@ -12,6 +12,7 @@ export function ChecklistPanel({ trip, onUpdate }) {
   const [label, setLabel] = useState('');
   const [category, setCategory] = useState('documents');
   const [customListTitle, setCustomListTitle] = useState('');
+  const [showCustomList, setShowCustomList] = useState(false);
   const progress = trip.checklistTotal > 0 ? (trip.checklistCompleted / trip.checklistTotal) * 100 : 0;
 
   const groupedItems = useMemo(() => {
@@ -41,6 +42,7 @@ export function ChecklistPanel({ trip, onUpdate }) {
     });
     setLabel('');
     setCustomListTitle('');
+    setShowCustomList(false);
   }
 
   function toggleItem(itemId) {
@@ -88,10 +90,14 @@ export function ChecklistPanel({ trip, onUpdate }) {
               <option key={item.id} value={item.id}>{t(item.labelKey)}</option>
             ))}
           </select>
-          <label className="checklist-add-form__custom-list">
-            <span className="sr-only">{t('checklist.customListTitle')}</span>
-            <input value={customListTitle} onChange={(event) => setCustomListTitle(event.target.value)} placeholder={t('checklist.customListPlaceholder')} />
-          </label>
+          {showCustomList ? (
+            <label className="checklist-add-form__custom-list">
+              <span className="sr-only">{t('checklist.customListTitle')}</span>
+              <input autoFocus value={customListTitle} onChange={(event) => setCustomListTitle(event.target.value)} placeholder={t('checklist.customListPlaceholder')} />
+            </label>
+          ) : (
+            <Button type="button" variant="secondary" icon="plus" onClick={() => setShowCustomList(true)}>{t('checklist.addList')}</Button>
+          )}
           <Button type="submit" icon="plus">{t('common.add')}</Button>
         </form>
       </Card>

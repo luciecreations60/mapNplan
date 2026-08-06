@@ -11,6 +11,7 @@ import { Button } from '../common/Button.jsx';
 import { Card } from '../common/Card.jsx';
 import { Icon } from '../common/Icon.jsx';
 import { InlineNotice } from '../feedback/InlineNotice.jsx';
+import { LocationAutocomplete } from '../common/LocationAutocomplete.jsx';
 import { TripMap } from './TripMap.jsx';
 
 export function MapPanel({ trip, onOpenTab, onUpdate }) {
@@ -19,6 +20,7 @@ export function MapPanel({ trip, onOpenTab, onUpdate }) {
   const dates = useMemo(() => buildTripDateRange(trip.startDate, trip.endDate), [trip.startDate, trip.endDate]);
   const [selection, setSelection] = useState(null);
   const [status, setStatus] = useState('idle');
+  const [searchValue, setSearchValue] = useState('');
   const [notice, setNotice] = useState(null);
   const [form, setForm] = useState({ date: getLastUsedItineraryDate(trip), time: '09:00', type: 'map', title: '', location: '' });
 
@@ -101,6 +103,7 @@ export function MapPanel({ trip, onOpenTab, onUpdate }) {
       </section>
       <InlineNotice tone="neutral" title={t('map.clickToAddTitle')}>{t('map.clickToAddText')}</InlineNotice>
       <p className="map-language-note"><Icon name="globe" size={15} /> {t('map.languageNote')}</p>
+      <LocationAutocomplete id="map-place-search" label={t('map.searchLabel')} value={searchValue} placeholder={t('map.searchPlaceholder')} variant="workspace" onValueChange={setSearchValue} onPlaceSelect={(place) => { if (place) { setSearchValue(place.label); selectMapPoint({ latitude: place.latitude, longitude: place.longitude }); } }} />
       {notice && <InlineNotice tone={notice.tone} title={notice.title}>{notice.text}</InlineNotice>}
       <div className="map-workspace-grid">
         <Card className="map-card map-card--interactive"><TripMap points={points} onMapClick={selectMapPoint} selection={selection} /></Card>
@@ -129,7 +132,7 @@ export function MapPanel({ trip, onOpenTab, onUpdate }) {
             <>
               <header className="workspace-panel__header"><div><p className="eyebrow">{t('map.mappedPlaces')}</p><h2>{t(points.length === 1 ? 'map.location' : 'map.locations', { count: points.length })}</h2></div></header>
               {points.length > 0 ? (
-                <div className="map-place-list__items">{points.map((point, index) => <article key={point.id} className="map-place-row"><span className="map-place-row__number">{index + 1}</span><div><small>{point.source === 'reservation' ? t('map.reservation') : point.source === 'destination' ? t('map.destination') : point.source === 'savedPlace' ? t('map.savedPlace') : t('map.itinerary')}</small><strong>{point.title}</strong><p><Icon name="pin" size={13} /> {point.subtitle || t('map.savedCoordinates')}</p></div></article>)}</div>
+                <div className="map-place-list__items">{points.map((point, index) => <button key={point.id} type="button" className="map-place-row map-place-row--button" onClick={() => setSelection({ latitude: point.latitude, longitude: point.longitude })}><span className="map-place-row__number">{index + 1}</span><div><small>{point.source === 'reservation' ? t('map.reservation') : point.source === 'destination' ? t('map.destination') : point.source === 'savedPlace' ? t('map.savedPlace') : t('map.itinerary')}</small><strong>{point.title}</strong><p><Icon name="pin" size={13} /> {point.subtitle || t('map.savedCoordinates')}</p></div></button>)}</div>
               ) : (
                 <section className="workspace-large-empty workspace-large-empty--compact"><span><Icon name="map" size={28} /></span><h3>{t('map.emptyTitle')}</h3><p>{t('map.emptyText')}</p><Button icon="plus" onClick={() => onOpenTab('itinerary')}>{t('map.addCoordinates')}</Button></section>
               )}
