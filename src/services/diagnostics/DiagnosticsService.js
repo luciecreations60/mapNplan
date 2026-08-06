@@ -1,4 +1,4 @@
-const DIAGNOSTICS_KEY = 'tripflow:diagnostics';
+const DIAGNOSTICS_KEY = 'mapnplan:diagnostics';
 const MAX_ENTRIES = 20;
 
 function serializeError(error) {
@@ -42,8 +42,8 @@ class DiagnosticsService {
   }
 
   installGlobalHandlers() {
-    if (typeof window === 'undefined' || window.__tripflowDiagnosticsInstalled) return;
-    window.__tripflowDiagnosticsInstalled = true;
+    if (typeof window === 'undefined' || window.__mapnplanDiagnosticsInstalled) return;
+    window.__mapnplanDiagnosticsInstalled = true;
     window.addEventListener('error', (event) => {
       this.capture(event.error || event.message, { source: 'window.error' });
     });

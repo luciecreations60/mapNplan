@@ -3,6 +3,7 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ErrorBoundary } from './components/feedback/ErrorBoundary.jsx';
 import { RouteLoading } from './components/feedback/RouteLoading.jsx';
 import { AppLayout } from './layouts/AppLayout.jsx';
+import { APP_CONFIG } from './config/app.config.js';
 
 function lazyNamed(importer, exportName) {
   return lazy(() => importer().then((module) => ({ default: module[exportName] })));
@@ -43,7 +44,7 @@ export default function App() {
               <Route path="/trips/:tripId" element={<TripWorkspacePage />} />
               <Route path="/templates" element={<TemplatesPage />} />
               <Route path="/explore" element={<ExplorePage />} />
-              <Route path="/content" element={<ContentStudioPage />} />
+              {APP_CONFIG.features.seoContentStudio && <Route path="/content" element={<ContentStudioPage />} />}
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>

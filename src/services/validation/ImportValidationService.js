@@ -1,5 +1,5 @@
 const BACKUP_FORMAT = 'travel-planner-backup';
-const SHARE_FORMAT = 'tripflow-share';
+const SHARE_FORMAT = 'mapnplan-share';
 
 export const IMPORT_LIMITS = Object.freeze({
   maximumTrips: 500,

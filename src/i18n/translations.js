@@ -107,7 +107,7 @@ export const TRANSLATIONS = Object.freeze({
       action: 'Edit trip', title: 'Edit trip', description: 'Update the main information without affecting the detailed planning.',
       submit: 'Save changes', savedTitle: 'Trip updated', savedMessage: 'Changes to “{{name}}” have been saved.',
       countryCode: 'Country code', accent: 'Card colour', summary: 'Short description',
-      summaryPlaceholder: 'Describe the spirit and purpose of this journey.',
+      summaryPlaceholder: 'Describe the spirit and purpose of this journey.', coverImage: 'Cover image URL', coverImagePlaceholder: 'https://example.com/trip-cover.jpg',
       accents: { violet: 'Blue-green', aqua: 'Teal', coral: 'Warm coral' },
     },
     explore: {
@@ -866,7 +866,7 @@ export const TRANSLATIONS = Object.freeze({
       action: 'Modifier le voyage', title: 'Modifier le voyage', description: 'Mettez à jour les informations principales sans affecter le planning détaillé.',
       submit: 'Enregistrer les modifications', savedTitle: 'Voyage mis à jour', savedMessage: 'Les modifications de « {{name}} » ont été enregistrées.',
       countryCode: 'Code pays', accent: 'Couleur de la carte', summary: 'Description courte',
-      summaryPlaceholder: 'Décrivez l’esprit et l’objectif de ce voyage.',
+      summaryPlaceholder: 'Décrivez l’esprit et l’objectif de ce voyage.', coverImage: 'URL de l’image de couverture', coverImagePlaceholder: 'https://exemple.fr/couverture-voyage.jpg',
       accents: { violet: 'Bleu-vert', aqua: 'Turquoise', coral: 'Corail chaud' },
     },
     explore: {

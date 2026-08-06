@@ -3,6 +3,7 @@ import { APP_CONFIG } from '../../config/app.config.js';
 const RECOVERY_PREFIX = 'recovery';
 const MAX_RECOVERY_VALUE_LENGTH = 250_000;
 const MAX_RECOVERY_ENTRIES = 5;
+const LEGACY_PREFIXES = Object.freeze(['tripflow']);
 
 /** Browser storage adapter with small corruption recovery snapshots. */
 class LocalStorageService {
@@ -14,7 +15,18 @@ class LocalStorageService {
 
   get(key, fallbackValue = null) {
     const storageKey = this.#buildKey(key);
-    const rawValue = localStorage.getItem(storageKey);
+    let rawValue = localStorage.getItem(storageKey);
+    if (rawValue === null) {
+      for (const legacyPrefix of LEGACY_PREFIXES) {
+        const legacyKey = `${legacyPrefix}:${key}`;
+        const legacyValue = localStorage.getItem(legacyKey);
+        if (legacyValue === null) continue;
+        rawValue = legacyValue;
+        localStorage.setItem(storageKey, legacyValue);
+        localStorage.removeItem(legacyKey);
+        break;
+      }
+    }
     if (rawValue === null) return fallbackValue;
 
     try {

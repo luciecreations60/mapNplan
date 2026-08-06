@@ -117,7 +117,7 @@ export function buildIcsCalendar({ trip, events, productId = '-//mapNplan//Trave
 }
 
 export function buildIcsEvent(event, trip) {
-  const uid = event.externalCalendarUid || `${event.id}@tripflow.local`;
+  const uid = event.externalCalendarUid || `${event.id}@mapnplan.local`;
   const now = formatUtcDateTime(new Date());
   const startLine = formatIcsDateProperty('DTSTART', event.date, event.time);
   const endDate = event.endDate || event.date;

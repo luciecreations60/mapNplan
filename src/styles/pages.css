@@ -5123,3 +5123,15 @@
   .trip-library-view-actions { justify-content: space-between; }
   .trips-map-view__legend { right: 8px; left: 8px; justify-content: center; }
 }
+
+
+/* V0.1.26 RC5 */
+.budget-hub--unified { display: grid; gap: 28px; }
+.map-place-row--button { width: 100%; border: 0; text-align: left; cursor: pointer; font: inherit; color: inherit; }
+.map-place-row--button:hover, .map-place-row--button:focus-visible { outline: 2px solid rgba(31,144,173,.35); outline-offset: 2px; }
+@media (max-width: 760px) {
+  .map-workspace-grid { grid-template-columns: 1fr; }
+  .map-place-list { min-width: 0; }
+  .map-add-form__actions { align-items: stretch; }
+  .map-add-form__actions .button { width: 100%; justify-content: center; }
+}

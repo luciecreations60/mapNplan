@@ -10,7 +10,7 @@ export const APP_CONFIG = Object.freeze({
   fallbackLocale: 'en-GB',
   supportedLocales: ['fr-FR', 'en-GB'],
   defaultCurrency: 'EUR',
-  storageNamespace: 'tripflow',
+  storageNamespace: 'mapnplan',
   defaultTheme: 'system',
   demoUserName: 'Lucie',
   features: Object.freeze({
@@ -39,7 +39,7 @@ export const APP_CONFIG = Object.freeze({
     calendarInteroperability: true,
     savedPlacesLibrary: true,
     affiliateLinks: true,
-    seoContentStudio: true,
+    seoContentStudio: false,
     staticSeoExport: true,
     aiAssistant: false,
   }),

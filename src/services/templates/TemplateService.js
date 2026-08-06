@@ -3,7 +3,7 @@ import { localStorageService } from '../storage/LocalStorageService.js';
 
 const TRIP_TEMPLATE_KEY = 'trip-templates';
 const DAY_TEMPLATE_KEY = 'day-templates';
-const TEMPLATE_FORMAT = 'tripflow-template-library';
+const TEMPLATE_FORMAT = 'mapnplan-template-library';
 const TEMPLATE_FORMAT_VERSION = 1;
 
 /**

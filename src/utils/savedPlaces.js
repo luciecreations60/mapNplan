@@ -119,7 +119,7 @@ export function addSavedPlaceToItinerary(trip, place, {
 
 export function downloadSavedPlaces(trip) {
   const payload = {
-    format: 'tripflow-saved-places',
+    format: 'mapnplan-saved-places',
     version: 1,
     exportedAt: new Date().toISOString(),
     trip: { id: trip.id, name: trip.name, destination: trip.destination },
@@ -140,7 +140,7 @@ export function downloadSavedPlaces(trip) {
 export async function readSavedPlacesFile(file) {
   const text = await file.text();
   const payload = JSON.parse(text);
-  if (payload?.format !== 'tripflow-saved-places' || payload?.version !== 1 || !Array.isArray(payload.places)) {
+  if (payload?.format !== 'mapnplan-saved-places' || payload?.version !== 1 || !Array.isArray(payload.places)) {
     throw new Error('Unsupported saved places file.');
   }
   return payload.places.map((place) => createSavedPlace({ ...place, id: createId('place') }));

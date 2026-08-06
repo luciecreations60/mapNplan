@@ -138,7 +138,7 @@ class ContentStudioService {
 
   exportLibrary() {
     const payload = {
-      format: 'tripflow-seo-content',
+      format: 'mapnplan-seo-content',
       formatVersion: SEO_CONFIG.exportFormatVersion,
       exportedAt: nowIso(),
       articles: this.getArticles(),
@@ -149,7 +149,7 @@ class ContentStudioService {
 
   async importLibrary(file) {
     const parsed = JSON.parse(await file.text());
-    if (parsed?.format !== 'tripflow-seo-content' || !Array.isArray(parsed?.articles)) {
+    if (parsed?.format !== 'mapnplan-seo-content' || !Array.isArray(parsed?.articles)) {
       throw new Error('Unsupported SEO content file.');
     }
     const current = this.getArticles();
@@ -163,7 +163,7 @@ class ContentStudioService {
   exportPublication() {
     const articles = this.getArticles().filter((article) => article.status === 'published');
     const payload = {
-      format: 'tripflow-seo-publication',
+      format: 'mapnplan-seo-publication',
       formatVersion: SEO_CONFIG.publicationFormatVersion,
       exportedAt: nowIso(),
       articles,

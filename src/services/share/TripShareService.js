@@ -2,7 +2,7 @@
 import { PROJECT_CONFIG } from '../../../project.config.js';
 import { validateSharedTripPayload } from '../validation/ImportValidationService.js';
 
-const SHARE_FORMAT = 'tripflow-share';
+const SHARE_FORMAT = 'mapnplan-share';
 const SHARE_VERSION = 1;
 const RECOMMENDED_URL_LENGTH = 12000;
 

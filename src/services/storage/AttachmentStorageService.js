@@ -1,6 +1,6 @@
 import { createId } from '../../utils/id.js';
 
-const DATABASE_NAME = 'tripflow-attachments';
+const DATABASE_NAME = 'mapnplan-attachments';
 const DATABASE_VERSION = 1;
 const STORE_NAME = 'attachments';
 const MAX_FILE_SIZE = 15 * 1024 * 1024;
