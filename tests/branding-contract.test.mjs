@@ -14,7 +14,7 @@ test('approved mapNplan identity is centralized while legacy storage remains com
   assert.equal(PROJECT_CONFIG.tagline, 'Planifiez. Explorez. Profitez.');
   assert.equal(PROJECT_CONFIG.release.brandFinalized, true);
   assert.equal(PROJECT_CONFIG.release.publicIndexingEnabled, false);
-  assert.equal(APP_CONFIG.storageNamespace, 'tripflow');
+  assert.equal(APP_CONFIG.storageNamespace, 'mapnplan');
 });
 
 test('brand assets expose the approved colours and wordmark', async () => {

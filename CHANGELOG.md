@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.26] — 2026-08-06 — RC5 / partie 27
+
+### Added
+- Recherche de lieux dans la carte avec géocodage localisé.
+- URL d’image de couverture des voyages.
+- Bouton explicite d’ajout de liste dans la checklist.
+
+### Changed
+- Namespace et formats internes renommés mapNplan avec migration des anciennes données TripFlow.
+- Budget et dépenses de groupe affichés sur une page unique.
+- Studio de contenu désactivé dans l’interface publique.
+- Interface cartographique et formulaire d’ajout renforcés sur mobile.
+
+# Changelog
+
 ## V0.1.25 RC4 — mapNplan identity
 
 - Replaced the provisional visible brand with **mapNplan**.

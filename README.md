@@ -1,4 +1,4 @@
-# mapNplan — V0.1.25 RC4
+# mapNplan — V0.1.26 RC5
 
 mapNplan est une application locale de planification de voyages construite avec React, Vite, Leaflet et GitHub Pages.
 

@@ -6,7 +6,7 @@ globalThis.localStorage = new MemoryStorage();
 const { localStorageService } = await import('../src/services/storage/LocalStorageService.js');
 
 test('corrupted JSON is quarantined before fallback data is used', () => {
-  localStorage.setItem('tripflow:trips', '{broken');
+  localStorage.setItem('mapnplan:trips', '{broken');
   assert.deepEqual(localStorageService.get('trips', []), []);
   const recovery = localStorageService.listRecoveryEntries();
   assert.equal(recovery.length, 1);
@@ -17,9 +17,9 @@ test('corrupted JSON is quarantined before fallback data is used', () => {
 test('namespace usage and recovery pruning stay bounded', () => {
   localStorage.clear();
   localStorageService.set('one', { value: 1 });
-  localStorage.setItem('tripflow:recovery:1', JSON.stringify({ originalKey: 'a' }));
-  localStorage.setItem('tripflow:recovery:2', JSON.stringify({ originalKey: 'b' }));
-  localStorage.setItem('tripflow:recovery:3', JSON.stringify({ originalKey: 'c' }));
+  localStorage.setItem('mapnplan:recovery:1', JSON.stringify({ originalKey: 'a' }));
+  localStorage.setItem('mapnplan:recovery:2', JSON.stringify({ originalKey: 'b' }));
+  localStorage.setItem('mapnplan:recovery:3', JSON.stringify({ originalKey: 'c' }));
   const entries = localStorageService.listNamespaceEntries();
   assert.ok(entries.length >= 4);
   assert.ok(entries.every((entry) => entry.bytes > 0));

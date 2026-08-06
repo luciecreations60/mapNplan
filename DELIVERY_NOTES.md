@@ -1,27 +1,15 @@
-# Notes de livraison — V0.1.25 RC4 mapNplan
+# Notes de livraison — V0.1.26 RC5 mapNplan
 
-## Objet
+## Partie 27 reconstruite depuis la RC4
 
-Cette livraison applique le nom et le système de design mapNplan à la RC3 stable. Aucune fonctionnalité métier n’a été ajoutée ou supprimée.
+- migration automatique des anciennes clés locales `tripflow:*` vers `mapnplan:*` ;
+- formats d’export, diagnostics, pièces jointes et identifiants techniques renommés mapNplan ;
+- Studio de contenu retiré de la navigation publique et désactivé par défaut ;
+- budget classique et dépenses de groupe réunis sur une seule page ;
+- recherche de lieux directement dans la carte et recentrage au clic ;
+- fenêtre d’ajout depuis la carte adaptée aux petits écrans ;
+- ajout d’une URL d’image de couverture dans la création et la modification d’un voyage ;
+- bouton explicite « Ajouter une liste » dans la checklist ;
+- duplication complète conservée avec régénération des identifiants imbriqués.
 
-## Changements
-
-- remplacement de l’identité visible mapNplan dans l’application, les impressions, la PWA et les métadonnées ;
-- nouveau symbole vectoriel et nouveau wordmark ;
-- palette officielle `#1F90AD`, `#2CBB6B`, `#0F172A` ;
-- typographie Poppins avec fallback système ;
-- boutons et indicateurs utilisant le dégradé bleu-vert ;
-- navigation active, cartes, badges et formulaires harmonisés ;
-- tableau de bord rapproché de la maquette mobile : accueil plus visuel et raccourcis en tuiles ;
-- héros des voyages, cartes de voyage et page Explorer adaptés ;
-- thème sombre décliné avec les mêmes couleurs ;
-- favicon, logo public et manifeste PWA mis à jour ;
-- SEO toujours verrouillé par `noindex`.
-
-## Données existantes
-
-Aucune migration du schéma de voyage n’est nécessaire. Les identifiants techniques historiques de stockage restent inchangés afin de conserver les voyages, pièces jointes, modèles et préférences déjà enregistrés.
-
-## Validation prioritaire
-
-Après déploiement, vérifier le tableau de bord, le logo dans la navigation, le thème sombre, l’ouverture d’un voyage, les formulaires et la PWA sur mobile.
+La migration du stockage conserve les données existantes : une ancienne clé est copiée vers le namespace mapNplan puis supprimée après lecture réussie.

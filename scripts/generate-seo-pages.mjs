@@ -18,7 +18,7 @@ const guidesDir = path.join(publicDir, 'guides');
 const generatedAt = new Date().toISOString().slice(0, 10);
 
 const payload = JSON.parse(await fs.readFile(sourcePath, 'utf8'));
-if (payload?.format !== 'tripflow-seo-publication' || !Array.isArray(payload?.articles)) {
+if (payload?.format !== 'mapnplan-seo-publication' || !Array.isArray(payload?.articles)) {
   throw new Error(`Invalid SEO publication file: ${SEO_CONFIG.publicationFilePath}`);
 }
 

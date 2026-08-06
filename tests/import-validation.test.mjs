@@ -12,7 +12,7 @@ test('rejects unsupported backup versions and remote attachment URLs', () => {
 });
 
 test('shared snapshots require array collections', () => {
-  const snapshot = { format: 'tripflow-share', version: 1, trip: { name: 'Test', itinerary: [], reservations: [] } };
+  const snapshot = { format: 'mapnplan-share', version: 1, trip: { name: 'Test', itinerary: [], reservations: [] } };
   assert.equal(validateSharedTripPayload(snapshot), snapshot);
   assert.throws(() => validateSharedTripPayload({ ...snapshot, trip: { name: 'Test', itinerary: {}, reservations: [] } }), /must be an array/);
 });
