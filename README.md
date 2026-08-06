@@ -1,9 +1,20 @@
-# mapNplan — V0.1.26 RC5
+# mapNplan — V0.1.26 RC5 / partie 27
 
-mapNplan est une application locale de planification de voyages construite avec React, Vite, Leaflet et GitHub Pages.
+Application de planification de voyages React/Vite, locale et testable sur GitHub Pages.
 
-**Planifiez. Explorez. Profitez.**
+## Démarrage
 
-Cette Release Candidate applique l’identité mapNplan à l’ensemble de l’interface sans modifier les données ou les fonctionnalités de la RC3.
+```bash
+npm install
+npm run dev
+```
 
-Voir `BRAND_GUIDE.md`, `DELIVERY_NOTES.md` et `UPLOAD_TO_GITHUB.md`.
+## Contrôles
+
+```bash
+npm run quality
+npm test
+npm run build
+```
+
+Cette version démarre avec une bibliothèque de voyages vide. Les nouveaux voyages, budgets, listes, documents et préférences sont enregistrés localement dans le navigateur.

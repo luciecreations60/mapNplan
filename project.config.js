@@ -1,9 +1,8 @@
 /**
  * Shared project configuration.
  *
- * The public brand is now mapNplan. The repository name and legacy local
- * storage identifiers are migrated automatically so existing installations and data keep
- * working while the future production domain is still undecided.
+ * Central metadata for the mapNplan release candidate.
+ * The application intentionally starts with a clean local trip library in this test release.
  */
 export const PROJECT_CONFIG = Object.freeze({
   repositoryName: 'travel-planner',

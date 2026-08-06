@@ -12,9 +12,9 @@ async function read(relativePath) {
 }
 
 test('release candidate identity and privacy switches are locked', () => {
-  assert.equal(PROJECT_CONFIG.version, '0.1.25');
+  assert.equal(PROJECT_CONFIG.version, '0.1.26');
   assert.equal(PROJECT_CONFIG.release.stage, 'release-candidate');
-  assert.equal(PROJECT_CONFIG.release.candidate, 'rc.4');
+  assert.equal(PROJECT_CONFIG.release.candidate, 'rc.5');
   assert.equal(PROJECT_CONFIG.release.publicIndexingEnabled, false);
   assert.equal(PROJECT_CONFIG.release.brandFinalized, true);
   assert.equal(PROJECT_CONFIG.brandName, 'mapNplan');

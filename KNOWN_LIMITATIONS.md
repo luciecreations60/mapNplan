@@ -1,8 +1,7 @@
-# Limites connues — RC4
+# Limites connues — RC5
 
-- Le domaine définitif n’est pas encore choisi ; le référencement reste désactivé.
-- Poppins est chargée depuis Google Fonts. En absence de réseau, l’interface utilise automatiquement une police système proche.
-- Le dépôt GitHub conserve le nom technique `travel-planner` pour le moment.
-- Les clés internes `tripflow:*` et la base `tripflow-attachments` sont conservées pour éviter toute perte de données. Elles ne sont pas visibles dans l’interface.
-- Les libellés du fond raster OpenStreetMap suivent les noms locaux présents dans les données cartographiques.
-- Le build de production définitif doit être confirmé par GitHub Actions.
+- Les données restent locales au navigateur ; elles ne sont pas synchronisées entre appareils.
+- La connexion Google et les droits administrateur nécessitent un service d’authentification et un backend avant une mise en production.
+- La recherche de lieux dépend du service public Photon et nécessite une connexion internet.
+- Les tuiles OpenFreeMap nécessitent une connexion internet ; l’interface principale reste compatible avec le cache PWA.
+- Certains lieux sans traduction disponible utilisent un nom latin ou anglais de repli.

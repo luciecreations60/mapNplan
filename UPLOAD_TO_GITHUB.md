@@ -1,16 +1,7 @@
-# Installation de la RC4 mapNplan
+# Mise en ligne de la partie 27
 
-1. Exporter une sauvegarde JSON depuis les paramètres.
-2. Décompresser `travel-planner-v0.1-part26.zip`.
-3. Dans le dépôt GitHub `travel-planner`, choisir **Add file → Upload files**.
-4. Déposer tout le contenu extrait et remplacer les fichiers existants.
-5. Utiliser le commit :
-
-```text
-style: apply mapNplan brand identity
-```
-
-6. Attendre la validation complète de GitHub Actions.
-7. Actualiser avec `Ctrl + F5` sous Chrome/Edge/Firefox ou `Cmd + Option + R` sous Safari.
-
-Aucune réinitialisation des données n’est nécessaire.
+1. Décompresser l’archive.
+2. Remplacer le contenu de la branche de test.
+3. Vérifier que GitHub Actions termine sans erreur.
+4. Forcer une actualisation du navigateur pour charger le nouveau service worker et la nouvelle icône.
+5. Créer un nouveau voyage et tester chaque onglet avant de conserver cette version.

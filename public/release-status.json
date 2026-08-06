@@ -4,15 +4,15 @@
   "version": "0.1.26",
   "candidate": "rc.5",
   "stage": "release-candidate",
-  "generatedAt": "2026-08-05T12:55:23.921Z",
+  "generatedAt": "2026-08-06T22:15:40.975Z",
   "buildChecked": false,
   "passed": true,
   "summary": {
-    "checks": 38,
-    "passed": 38,
+    "checks": 39,
+    "passed": 39,
     "errors": 0,
     "warnings": 1,
-    "automatedTestFiles": 16
+    "automatedTestFiles": 17
   },
   "checks": [
     {
@@ -125,6 +125,10 @@
     },
     {
       "name": "No disabled tests: local-storage.test.mjs",
+      "passed": true
+    },
+    {
+      "name": "No disabled tests: part27-requirements.test.mjs",
       "passed": true
     },
     {

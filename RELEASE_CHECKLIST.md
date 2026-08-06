@@ -1,27 +1,30 @@
-# Checklist de validation — V0.1.23 rc.2
+# Checklist de validation — V0.1.26 RC5 / partie 27
 
 ## Automatique
 
-- [ ] GitHub Actions entièrement vert.
-- [ ] Qualité du projet réussie.
-- [ ] 38 tests réussis.
-- [ ] Build Vite réussi.
-- [ ] Budget de taille respecté.
-- [ ] Audit Release Candidate réussi avec `buildChecked: true`.
+- [x] Qualité et imports contrôlés.
+- [x] 61 tests Node réussis.
+- [x] 39 contrôles de Release Candidate réussis en audit source.
+- [x] Aucune occurrence de l’ancienne identité.
+- [ ] Installation des dépendances et build Vite validés par GitHub Actions.
+- [ ] Budget de taille du build validé.
 
-## Données
+## Fonctionnel
 
-- [ ] Les anciens voyages sont toujours lisibles après migration vers le schéma 17.
-- [ ] Une sauvegarde peut être exportée, supprimée localement puis restaurée.
-- [ ] Les fichiers ajoutés à une réservation sont visibles dans Documents.
-- [ ] La duplication ne conserve pas les associations privées.
+- [ ] Retour à Vue générale en un clic.
+- [ ] Dates de l’aperçu lisibles sur ordinateur et mobile.
+- [ ] Carte traduite selon la langue choisie.
+- [ ] Recherche, zoom et ajout d’un lieu depuis la carte.
+- [ ] Irlande et Japon visibles au bon endroit sur la carte globale.
+- [ ] Budget unique et répartition personnalisée testés.
+- [ ] Voyage à une personne non bloquant.
+- [ ] Duplication et couvertures testées.
+- [ ] Création explicite d’une liste de checklist testée.
+- [ ] Favicon et titre d’onglet contrôlés après purge du cache.
 
-## Ergonomie
+## Avant production
 
-- [ ] Toutes les dates du séjour sont visibles.
-- [ ] Chaque bouton de journée préremplit la bonne date.
-- [ ] Le bouton inférieur reprend le dernier jour utilisé.
-- [ ] Les champs Lieu ne chevauchent plus leur icône.
-- [ ] Les textes restent lisibles à 150 % de zoom.
-- [ ] Les tris de dépenses fonctionnent.
-- [ ] Les dates apparaissent dans l’aperçu général.
+- [ ] Authentification et comptes Google reliés à un backend.
+- [ ] Rôle administrateur pour les futurs outils éditoriaux.
+- [ ] Politique de confidentialité et conditions publiées.
+- [ ] Quotas et conditions d’utilisation des services cartographiques validés.

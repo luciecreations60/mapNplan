@@ -26,7 +26,7 @@ test('trip workspace keeps one budget tab and statistics last', async () => {
   const budgetHub = await read('src/components/tripWorkspace/BudgetHubPanel.jsx');
   assert.doesNotMatch(tabs, /id: 'expenses'/);
   assert.ok(tabs.lastIndexOf("id: 'statistics'") > tabs.lastIndexOf("id: 'collaboration'"));
-  assert.match(budgetHub, /BudgetPanel/);
+  assert.doesNotMatch(budgetHub, /BudgetPanel/);
   assert.match(budgetHub, /SharedExpensesPanel/);
 });
 
@@ -71,8 +71,9 @@ test('custom checklist list titles survive trip normalization', async () => {
     checklist: [{ id: 'item-1', label: 'Baby carrier', category: 'packing', listTitle: 'Baby essentials', completed: false }],
   }]);
   const [trip] = tripService.getAll();
-  assert.equal(trip.schemaVersion, 18);
+  assert.equal(trip.schemaVersion, 19);
   assert.equal(trip.checklist[0].listTitle, 'Baby essentials');
+  assert.equal(trip.checklistLists[0].title, 'Baby essentials');
 });
 
 test('route changes scroll the application to the top and all trips can be mapped', async () => {

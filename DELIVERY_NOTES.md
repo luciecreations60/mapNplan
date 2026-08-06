@@ -1,15 +1,12 @@
-# Notes de livraison — V0.1.26 RC5 mapNplan
+# Livraison — V0.1.26 RC5 / partie 27
 
-## Partie 27 reconstruite depuis la RC4
-
-- migration automatique des anciennes clés locales `tripflow:*` vers `mapnplan:*` ;
-- formats d’export, diagnostics, pièces jointes et identifiants techniques renommés mapNplan ;
-- Studio de contenu retiré de la navigation publique et désactivé par défaut ;
-- budget classique et dépenses de groupe réunis sur une seule page ;
-- recherche de lieux directement dans la carte et recentrage au clic ;
-- fenêtre d’ajout depuis la carte adaptée aux petits écrans ;
-- ajout d’une URL d’image de couverture dans la création et la modification d’un voyage ;
-- bouton explicite « Ajouter une liste » dans la checklist ;
-- duplication complète conservée avec régénération des identifiants imbriqués.
-
-La migration du stockage conserve les données existantes : une ancienne clé est copiée vers le namespace mapNplan puis supprimée après lecture réussie.
+- bibliothèque de voyages volontairement réinitialisée pour repartir sur une base de test propre ;
+- navigation de la Vue générale corrigée ;
+- aperçu des dates rendu lisible sur ordinateur et mobile ;
+- carte vectorielle multilingue, recherche de lieux, zoom au clic et ajout à l’itinéraire ;
+- budget et dépenses de groupe réunis dans une seule page ;
+- répartitions égales ou personnalisées par voyageur ;
+- duplication et couverture personnalisée des voyages ;
+- carte globale fiabilisée par géocodage de la destination et reprise des coordonnées du voyage ;
+- création explicite de listes dans la checklist ;
+- Studio de contenu retiré de l’application publique tant qu’une authentification serveur n’existe pas.

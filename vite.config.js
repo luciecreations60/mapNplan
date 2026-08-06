@@ -56,7 +56,7 @@ export default defineConfig({
               name: 'react-vendor',
             },
             {
-              test: /node_modules[\\/]leaflet[\\/]/,
+              test: /node_modules[\\/]maplibre-gl[\\/]/,
               name: 'map-vendor',
             },
             {
