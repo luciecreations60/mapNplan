@@ -1,0 +1,104 @@
+.print-page {
+  min-height: 100vh;
+  padding: 28px;
+  color: #1c2030;
+  background: #eef0f6;
+}
+
+.print-toolbar {
+  display: flex;
+  width: min(980px, 100%);
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 auto 20px;
+}
+
+.print-document {
+  width: min(980px, 100%);
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 18px 60px rgba(25, 31, 50, .14);
+}
+
+.print-cover {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 30px;
+  padding: 48px;
+  color: white;
+  background: linear-gradient(135deg, #1f90ad, #2cbb6b);
+}
+
+.print-cover--aqua { background: linear-gradient(135deg, #168f89, #52cbb2); }
+.print-cover--coral { background: linear-gradient(135deg, #c9576b, #efaa72); }
+.print-brand { margin: 0 0 30px; font-size: .72rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+.print-cover h1 { margin: 0 0 8px; color: white; font-size: clamp(2.1rem, 6vw, 4rem); }
+.print-destination { margin: 0 0 8px; font-size: 1.1rem; }
+.print-cover__meta { display: grid; grid-template-columns: auto auto; gap: 8px 18px; padding: 18px; border: 1px solid rgba(255,255,255,.22); border-radius: 14px; background: rgba(255,255,255,.12); }
+.print-cover__meta span { font-size: .7rem; opacity: .8; }
+.print-cover__meta strong { text-align: right; }
+.print-summary { margin: 0; padding: 24px 48px; color: #51596c; border-bottom: 1px solid #e5e7ef; font-size: 1rem; line-height: 1.65; }
+.print-section { padding: 30px 48px; border-bottom: 1px solid #e5e7ef; }
+.print-section h2 { margin: 0 0 20px; color: #202538; font-size: 1.3rem; }
+.print-metrics { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+.print-metrics > div { padding: 14px; border-radius: 12px; background: #f4f5f9; }
+.print-metrics span { display: block; margin-bottom: 5px; color: #737b8d; font-size: .68rem; }
+.print-metrics strong { font-size: 1rem; }
+.print-day { margin-bottom: 22px; page-break-inside: avoid; }
+.print-day:last-child { margin-bottom: 0; }
+.print-day > header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+.print-day > header > span { display: grid; min-width: 56px; min-height: 30px; place-items: center; border-radius: 9px; color: #5254d5; background: #eeeeff; font-size: .68rem; font-weight: 850; }
+.print-day h3 { margin: 0 0 2px; font-size: 1rem; }
+.print-day header small { color: #7a8294; }
+.print-list { display: grid; gap: 7px; margin-left: 68px; }
+.print-list__row { display: grid; grid-template-columns: 54px minmax(0,1fr) auto; gap: 12px; padding: 10px 12px; border: 1px solid #e5e7ef; border-radius: 10px; }
+.print-list__row > strong { color: #5254d5; }
+.print-list__row > div { display: grid; gap: 2px; }
+.print-list__row span, .print-list__row small { color: #757d8e; font-size: .7rem; }
+.print-table-wrap { overflow-x: auto; }
+.print-table { width: 100%; border-collapse: collapse; font-size: .72rem; }
+.print-table th, .print-table td { padding: 10px 8px; border-bottom: 1px solid #e5e7ef; text-align: left; vertical-align: top; }
+.print-table th { color: #737b8d; font-size: .62rem; text-transform: uppercase; }
+.print-table td small { display: block; margin-top: 2px; color: #858c9d; }
+.print-grid-section { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 34px; }
+.print-budget-summary { display: flex; justify-content: space-between; gap: 15px; margin-bottom: 12px; padding: 12px; border-radius: 10px; background: #f4f5f9; }
+.print-key-value { display: flex; justify-content: space-between; gap: 15px; padding: 7px 0; border-bottom: 1px dashed #e5e7ef; font-size: .75rem; }
+.print-checklist-row { display: flex; align-items: center; gap: 9px; padding: 6px 0; font-size: .76rem; }
+.print-checkbox { display: grid; width: 18px; height: 18px; flex: 0 0 auto; place-items: center; border: 1px solid #cbd0dd; border-radius: 5px; }
+.print-checkbox--checked { color: white; border-color: #1f90ad; background: #1f90ad; }
+.print-document-row { display: grid; grid-template-columns: minmax(0,1fr) minmax(130px,.5fr) minmax(120px,.4fr); gap: 18px; padding: 11px 0; border-bottom: 1px solid #e5e7ef; }
+.print-document-row > div { display: grid; gap: 3px; }
+.print-document-row span { color: #7a8294; font-size: .66rem; }
+.print-notes { margin: 0; white-space: pre-wrap; line-height: 1.65; }
+.print-muted { color: #7a8294; font-style: italic; }
+.print-footer { display: flex; justify-content: space-between; gap: 20px; padding: 18px 48px; color: #7a8294; background: #f4f5f9; font-size: .65rem; }
+.print-page--empty { display: grid; place-content: center; text-align: center; }
+
+@media (max-width: 720px) {
+  .print-page { padding: 0; }
+  .print-toolbar { padding: 12px; }
+  .print-document { border-radius: 0; }
+  .print-cover { grid-template-columns: 1fr; padding: 32px 24px; }
+  .print-summary, .print-section { padding-right: 24px; padding-left: 24px; }
+  .print-metrics, .print-grid-section { grid-template-columns: 1fr 1fr; }
+  .print-list { margin-left: 0; }
+  .print-document-row { grid-template-columns: 1fr; gap: 7px; }
+}
+
+@media print {
+  @page { margin: 12mm; size: A4 portrait; }
+  html, body, #root { background: white !important; }
+  .no-print { display: none !important; }
+  .print-page { min-height: auto; padding: 0; background: white; }
+  .print-document { width: 100%; overflow: visible; border-radius: 0; box-shadow: none; }
+  .print-cover { padding: 26px 30px; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .print-summary { padding: 16px 30px; }
+  .print-section { padding: 20px 30px; }
+  .print-footer { padding: 14px 30px; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .print-section--breakable { break-inside: auto; }
+  .print-day, .print-document-row, .print-list__row, .print-grid-section > div { break-inside: avoid; }
+}

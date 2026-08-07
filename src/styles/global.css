@@ -1,0 +1,222 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  background: var(--color-bg);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--color-text);
+  background: var(--color-bg);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  color: inherit;
+}
+
+button:not(:disabled),
+a {
+  cursor: pointer;
+}
+
+img,
+svg {
+  display: block;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--color-text);
+  line-height: 1.16;
+  letter-spacing: -0.035em;
+}
+
+h1 {
+  margin-bottom: 10px;
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+h2 {
+  margin-bottom: 8px;
+  font-size: clamp(1.35rem, 2vw, 1.65rem);
+}
+
+h3 {
+  margin-bottom: 6px;
+  font-size: 1.12rem;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  color: var(--color-white);
+  background: var(--color-primary);
+}
+
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-primary) 36%, transparent);
+  outline-offset: 3px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.eyebrow {
+  margin-bottom: 7px;
+  color: var(--color-primary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+/* Long labels and user-entered content must never force horizontal overflow. */
+button,
+input,
+select,
+textarea,
+.card,
+.trip-card,
+.workspace-panel {
+  min-width: 0;
+}
+
+p,
+h1,
+h2,
+h3,
+strong,
+small,
+span,
+dd,
+dt {
+  overflow-wrap: anywhere;
+}
+
+
+/* ========================================================================== */
+/* V0.1.20 — Cross-browser accessibility baseline                            */
+/* ========================================================================== */
+
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+}
+
+html,
+body {
+  overflow-x: clip;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 1000;
+  top: 10px;
+  left: 10px;
+  padding: 11px 15px;
+  border: 2px solid var(--color-primary);
+  border-radius: 10px;
+  color: var(--color-text);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  font-weight: 800;
+  transform: translateY(-180%);
+  transition: transform var(--transition-fast);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@supports not (overflow: clip) {
+  html,
+  body { overflow-x: hidden; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  :focus-visible { outline: 3px solid Highlight; }
+  .button,
+  .icon-button,
+  .card,
+  .field__input,
+  .trip-tabs { border: 1px solid CanvasText; }
+  .trip-tabs__button--active,
+  .sidebar__link--active { outline: 2px solid Highlight; }
+}
+
+@media (pointer: coarse) {
+  .icon-button,
+  .icon-button--small,
+  .trip-tabs__button,
+  .sidebar__link,
+  .text-link {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
