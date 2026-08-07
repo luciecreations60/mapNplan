@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+# Public indexing is disabled by page-level noindex metadata.

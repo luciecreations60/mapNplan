@@ -1,0 +1,35 @@
+{
+  "name": "mapnplan",
+  "private": true,
+  "version": "0.1.27",
+  "type": "module",
+  "description": "mapNplan — a modern, local-first travel planning application.",
+  "scripts": {
+    "dev": "vite",
+    "seo:generate": "node scripts/generate-seo-pages.mjs",
+    "seo:audit": "node scripts/audit-seo.mjs",
+    "quality": "node scripts/check-project.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "prebuild": "npm run seo:generate && npm run seo:audit",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "npm run quality && npm run test && npm run build && npm run performance:audit && npm run release:audit:ci",
+    "performance:audit": "node scripts/audit-build-size.mjs",
+    "release:audit": "node scripts/audit-release-candidate.mjs",
+    "release:audit:ci": "node scripts/audit-release-candidate.mjs --require-build"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "lucide-react": "1.27.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-router-dom": "7.18.1",
+    "maplibre-gl": "5.24.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "6.0.4",
+    "vite": "8.1.5"
+  }
+}

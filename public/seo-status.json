@@ -1,0 +1,96 @@
+{
+  "generatedAt": "2026-08-07T11:48:37.815Z",
+  "baseUrl": "https://luciecreations60.github.io/travel-planner",
+  "publicIndexingEnabled": false,
+  "publishedPages": 1,
+  "audit": {
+    "baseUrl": "https://luciecreations60.github.io/travel-planner",
+    "publishedCount": 1,
+    "checks": [
+      {
+        "id": "https",
+        "passed": true,
+        "severity": "error"
+      },
+      {
+        "id": "placeholder-domain",
+        "passed": true,
+        "severity": "error"
+      },
+      {
+        "id": "published-pages",
+        "passed": true,
+        "severity": "warning"
+      },
+      {
+        "id": "unique-slugs",
+        "passed": true,
+        "severity": "error"
+      },
+      {
+        "id": "quality-score",
+        "passed": true,
+        "severity": "warning"
+      }
+    ],
+    "articles": [
+      {
+        "id": "seo-paris-three-days",
+        "slug": "three-days-in-paris",
+        "title": "Three days in Paris: a practical first-time itinerary",
+        "score": 100,
+        "checks": [
+          {
+            "id": "title-length",
+            "passed": true,
+            "score": 15
+          },
+          {
+            "id": "description-length",
+            "passed": true,
+            "score": 15
+          },
+          {
+            "id": "keyword-title",
+            "passed": true,
+            "score": 15
+          },
+          {
+            "id": "keyword-introduction",
+            "passed": true,
+            "score": 10
+          },
+          {
+            "id": "word-count",
+            "passed": true,
+            "score": 15
+          },
+          {
+            "id": "slug",
+            "passed": true,
+            "score": 10
+          },
+          {
+            "id": "hero-alt",
+            "passed": true,
+            "score": 5
+          },
+          {
+            "id": "faq",
+            "passed": true,
+            "score": 5
+          },
+          {
+            "id": "sections",
+            "passed": true,
+            "score": 10
+          }
+        ],
+        "wordCount": 598
+      }
+    ],
+    "errors": 0,
+    "warnings": 0,
+    "passed": true
+  }
+}
