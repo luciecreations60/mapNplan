@@ -107,8 +107,22 @@ export function upsertActivityAcrossDates(itinerary, startDate, endDate, activit
 
   const seriesId = previousSeriesId || activity.seriesId || createId('activity-series');
   const totalCost = Math.max(0, Number(activity.estimatedCost) || 0);
+  const checkInTime = activity.checkInTime || activity.time || '';
+  const checkOutTime = activity.checkOutTime || '';
   dates.forEach((date, index) => {
     const previousOccurrence = previousOccurrencesByDate.get(date);
+    const stayRole = dates.length === 1
+      ? 'single'
+      : index === 0
+        ? 'checkin'
+        : index === dates.length - 1
+          ? 'checkout'
+          : 'stay';
+    const occurrenceTime = stayRole === 'checkout'
+      ? checkOutTime
+      : stayRole === 'stay'
+        ? ''
+        : checkInTime;
     const occurrence = {
       ...activity,
       id: previousOccurrence?.id || createId('activity'),
@@ -117,6 +131,10 @@ export function upsertActivityAcrossDates(itinerary, startDate, endDate, activit
       seriesIndex: index,
       stayStartDate: startDate,
       stayEndDate: endDate,
+      stayRole,
+      checkInTime,
+      checkOutTime,
+      time: occurrenceTime,
       estimatedCost: index === 0 ? totalCost : 0,
     };
     next = appendActivityToDate(next, date, occurrence);
@@ -188,7 +206,9 @@ function cloneItinerary(itinerary) {
 }
 
 function compareActivities(left, right) {
-  return `${left.time || '99:99'}-${left.title || ''}`.localeCompare(`${right.time || '99:99'}-${right.title || ''}`);
+  const leftTime = left.type === 'hotel' && left.stayRole === 'stay' ? '00:00' : (left.time || '99:99');
+  const rightTime = right.type === 'hotel' && right.stayRole === 'stay' ? '00:00' : (right.time || '99:99');
+  return `${leftTime}-${left.title || ''}`.localeCompare(`${rightTime}-${right.title || ''}`);
 }
 function isIsoDate(value) { return /^\d{4}-\d{2}-\d{2}$/.test(String(value || '')); }
 function toIsoDate(date) {

@@ -8,7 +8,7 @@ const { tripService } = await import('../src/services/trips/TripService.js');
 test('current trip records are normalized without losing notes', () => {
   localStorage.setItem('mapnplan:trip-library', JSON.stringify([{ id: 'current', name: ' Current ', travelers: 0, currency: 'eur', itinerary: [{ id: 'd', date: '2026-08-01', items: [{ id: 'i', title: 'Place', latitude: 120, longitude: 220 }] }], notes: 'keep me' }]));
   const [trip] = tripService.getAll();
-  assert.equal(trip.schemaVersion, 20);
+  assert.equal(trip.schemaVersion, 21);
   assert.equal(trip.name, 'Current');
   assert.equal(trip.travelers, 1);
   assert.equal(trip.currency, 'EUR');

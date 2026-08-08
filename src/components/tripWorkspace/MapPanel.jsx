@@ -20,6 +20,7 @@ function createInitialForm(trip) {
     date: getLastUsedItineraryDate(trip),
     endDate: getLastUsedItineraryDate(trip),
     time: '09:00',
+    endTime: '10:00',
     type: 'map',
     title: '',
     location: '',
@@ -34,6 +35,7 @@ export function MapPanel({ trip, onOpenTab, onUpdate }) {
   const points = useMemo(() => getTripMapPoints(trip), [trip]);
   const dates = useMemo(() => buildTripDateRange(trip.startDate, trip.endDate), [trip.startDate, trip.endDate]);
   const [selection, setSelection] = useState(null);
+  const [focusedPointId, setFocusedPointId] = useState(null);
   const [status, setStatus] = useState('idle');
   const [searchValue, setSearchValue] = useState('');
   const [notice, setNotice] = useState(null);
@@ -94,6 +96,8 @@ export function MapPanel({ trip, onOpenTab, onUpdate }) {
     const activity = {
       id: createId('activity'),
       time: form.time,
+      checkInTime: form.type === 'hotel' ? form.time : '',
+      checkOutTime: form.type === 'hotel' ? form.endTime : '',
       type: form.type,
       title: form.title.trim(),
       location: form.location.trim(),
@@ -120,6 +124,12 @@ export function MapPanel({ trip, onOpenTab, onUpdate }) {
     setSearchValue('');
     closeEditor();
   }
+
+  const focusExistingPoint = useCallback((point) => {
+    if (!point?.id) return;
+    setFocusedPointId(point.id);
+    setNotice(null);
+  }, []);
 
   function saveSelectionToPlaces() {
     if (!selection || !form.title.trim()) return;
@@ -163,7 +173,7 @@ export function MapPanel({ trip, onOpenTab, onUpdate }) {
           placeholder={t('map.searchPlaceholder')}
           hint={t('map.searchHint')}
           variant="workspace"
-          bias={{ latitude: trip.destinationLatitude, longitude: trip.destinationLongitude }}
+         
           onValueChange={setSearchValue}
           onPlaceSelect={(place) => {
             if (!place) return;
@@ -176,13 +186,22 @@ export function MapPanel({ trip, onOpenTab, onUpdate }) {
 
       {notice && <InlineNotice tone={notice.tone} title={notice.title}>{notice.text}</InlineNotice>}
 
+      <div className="map-marker-legend" aria-label={t('map.legend')}>
+        <span><i className="map-marker-legend__dot map-marker-legend__dot--place" />{t('map.legendPlace')}</span>
+        <span><i className="map-marker-legend__dot map-marker-legend__dot--hotel" />{t('map.legendAccommodation')}</span>
+        <span><i className="map-marker-legend__dot map-marker-legend__dot--transport" />{t('map.legendTransport')}</span>
+        <span><i className="map-marker-legend__dot map-marker-legend__dot--activity" />{t('map.legendActivity')}</span>
+        <span><i className="map-marker-legend__dot map-marker-legend__dot--destination" />{t('map.legendDestination')}</span>
+      </div>
+
       <div className="map-workspace-grid map-workspace-grid--planner">
         <Card className="map-card map-card--interactive">
           <TripMap
             points={points}
             onMapClick={selectMapPoint}
-            onPointSelect={(point) => selectMapPoint({ latitude: point.latitude, longitude: point.longitude }, point)}
+            onPointSelect={focusExistingPoint}
             selection={selection}
+            focusedPointId={focusedPointId}
           />
           <div className="map-card__instruction"><Icon name="pin" size={16} /> {t('map.clickToAddText')}</div>
         </Card>
@@ -197,8 +216,8 @@ export function MapPanel({ trip, onOpenTab, onUpdate }) {
                 <button
                   key={point.id}
                   type="button"
-                  className="map-place-row map-place-row--button"
-                  onClick={() => selectMapPoint({ latitude: point.latitude, longitude: point.longitude }, point)}
+                  className={`map-place-row map-place-row--button${focusedPointId === point.id ? ' map-place-row--active' : ''}`}
+                  onClick={() => focusExistingPoint(point)}
                 >
                   <span className="map-place-row__number">{index + 1}</span>
                   <div>
@@ -237,7 +256,8 @@ export function MapPanel({ trip, onOpenTab, onUpdate }) {
             <label className="workspace-field workspace-form__wide"><span>{t('common.location')}</span><textarea name="location" rows="2" value={form.location} onChange={updateField} /></label>
             <label className="workspace-field"><span>{t(form.type === 'hotel' ? 'itinerary.startDate' : 'itinerary.date')}</span><select name="date" value={form.date} onChange={updateField} required>{dates.map((date, index) => <option key={date} value={date}>{t('itinerary.day', { count: index + 1 })} · {formatLocalizedDate(date, locale, 'compact')}</option>)}</select></label>
             {form.type === 'hotel' && <label className="workspace-field"><span>{t('itinerary.endDate')}</span><select name="endDate" value={form.endDate || form.date} onChange={updateField} required>{dates.filter((date) => date >= form.date).map((date, index) => <option key={date} value={date}>{formatLocalizedDate(date, locale, 'compact')}</option>)}</select></label>}
-            <label className="workspace-field"><span>{t('itinerary.time')}</span><input name="time" type="time" value={form.time} onChange={updateField} /></label>
+            <label className="workspace-field"><span>{t(form.type === 'hotel' ? 'itinerary.checkInTime' : 'itinerary.time')}</span><input name="time" type="time" value={form.time} onChange={updateField} /></label>
+            {form.type === 'hotel' && <label className="workspace-field"><span>{t('itinerary.checkOutTime')}</span><input name="endTime" type="time" value={form.endTime} onChange={updateField} /></label>}
             <label className="workspace-field"><span>{t('itinerary.type')}</span><select name="type" value={form.type} onChange={updateField}>{ACTIVITY_TYPES.map((type) => <option key={type.id} value={type.id}>{t(type.labelKey)}</option>)}</select></label>
             <label className="workspace-field"><span>{t('itinerary.duration')}</span><input name="durationMinutes" type="number" min="0" step="15" value={form.durationMinutes} onChange={updateField} /></label>
             <label className="workspace-field"><span>{t('itinerary.estimatedCost')} ({trip.currency})</span><input name="estimatedCost" type="number" min="0" step="0.01" value={form.estimatedCost} onChange={updateField} /></label>

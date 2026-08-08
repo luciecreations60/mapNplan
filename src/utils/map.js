@@ -55,6 +55,7 @@ export function getTripMapPoints(trip) {
         latitude: Number(item.latitude),
         longitude: Number(item.longitude),
         type: item.type || 'map',
+        transportMode: item.transportMode || '',
         date: day.date,
         time: item.time,
         seriesId: item.seriesId || null,
@@ -72,6 +73,7 @@ export function getTripMapPoints(trip) {
       latitude: Number(reservation.latitude),
       longitude: Number(reservation.longitude),
       type: reservation.type || 'ticket',
+      transportMode: reservation.type === 'transport' ? 'transit' : '',
       date: reservation.startDate,
       time: reservation.startTime,
     }));
@@ -86,7 +88,8 @@ export function getTripMapPoints(trip) {
       subtitle: place.label || [place.city, place.country].filter(Boolean).join(', '),
       latitude: Number(place.latitude),
       longitude: Number(place.longitude),
-      type: place.category === 'food' ? 'food' : 'pin',
+      type: place.category === 'food' ? 'food' : place.category === 'accommodation' ? 'hotel' : place.category === 'transport' ? 'car' : 'map',
+      category: place.category || 'other',
       date: '',
       time: '',
     }));

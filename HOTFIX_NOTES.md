@@ -1,14 +1,14 @@
-# Correctif de build — V0.1.23 rc.2
+# Correctif GitHub Actions inclus — V0.1.28 RC7
 
-## Cause
+## Cause observée dans la partie précédente
 
-GitHub Actions installait correctement les dépendances, puis Vite 8.1.5 refusait la configuration `manualChunks` sous forme d’objet.
+Le build Vite de production était réussi, mais l’étape **Build size audit** échouait parce que le chunk `map-vendor` généré par MapLibre dépassait la limite générique de 750 Ko.
 
-## Correction
+## Correction incluse dans la partie 29
 
-- remplacement de `build.rollupOptions.output.manualChunks` ;
-- utilisation de `build.rolldownOptions.output.codeSplitting.groups` ;
-- conservation des groupes React, Leaflet et Lucide ;
-- ajout d’un test empêchant le retour de l’ancienne syntaxe.
+- limite générique conservée à **750 Ko** pour les chunks JavaScript ordinaires ;
+- limite dédiée à **1,1 Mo** uniquement pour `map-vendor` ;
+- limite JavaScript totale conservée à **2,5 Mo** ;
+- test automatisé ajouté pour empêcher la disparition de cette règle.
 
-Aucune fonctionnalité, donnée utilisateur, migration ou configuration SEO n’a été modifiée.
+Ce correctif ne désactive pas l’audit de performance : il distingue simplement le vendor cartographique des autres bundles.

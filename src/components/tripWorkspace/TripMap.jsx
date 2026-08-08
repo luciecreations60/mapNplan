@@ -4,24 +4,30 @@ import { useI18n } from '../../hooks/useI18n.js';
 import { MAP_CONFIG } from '../../config/map.config.js';
 import { applyMapLanguage, createMapMarkerElement } from '../../utils/mapLanguage.js';
 
-const SOURCE_COLORS = Object.freeze({
-  reservation: '#1aa181',
+const TYPE_COLORS = Object.freeze({
   destination: '#c96574',
+  map: '#1f90ad',
+  food: '#d88924',
+  hotel: '#7559c8',
+  plane: '#4b83cf',
+  car: '#2c8aa8',
+  ferry: '#137f9d',
+  ticket: '#2cbb6b',
+  reservation: '#1aa181',
   savedPlace: '#d89422',
-  itinerary: '#1f90ad',
 });
 
-export function TripMap({ points, onMapClick = null, onPointSelect = null, selection = null }) {
+export function TripMap({ points, onMapClick = null, onPointSelect = null, selection = null, focusedPointId = null }) {
   const { language, t } = useI18n();
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const markersRef = useRef([]);
   const selectionMarkerRef = useRef(null);
   const clickHandlerRef = useRef(onMapClick);
+  const pointSelectHandlerRef = useRef(onPointSelect);
 
-  useEffect(() => {
-    clickHandlerRef.current = onMapClick;
-  }, [onMapClick]);
+  useEffect(() => { clickHandlerRef.current = onMapClick; }, [onMapClick]);
+  useEffect(() => { pointSelectHandlerRef.current = onPointSelect; }, [onPointSelect]);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return undefined;
@@ -40,10 +46,7 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
     map.on('styledata', () => applyMapLanguage(map, language));
     map.on('click', (event) => {
       if (!clickHandlerRef.current) return;
-      clickHandlerRef.current({
-        latitude: Number(event.lngLat.lat),
-        longitude: Number(event.lngLat.lng),
-      });
+      clickHandlerRef.current({ latitude: Number(event.lngLat.lat), longitude: Number(event.lngLat.lng) });
     });
 
     mapRef.current = map;
@@ -52,7 +55,7 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
 
     return () => {
       resizeObserver.disconnect();
-      markersRef.current.forEach((marker) => marker.remove());
+      markersRef.current.forEach(({ marker }) => marker.remove());
       selectionMarkerRef.current?.remove();
       map.remove();
       mapRef.current = null;
@@ -73,7 +76,7 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
     const map = mapRef.current;
     if (!map) return;
 
-    markersRef.current.forEach((marker) => marker.remove());
+    markersRef.current.forEach(({ marker }) => marker.remove());
     markersRef.current = [];
 
     if (points.length === 0) {
@@ -90,31 +93,42 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
       const coordinates = [longitude, latitude];
       bounds.extend(coordinates);
       const element = createMapMarkerElement({
-        color: SOURCE_COLORS[point.source] || SOURCE_COLORS.itinerary,
-        size: point.source === 'destination' ? 21 : 18,
+        color: getPointColor(point),
+        size: point.source === 'destination' ? 22 : 20,
         label: `${index + 1}. ${point.title}`,
+        number: index + 1,
       });
       element.dataset.pointId = point.id;
       element.addEventListener('click', (event) => {
         event.stopPropagation();
         map.flyTo({ center: coordinates, zoom: MAP_CONFIG.focusedZoom, essential: true });
-        onPointSelect?.(point);
+        pointSelectHandlerRef.current?.(point);
       });
 
       const marker = new maplibregl.Marker({ element, anchor: 'bottom' })
         .setLngLat(coordinates)
         .setPopup(new maplibregl.Popup({ offset: 18, closeButton: false }).setDOMContent(createPopupNode(point, t)))
         .addTo(map);
-      markersRef.current.push(marker);
+      markersRef.current.push({ id: point.id, marker, element });
     });
 
     if (bounds.isEmpty()) return;
-    if (points.length === 1) {
-      map.easeTo({ center: bounds.getCenter(), zoom: MAP_CONFIG.focusedZoom, duration: 450 });
-    } else {
-      map.fitBounds(bounds, { padding: 54, maxZoom: MAP_CONFIG.tripOverviewZoom, duration: 500 });
-    }
-  }, [onPointSelect, points, t]);
+    if (points.length === 1) map.easeTo({ center: bounds.getCenter(), zoom: MAP_CONFIG.focusedZoom, duration: 450 });
+    else map.fitBounds(bounds, { padding: 54, maxZoom: MAP_CONFIG.tripOverviewZoom, duration: 500 });
+  }, [points, t]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !focusedPointId) return;
+    const point = points.find((candidate) => candidate.id === focusedPointId);
+    if (!point) return;
+    const latitude = Number(point.latitude);
+    const longitude = Number(point.longitude);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
+
+    markersRef.current.forEach(({ id, element }) => element.classList.toggle('maplibre-point-marker--focused', id === focusedPointId));
+    map.flyTo({ center: [longitude, latitude], zoom: Math.max(map.getZoom(), MAP_CONFIG.focusedZoom), speed: 1.25, essential: true });
+  }, [focusedPointId, points]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -123,21 +137,23 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
     if (!map || !selection || !Number.isFinite(selection.latitude) || !Number.isFinite(selection.longitude)) return;
 
     const coordinates = [selection.longitude, selection.latitude];
-    const element = createMapMarkerElement({ color: '#f4a62a', size: 24, label: t('map.selectedPoint') });
+    const element = createMapMarkerElement({ color: '#f4a62a', size: 24, label: t('map.selectedPoint'), number: '+' });
     element.classList.add('maplibre-point-marker--selected');
-    selectionMarkerRef.current = new maplibregl.Marker({ element, anchor: 'bottom' })
-      .setLngLat(coordinates)
-      .addTo(map);
+    selectionMarkerRef.current = new maplibregl.Marker({ element, anchor: 'bottom' }).setLngLat(coordinates).addTo(map);
 
-    map.flyTo({
-      center: coordinates,
-      zoom: Math.max(map.getZoom(), MAP_CONFIG.focusedZoom),
-      speed: 1.25,
-      essential: true,
-    });
+    map.flyTo({ center: coordinates, zoom: Math.max(map.getZoom(), MAP_CONFIG.focusedZoom), speed: 1.25, essential: true });
   }, [selection, t]);
 
   return <div ref={containerRef} className="trip-map" aria-label={t('map.aria')} />;
+}
+
+function getPointColor(point) {
+  if (point.source === 'destination') return TYPE_COLORS.destination;
+  if (point.type === 'car' && point.transportMode === 'ferry') return TYPE_COLORS.ferry;
+  if (TYPE_COLORS[point.type]) return TYPE_COLORS[point.type];
+  if (point.source === 'reservation') return TYPE_COLORS.reservation;
+  if (point.source === 'savedPlace') return TYPE_COLORS.savedPlace;
+  return TYPE_COLORS.map;
 }
 
 function createPopupNode(point, t) {

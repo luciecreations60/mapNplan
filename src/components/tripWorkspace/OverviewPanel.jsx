@@ -8,7 +8,6 @@ import {
   getConfirmedReservationCount,
   getItineraryItemCount,
   getPaidExpenseTotal,
-  getPlannedExpenseTotal,
 } from '../../utils/tripWorkspace.js';
 import { Card } from '../common/Card.jsx';
 import { Icon } from '../common/Icon.jsx';
@@ -17,7 +16,6 @@ import { ProgressBar } from '../common/ProgressBar.jsx';
 export function OverviewPanel({ trip, onOpenTab }) {
   const { locale, t } = useI18n();
   const paidTotal = getPaidExpenseTotal(trip.expenses);
-  const plannedTotal = getPlannedExpenseTotal(trip.expenses);
   const budgetProgress = trip.budget > 0 ? (paidTotal / trip.budget) * 100 : 0;
   const checklistProgress = trip.checklistTotal > 0
     ? (trip.checklistCompleted / trip.checklistTotal) * 100
@@ -89,7 +87,7 @@ export function OverviewPanel({ trip, onOpenTab }) {
             </header>
             <div className="budget-health">
               <div><span>{t('overview.paidLabel')}</span><strong>{formatCurrency(paidTotal, trip.currency, locale)}</strong></div>
-              <div><span>{t('overview.planned')}</span><strong>{formatCurrency(plannedTotal, trip.currency, locale)}</strong></div>
+              <div><span>{t('overview.tripBudget')}</span><strong>{formatCurrency(trip.budget, trip.currency, locale)}</strong></div>
             </div>
             <ProgressBar value={budgetProgress} label={t('overview.budgetUsed')} />
             <p className="budget-health__caption">

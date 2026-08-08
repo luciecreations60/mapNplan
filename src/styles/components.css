@@ -945,3 +945,8 @@
     flex: 1 1 180px;
   }
 }
+
+/* RC7 — wider desktop dialogs for place search and document workflows. */
+@media (min-width: 761px) {
+  .modal--large { width: min(980px, 100%); max-height: none; overflow: visible; }
+}

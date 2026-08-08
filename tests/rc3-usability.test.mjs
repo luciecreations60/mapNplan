@@ -71,7 +71,7 @@ test('custom checklist list titles survive trip normalization', async () => {
     checklist: [{ id: 'item-1', label: 'Baby carrier', category: 'packing', listTitle: 'Baby essentials', completed: false }],
   }]);
   const [trip] = tripService.getAll();
-  assert.equal(trip.schemaVersion, 20);
+  assert.equal(trip.schemaVersion, 21);
   assert.equal(trip.checklist[0].listTitle, 'Baby essentials');
   assert.equal(trip.checklistLists[0].title, 'Baby essentials');
 });

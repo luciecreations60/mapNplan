@@ -9,10 +9,10 @@ export const PROJECT_CONFIG = Object.freeze({
   codeName: 'mapNplan',
   brandName: 'mapNplan',
   tagline: 'Planifiez. Explorez. Profitez.',
-  version: '0.1.27',
+  version: '0.1.28',
   release: Object.freeze({
     stage: 'release-candidate',
-    candidate: 'rc.6',
+    candidate: 'rc.7',
     brandFinalized: true,
     publicIndexingEnabled: false,
     productionDomain: '',

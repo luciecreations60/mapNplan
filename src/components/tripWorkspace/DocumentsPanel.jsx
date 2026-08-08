@@ -15,7 +15,7 @@ const EMPTY_FORM = Object.freeze({
   type: 'booking', title: '', reference: '', url: '', expiryDate: '', notes: '', linkedReservationId: '',
 });
 
-export function DocumentsPanel({ trip, onUpdate }) {
+export function DocumentsPanel({ trip, onUpdate, focusedDocumentId = null }) {
   const { locale, t } = useI18n();
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [isFormOpen, setFormOpen] = useState(false);
@@ -61,6 +61,18 @@ export function DocumentsPanel({ trip, onUpdate }) {
   useEffect(() => {
     refreshAttachments();
   }, [refreshAttachments, trip.documents]);
+
+  useEffect(() => {
+    if (!focusedDocumentId) return undefined;
+    setQuery('');
+    const timeoutId = window.setTimeout(() => {
+      const card = document.getElementById(`document-${focusedDocumentId}`);
+      if (!card) return;
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.focus({ preventScroll: true });
+    }, 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [focusedDocumentId, trip.documents]);
 
   useEffect(() => () => {
     if (preview?.url) URL.revokeObjectURL(preview.url);
@@ -196,7 +208,11 @@ export function DocumentsPanel({ trip, onUpdate }) {
       const record = await attachmentStorageService.get(attachment.id);
       if (!record) throw new Error(t('documents.fileMissing'));
       if (!record.type.startsWith('image/') && record.type !== 'application/pdf') {
-        downloadRecord(record);
+        const url = URL.createObjectURL(record.blob);
+        const opened = window.open(url, '_blank');
+        if (opened) opened.opener = null;
+        else downloadRecord(record);
+        window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
         return;
       }
       const url = URL.createObjectURL(record.blob);
@@ -355,7 +371,7 @@ export function DocumentsPanel({ trip, onUpdate }) {
             const attachments = attachmentsByDocument[document.id] || [];
             const linkedReservation = trip.reservations.find((reservation) => reservation.id === document.linkedReservationId);
             return (
-              <Card key={document.id} className="document-card document-card--vault">
+              <Card key={document.id} id={`document-${document.id}`} tabIndex="-1" className={`document-card document-card--vault${focusedDocumentId === document.id ? ' document-card--focused' : ''}`}>
                 <div className="document-card__icon"><Icon name={getDocumentIcon(document.type)} size={22} /></div>
                 <div className="document-card__content">
                   <small>{getCategoryLabel(DOCUMENT_TYPES, document.type, t)}</small>
@@ -409,9 +425,9 @@ export function DocumentsPanel({ trip, onUpdate }) {
                             <small>{formatBytes(attachment.size, locale)} · {formatLocalizedDateTime(attachment.createdAt, locale)}</small>
                           </div>
                           <div className="attachment-item__actions">
-                            <button className="icon-button icon-button--small" type="button" disabled={busyAttachmentId === attachment.id} aria-label={t('documents.previewFile', { name: attachment.name })} onClick={() => previewAttachment(attachment)}>
-                              <Icon name="eye" size={15} />
-                            </button>
+                            <Button size="small" variant="secondary" icon="eye" disabled={busyAttachmentId === attachment.id} aria-label={t('documents.previewFile', { name: attachment.name })} onClick={() => previewAttachment(attachment)}>
+                              {t('documents.view')}
+                            </Button>
                             <button className="icon-button icon-button--small" type="button" disabled={busyAttachmentId === attachment.id} aria-label={t('documents.downloadFile', { name: attachment.name })} onClick={() => downloadAttachment(attachment)}>
                               <Icon name="download" size={15} />
                             </button>

@@ -3,7 +3,7 @@ import { useI18n } from '../../hooks/useI18n.js';
 import { useFocusTrap } from '../../hooks/useFocusTrap.js';
 import { Icon } from './Icon.jsx';
 
-export function Modal({ isOpen, title, description, children, onClose }) {
+export function Modal({ isOpen, title, description, children, onClose, size = 'default' }) {
   const { t } = useI18n();
   const titleId = useId();
   const descriptionId = useId();
@@ -40,7 +40,7 @@ export function Modal({ isOpen, title, description, children, onClose }) {
         aria-describedby={description ? descriptionId : undefined}
         aria-labelledby={titleId}
         aria-modal="true"
-        className="modal"
+        className={`modal${size === 'large' ? ' modal--large' : ''}`}
         role="dialog"
         tabIndex="-1"
         onMouseDown={(event) => event.stopPropagation()}

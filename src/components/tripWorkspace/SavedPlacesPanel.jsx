@@ -22,6 +22,7 @@ import { InlineNotice } from '../feedback/InlineNotice.jsx';
 
 const EMPTY_FORM = Object.freeze({
   name: '',
+  nameAutofilled: true,
   label: '',
   city: '',
   country: '',
@@ -65,7 +66,7 @@ export function SavedPlacesPanel({ trip, onUpdate, onOpenTab }) {
   const [planTime, setPlanTime] = useState('10:00');
 
   const places = trip.savedPlaces || [];
-  const listOptions = useMemo(() => getSavedPlaceLists(places), [places]);
+  const listOptions = useMemo(() => getSavedPlaceLists(places, trip.savedPlaceLists || []), [places, trip.savedPlaceLists]);
   const dateOptions = useMemo(() => {
     const dates = [
       ...getTripDateRange(trip.startDate, trip.endDate),
@@ -104,7 +105,7 @@ export function SavedPlacesPanel({ trip, onUpdate, onOpenTab }) {
   }
 
   function updateForm(key, value) {
-    setForm((current) => ({ ...current, [key]: value }));
+    setForm((current) => ({ ...current, [key]: value, ...(key === 'name' ? { nameAutofilled: false } : {}) }));
   }
 
   function changeLocationValue(value) {
@@ -136,7 +137,8 @@ export function SavedPlacesPanel({ trip, onUpdate, onOpenTab }) {
 
     setForm((current) => ({
       ...current,
-      name: current.name || place.name,
+      name: current.nameAutofilled || !current.name.trim() ? (place.name || place.primaryLabel || String(place.label || '').split(',')[0].trim()) : current.name,
+      nameAutofilled: current.nameAutofilled || !current.name.trim(),
       label: place.label,
       city: place.city,
       country: place.country,
@@ -175,7 +177,9 @@ export function SavedPlacesPanel({ trip, onUpdate, onOpenTab }) {
       ? places.map((place) => place.id === editingId ? savedPlace : place)
       : [...places, savedPlace];
 
-    onUpdate({ savedPlaces: nextPlaces });
+    const normalizedList = String(savedPlace.list || '').trim();
+    const savedPlaceLists = [...new Set([...(trip.savedPlaceLists || []), normalizedList].filter(Boolean))];
+    onUpdate({ savedPlaces: nextPlaces, savedPlaceLists });
     setNotice({
       tone: 'success',
       title: t(editingId ? 'places.updatedTitle' : 'places.savedTitle'),
@@ -186,7 +190,7 @@ export function SavedPlacesPanel({ trip, onUpdate, onOpenTab }) {
 
   function editPlace(place) {
     setEditingId(place.id);
-    setForm({ ...place, tags: (place.tags || []).join(', ') });
+    setForm({ ...place, tags: (place.tags || []).join(', '), nameAutofilled: String(place.name || '').trim() === String(place.label || '').split(',')[0].trim() });
     setFormOpen(true);
   }
 
@@ -293,13 +297,10 @@ export function SavedPlacesPanel({ trip, onUpdate, onOpenTab }) {
         title={t(editingId ? 'places.editTitle' : 'places.newTitle')}
         description={t(editingId ? 'places.editModalText' : 'places.newModalText')}
         onClose={resetForm}
+        size="large"
       >
         <form className="workspace-form saved-place-modal-form" onSubmit={savePlace}>
           <div className="workspace-form__grid">
-            <label className="workspace-field workspace-form__wide">
-              <span>{t('places.name')}</span>
-              <input required value={form.name} placeholder={t('places.namePlaceholder')} onChange={(event) => updateForm('name', event.target.value)} />
-            </label>
             <LocationAutocomplete
               variant="workspace"
               className="workspace-form__wide"
@@ -307,11 +308,17 @@ export function SavedPlacesPanel({ trip, onUpdate, onOpenTab }) {
               value={form.label}
               required
               placeholder={t('places.locationPlaceholder')}
-              bias={{ latitude: trip.destinationLatitude, longitude: trip.destinationLongitude }}
+              hint={t('places.locationFirstHint')}
+             
               countryCode={trip.countryCode}
               onValueChange={changeLocationValue}
               onPlaceSelect={selectLocation}
             />
+            <label className="workspace-field workspace-form__wide">
+              <span>{t('places.name')}</span>
+              <input required value={form.name} placeholder={t('places.nameGeneratedPlaceholder')} onChange={(event) => updateForm('name', event.target.value)} />
+              <small className="field-hint">{t('places.nameGeneratedHint')}</small>
+            </label>
             <label className="workspace-field">
               <span>{t('places.category')}</span>
               <select value={form.category} onChange={(event) => updateForm('category', event.target.value)}>

@@ -8,7 +8,7 @@ export function LocalTimeCard({ timezone, timezoneAbbreviation, locationLabel })
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
-    const timerId = window.setInterval(() => setNow(new Date()), 30000);
+    const timerId = window.setInterval(() => setNow(new Date()), 1000);
     return () => window.clearInterval(timerId);
   }, []);
 

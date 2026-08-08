@@ -9,7 +9,7 @@ import { localStorageService } from '../storage/LocalStorageService.js';
 
 const STORAGE_KEY = 'trip-library';
 const OBSOLETE_TEST_STORAGE_KEYS = Object.freeze(['trips', 'seo-content-library']);
-const CURRENT_TRIP_SCHEMA_VERSION = 20;
+const CURRENT_TRIP_SCHEMA_VERSION = 21;
 
 /**
  * Trip repository façade.
@@ -57,6 +57,7 @@ class TripService {
       reservations: [],
       documents: [],
       savedPlaces: [],
+      savedPlaceLists: [],
       bookingOptions: [],
       notes: '',
       collaboration: null,
@@ -254,6 +255,7 @@ class TripService {
     const reservations = this.#normalizeReservations(trip.reservations);
     const documents = this.#normalizeDocuments(trip.documents, reservations);
     const savedPlaces = this.#normalizeSavedPlaces(trip.savedPlaces);
+    const savedPlaceLists = this.#normalizeSavedPlaceLists(trip.savedPlaceLists, savedPlaces);
     const bookingOptions = this.#normalizeBookingOptions(trip.bookingOptions, trip.currency);
     const companion = normalizeCompanionSettings(trip.companion);
     const calculatedSpent = expenses
@@ -301,6 +303,7 @@ class TripService {
       reservations,
       documents,
       savedPlaces,
+      savedPlaceLists,
       bookingOptions,
       companion,
       collaboration,
@@ -520,6 +523,9 @@ class TripService {
               seriesIndex: Math.max(0, Number(item.seriesIndex) || 0),
               stayStartDate: String(item.stayStartDate || '').trim(),
               stayEndDate: String(item.stayEndDate || '').trim(),
+              stayRole: ['single', 'checkin', 'stay', 'checkout'].includes(item.stayRole) ? item.stayRole : '',
+              checkInTime: String(item.checkInTime || (item.type === 'hotel' ? item.time || '' : '')).trim(),
+              checkOutTime: String(item.checkOutTime || '').trim(),
             }))
           : [],
       }))
@@ -643,6 +649,15 @@ class TripService {
       .map((place) => createSavedPlace(place))
       .filter((place) => place.name)
       .slice(0, 1000);
+  }
+
+  #normalizeSavedPlaceLists(savedPlaceLists, savedPlaces = []) {
+    const source = Array.isArray(savedPlaceLists) ? savedPlaceLists : [];
+    const used = savedPlaces.map((place) => place.list);
+    return [...new Set([...source, ...used]
+      .map((list) => String(list || '').trim())
+      .filter(Boolean))]
+      .slice(0, 100);
   }
 
   #normalizeReminderMinutes(value) {

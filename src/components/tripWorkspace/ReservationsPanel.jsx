@@ -21,7 +21,7 @@ const EMPTY_FORM = Object.freeze({
   latitude: '', longitude: '', notes: '', sourceActivityId: null, sourceActivitySeriesId: null,
 });
 
-export function ReservationsPanel({ trip, onUpdate, focusedReservationId = null }) {
+export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focusedReservationId = null }) {
   const { locale, t } = useI18n();
   const [form, setForm] = useState(() => ({ ...EMPTY_FORM, startDate: trip.startDate || '' }));
   const [isCreateOpen, setCreateOpen] = useState(false);
@@ -367,6 +367,7 @@ export function ReservationsPanel({ trip, onUpdate, focusedReservationId = null 
                     <div className="reservation-card__actions">
                       <label><span className="sr-only">{t('reservations.status')}</span><select value={reservation.status} onChange={(event) => updateStatus(reservation.id, event.target.value)}>{RESERVATION_STATUSES.map((status) => <option key={status.id} value={status.id}>{t(status.labelKey)}</option>)}</select></label>
                       {safeUrl && <a className="text-link" href={safeUrl} target="_blank" rel="noreferrer">{t('reservations.openBooking')} <Icon name="externalLink" size={15} /></a>}
+                      {linkedDocuments.length > 0 && <button className="text-link" type="button" onClick={() => onOpenDocument?.(linkedDocuments[0].id)}><Icon name="folder" size={15} /> {t('reservations.openDocuments', { count: linkedDocuments.length })}</button>}
                       <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.edit')} ${reservation.title}`} onClick={() => openEditForm(reservation)}><Icon name="edit" size={16} /></button>
                       <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.delete')} ${reservation.title}`} onClick={() => removeReservation(reservation)}><Icon name="trash" size={16} /></button>
                     </div>

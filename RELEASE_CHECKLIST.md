@@ -1,26 +1,31 @@
-# Checklist de validation — V0.1.27 RC6 / partie 28
+# Checklist de validation — V0.1.28 RC7 / partie 29
 
 ## Automatique
 
 - [x] Qualité et imports contrôlés.
-- [x] 61 tests Node réussis.
-- [x] 39 contrôles de Release Candidate réussis en audit source.
+- [x] 78 tests Node réussis.
+- [x] 41 contrôles de Release Candidate réussis en audit source.
 - [x] Aucune occurrence de l’ancienne identité.
+- [x] Budget spécifique MapLibre intégré au contrôle de taille.
 - [ ] Installation des dépendances et build Vite validés par GitHub Actions.
-- [ ] Budget de taille du build validé.
+- [ ] Audit de taille exécuté sur le build GitHub Actions.
 
-## Fonctionnel
+## Partie 29 — tests fonctionnels
 
-- [ ] Retour à Vue générale en un clic.
-- [ ] Dates de l’aperçu lisibles sur ordinateur et mobile.
-- [ ] Carte traduite selon la langue choisie.
-- [ ] Recherche, zoom et ajout d’un lieu depuis la carte.
-- [ ] Irlande et Japon visibles au bon endroit sur la carte globale.
-- [ ] Budget unique et répartition personnalisée testés.
-- [ ] Voyage à une personne non bloquant.
-- [ ] Duplication et couvertures testées.
-- [ ] Création explicite d’une liste de checklist testée.
-- [ ] Favicon et titre d’onglet contrôlés après purge du cache.
+- [ ] Lieu saisi avant le titre et titre généré pour chaque type d’activité.
+- [ ] Ajouter pour ce jour ouvre le formulaire sous la journée sans scroll vers le haut.
+- [ ] Modification d’activité reste sous l’activité.
+- [ ] Hébergement : check-in premier jour, séjour compact les jours intermédiaires, check-out dernier jour.
+- [ ] Recherche d’un lieu hors de la destination du voyage (ex. Nice pendant un voyage en Corse).
+- [ ] Numéros de la liste retrouvés sur les repères de carte.
+- [ ] Couleurs de repères différenciées par type.
+- [ ] Clic dans la liste : focus carte conservé après fermeture/annulation.
+- [ ] Lieux enregistrés : lieu avant nom, suggestions visibles en entier, liste personnalisée réutilisable.
+- [ ] Heure locale avec secondes en mouvement.
+- [ ] Réservation liée : bouton vers les documents.
+- [ ] Documents image/PDF visualisables dans le navigateur.
+- [ ] Montants avec décimales utiles et expressions simples (`300/2`).
+- [ ] Vue générale : Payé à gauche, Budget du voyage à droite, reste disponible cohérent.
 
 ## Avant production
 
@@ -28,14 +33,3 @@
 - [ ] Rôle administrateur pour les futurs outils éditoriaux.
 - [ ] Politique de confidentialité et conditions publiées.
 - [ ] Quotas et conditions d’utilisation des services cartographiques validés.
-
-## RC6 / partie 28
-
-- [ ] couverture URL sans répétition ;
-- [ ] libellé de jour modifiable ;
-- [ ] édition d’activité sous l’activité ;
-- [ ] réservation liée ouvrable ;
-- [ ] repères cartographiques précis visuellement ;
-- [ ] hébergement multi-jours cohérent ;
-- [ ] dépenses suggérées depuis les budgets d’activités ;
-- [ ] partage égal proposé par défaut à plusieurs voyageurs.

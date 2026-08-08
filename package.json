@@ -1,7 +1,7 @@
 {
   "name": "mapnplan",
   "private": true,
-  "version": "0.1.27",
+  "version": "0.1.28",
   "type": "module",
   "description": "mapNplan — a modern, local-first travel planning application.",
   "scripts": {

@@ -76,6 +76,7 @@ export function TripWorkspacePage() {
     shouldFocusTabsRef.current = true;
     const nextParams = new URLSearchParams(searchParams);
     nextParams.delete('reservation');
+    nextParams.delete('document');
     if (tab === 'overview') nextParams.delete('tab');
     else nextParams.set('tab', tab);
     setSearchParams(nextParams, { replace: true });
@@ -87,6 +88,16 @@ export function TripWorkspacePage() {
     const nextParams = new URLSearchParams(searchParams);
     nextParams.set('tab', 'reservations');
     nextParams.set('reservation', reservationId);
+    setSearchParams(nextParams, { replace: true });
+  }
+
+  function handleOpenDocument(documentId) {
+    if (!documentId) return;
+    shouldFocusTabsRef.current = true;
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete('reservation');
+    nextParams.set('tab', 'documents');
+    nextParams.set('document', documentId);
     setSearchParams(nextParams, { replace: true });
   }
 
@@ -116,11 +127,11 @@ export function TripWorkspacePage() {
         {activeTab === 'places' && <SavedPlacesPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} />}
         {activeTab === 'tools' && <TravelToolsPanel trip={trip} onOpenTab={handleTabChange} />}
         {activeTab === 'booking' && <BookingPanel trip={trip} onUpdate={handleUpdate} />}
-        {activeTab === 'reservations' && <ReservationsPanel trip={trip} onUpdate={handleUpdate} focusedReservationId={searchParams.get('reservation')} />}
+        {activeTab === 'reservations' && <ReservationsPanel trip={trip} onUpdate={handleUpdate} onOpenDocument={handleOpenDocument} focusedReservationId={searchParams.get('reservation')} />}
         {activeTab === 'budget' && <BudgetHubPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'statistics' && <StatisticsPanel trip={trip} />}
         {activeTab === 'checklist' && <ChecklistPanel trip={trip} onUpdate={handleUpdate} />}
-        {activeTab === 'documents' && <DocumentsPanel trip={trip} onUpdate={handleUpdate} />}
+        {activeTab === 'documents' && <DocumentsPanel trip={trip} onUpdate={handleUpdate} focusedDocumentId={searchParams.get('document')} />}
         {activeTab === 'notes' && <NotesPanel trip={trip} onUpdate={handleUpdate} />}
         {activeTab === 'collaboration' && <CollaborationPanel trip={trip} onUpdate={handleUpdate} />}
       </div>

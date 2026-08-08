@@ -39,7 +39,7 @@ export function buildLocalizedNameExpression(language = 'en') {
   ];
 }
 
-export function createMapMarkerElement({ color = '#1f90ad', size = 18, label = '' } = {}) {
+export function createMapMarkerElement({ color = '#1f90ad', size = 18, label = '', number = '' } = {}) {
   const element = document.createElement('button');
   element.type = 'button';
   element.className = 'maplibre-point-marker';
@@ -50,6 +50,12 @@ export function createMapMarkerElement({ color = '#1f90ad', size = 18, label = '
   const visual = document.createElement('span');
   visual.className = 'maplibre-point-marker__visual';
   visual.setAttribute('aria-hidden', 'true');
+  if (number !== '' && number !== null && number !== undefined) {
+    const numberNode = document.createElement('span');
+    numberNode.className = 'maplibre-point-marker__number';
+    numberNode.textContent = String(number);
+    visual.append(numberNode);
+  }
   element.append(visual);
   return element;
 }

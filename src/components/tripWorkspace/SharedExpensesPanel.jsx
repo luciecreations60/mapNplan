@@ -3,6 +3,7 @@ import { useI18n } from '../../hooks/useI18n.js';
 import { formatLocalizedDate } from '../../utils/date.js';
 import { formatCurrency } from '../../utils/currency.js';
 import { createId } from '../../utils/id.js';
+import { evaluateMoneyExpression, normalizeMoneyExpression } from '../../utils/moneyExpression.js';
 import { buildTripDateRange } from '../../utils/itinerary.js';
 import { getBudgetedItineraryActivities, getUnlinkedBudgetedActivities } from '../../utils/activityExpenses.js';
 import {
@@ -148,7 +149,18 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
   }
 
   function normalizeMoneyField(fieldName) {
-    setExpenseForm((current) => ({ ...current, [fieldName]: normalizeMoney(current[fieldName]) }));
+    setExpenseForm((current) => {
+      const normalized = normalizeMoneyExpression(current[fieldName]);
+      return normalized === null ? current : { ...current, [fieldName]: normalized };
+    });
+  }
+
+  function normalizeShareAmount(participantId) {
+    setExpenseForm((current) => {
+      const normalized = normalizeMoneyExpression(current.shareAmounts[participantId]);
+      if (normalized === null) return current;
+      return { ...current, shareAmounts: { ...current.shareAmounts, [participantId]: normalized } };
+    });
   }
 
   function updateShareAmount(participantId, value) {
@@ -173,8 +185,8 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
 
   function submitExpense(event) {
     event.preventDefault();
-    const amount = Math.max(0, Number(expenseForm.amount) || 0);
-    const paidAmount = Math.min(amount, Math.max(0, Number(expenseForm.paidAmount) || 0));
+    const amount = Math.max(0, evaluateMoneyExpression(expenseForm.amount) ?? 0);
+    const paidAmount = Math.min(amount, Math.max(0, evaluateMoneyExpression(expenseForm.paidAmount) ?? 0));
     const selectedIds = expenseForm.splitBetweenIds.length > 0
       ? expenseForm.splitBetweenIds
       : participants.length === 1
@@ -189,7 +201,7 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
     const splitShares = expenseForm.splitMode === 'custom'
       ? selectedIds.map((participantId) => ({
           participantId,
-          amount: Math.max(0, Number(expenseForm.shareAmounts[participantId]) || 0),
+          amount: Math.max(0, evaluateMoneyExpression(expenseForm.shareAmounts[participantId]) ?? 0),
         }))
       : [];
     const customTotal = splitShares.reduce((sum, share) => sum + share.amount, 0);
@@ -287,7 +299,7 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
 
   function submitSettlement(event) {
     event.preventDefault();
-    const amount = Math.max(0, Number(settlementForm.amount) || 0);
+    const amount = Math.max(0, evaluateMoneyExpression(settlementForm.amount) ?? 0);
     if (
       amount <= 0
       || !settlementForm.fromParticipantId
@@ -589,7 +601,7 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
         <form className="settlement-form" onSubmit={submitSettlement}>
           <label><span>{t('sharedExpenses.from')}</span><select name="fromParticipantId" value={settlementForm.fromParticipantId} onChange={updateSettlementField} required><option value="">{t('common.none')}</option>{participants.map((participant) => <option key={participant.id} value={participant.id}>{participant.name}</option>)}</select></label>
           <label><span>{t('sharedExpenses.to')}</span><select name="toParticipantId" value={settlementForm.toParticipantId} onChange={updateSettlementField} required><option value="">{t('common.none')}</option>{participants.map((participant) => <option key={participant.id} value={participant.id}>{participant.name}</option>)}</select></label>
-          <label><span>{t('sharedExpenses.amount')} ({trip.currency})</span><input name="amount" type="number" min="0.01" step="0.01" value={settlementForm.amount} onChange={updateSettlementField} required /></label>
+          <label><span>{t('sharedExpenses.amount')} ({trip.currency})</span><input name="amount" type="text" inputMode="decimal" value={settlementForm.amount} onChange={updateSettlementField} onBlur={() => setSettlementForm((current) => { const normalized = normalizeMoneyExpression(current.amount, { minimum: 0.01 }); return normalized === null ? current : { ...current, amount: normalized }; })} placeholder={t('sharedExpenses.calculationPlaceholder')} required /></label>
           <label><span>{t('common.date')}</span><input name="date" type="date" value={settlementForm.date} onChange={updateSettlementField} /></label>
           <label className="settlement-form__notes"><span>{t('common.notes')}</span><input name="notes" value={settlementForm.notes} onChange={updateSettlementField} placeholder={t('sharedExpenses.settlementNotePlaceholder')} /></label>
           <Button type="submit" size="small" icon="exchange">{t('sharedExpenses.recordPayment')}</Button>
@@ -630,6 +642,7 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
         onMoneyBlur={normalizeMoneyField}
         onToggleParticipant={toggleSplitParticipant}
         onShareAmountChange={updateShareAmount}
+        onShareAmountBlur={normalizeShareAmount}
         onSubmit={submitExpense}
       />
 
@@ -646,12 +659,12 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
   );
 }
 
-function ExpenseDialog({ isOpen, form, participants, currency, itineraryDates, budgetedActivities, locale, t, onClose, onFieldChange, onMoneyBlur, onToggleParticipant, onShareAmountChange, onSubmit }) {
+function ExpenseDialog({ isOpen, form, participants, currency, itineraryDates, budgetedActivities, locale, t, onClose, onFieldChange, onMoneyBlur, onToggleParticipant, onShareAmountChange, onShareAmountBlur, onSubmit }) {
   const customTotal = form.splitBetweenIds.reduce(
-    (sum, participantId) => sum + Math.max(0, Number(form.shareAmounts[participantId]) || 0),
+    (sum, participantId) => sum + Math.max(0, evaluateMoneyExpression(form.shareAmounts[participantId]) ?? 0),
     0,
   );
-  const expectedTotal = Math.max(0, Number(form.amount) || 0);
+  const expectedTotal = Math.max(0, evaluateMoneyExpression(form.amount) ?? 0);
 
   return (
     <Modal
@@ -674,8 +687,8 @@ function ExpenseDialog({ isOpen, form, participants, currency, itineraryDates, b
           )}
           <label className="workspace-field workspace-form__wide"><span>{t('sharedExpenses.expenseLabel')}</span><input name="label" value={form.label} onChange={onFieldChange} placeholder={t('sharedExpenses.expensePlaceholder')} required /></label>
           <label className="workspace-field"><span>{t('sharedExpenses.category')}</span><select name="category" value={form.category} onChange={onFieldChange}>{EXPENSE_CATEGORIES.map((category) => <option key={category.id} value={category.id}>{t(category.labelKey)}</option>)}</select></label>
-          <label className="workspace-field"><span>{t('sharedExpenses.totalAmount')} ({currency})</span><input name="amount" type="number" min="0.01" step="0.01" value={form.amount} onChange={onFieldChange} onBlur={() => onMoneyBlur('amount')} required /></label>
-          <label className="workspace-field"><span>{t('sharedExpenses.paidAmount')} ({currency})</span><input name="paidAmount" type="number" min="0" step="0.01" max={form.amount || undefined} value={form.paidAmount} onChange={onFieldChange} onBlur={() => onMoneyBlur('paidAmount')} /></label>
+          <label className="workspace-field"><span>{t('sharedExpenses.totalAmount')} ({currency})</span><input name="amount" type="text" inputMode="decimal" value={form.amount} onChange={onFieldChange} onBlur={() => onMoneyBlur('amount')} placeholder={t('sharedExpenses.calculationPlaceholder')} required /><small className="field-hint">{t('sharedExpenses.calculationHint')}</small></label>
+          <label className="workspace-field"><span>{t('sharedExpenses.paidAmount')} ({currency})</span><input name="paidAmount" type="text" inputMode="decimal" value={form.paidAmount} onChange={onFieldChange} onBlur={() => onMoneyBlur('paidAmount')} placeholder={t('sharedExpenses.calculationPlaceholder')} /></label>
           <label className="workspace-field"><span>{t('sharedExpenses.itineraryDate')}</span><select name="date" value={form.date} onChange={onFieldChange}>
             <option value="">{t('common.none')}</option>
             {itineraryDates.map((date) => <option key={date} value={date}>{formatDate(date, locale)}</option>)}
@@ -713,11 +726,12 @@ function ExpenseDialog({ isOpen, form, participants, currency, itineraryDates, b
                       <label className="share-amount-field">
                         <span className="sr-only">{t('sharedExpenses.shareAmountFor', { name: participant.name })}</span>
                         <input
-                          type="number"
-                          min="0"
-                          step="0.01"
+                          type="text"
+                          inputMode="decimal"
                           value={form.shareAmounts[participant.id] ?? ''}
                           onChange={(event) => onShareAmountChange(participant.id, event.target.value)}
+                          onBlur={() => onShareAmountBlur(participant.id)}
+                          placeholder={t('sharedExpenses.calculationPlaceholder')}
                           aria-label={t('sharedExpenses.shareAmountFor', { name: participant.name })}
                         />
                         <span>{currency}</span>
@@ -750,12 +764,6 @@ function ExpenseDialog({ isOpen, form, participants, currency, itineraryDates, b
       </form>
     </Modal>
   );
-}
-
-function normalizeMoney(value) {
-  if (value === '') return '';
-  const number = Number(value);
-  return Number.isFinite(number) ? Math.max(0, number).toFixed(2) : '';
 }
 
 function compareExpenses(left, right, sort, locale) {

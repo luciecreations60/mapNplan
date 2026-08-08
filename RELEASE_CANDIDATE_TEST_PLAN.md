@@ -1,77 +1,62 @@
-# Plan de test — V0.1.27 RC6 mapNplan
+# Plan de test — V0.1.28 RC7 mapNplan
 
-## 1. Démarrage propre
+## 1. Déploiement
 
-1. Déployer l’archive en remplacement complet de la version précédente.
-2. Ouvrir le site dans une fenêtre privée ou utiliser **Effacer les données locales des voyages**.
-3. Vérifier que la bibliothèque de voyages est vide.
-4. Rechercher l’ancienne identité dans le dépôt et confirmer qu’aucune occurrence n’existe.
+1. Copier l’intégralité de la partie 29 dans le dépôt local cloné avec GitHub Desktop.
+2. Commit puis **Push origin**.
+3. Dans GitHub Actions, vérifier successivement : qualité, tests, build, audit de taille, audit RC et déploiement.
+4. Vérifier que le chunk `map-vendor` n’échoue plus au seuil générique de 750 Ko.
 
-## 2. Navigation de l’espace voyage
+## 2. Itinéraire
 
-1. Créer un voyage puis ouvrir **Itinéraire**.
-2. Cliquer une seule fois sur **Vue générale**.
-3. Confirmer que la Vue générale s’affiche immédiatement.
-4. Depuis la Vue générale, tester chaque carte interactive : itinéraire, réservations, carte, budget, checklist, documents et réservations externes.
-5. Vérifier les mêmes parcours sur ordinateur et mobile.
+1. Cliquer **Ajouter pour ce jour** en milieu de page : le formulaire doit apparaître sous la journée sans retour en haut.
+2. Vérifier l’ordre : Type, Lieu, latitude/longitude, puis Titre généré.
+3. Sélectionner un lieu pour chaque type d’activité et contrôler le titre généré.
+4. Pour Transport, choisir Ferry et vérifier le titre basé sur départ → arrivée.
+5. Modifier une activité en milieu de journée et vérifier que l’éditeur reste sous l’activité.
 
-## 3. Aperçu de l’itinéraire
+## 3. Hébergement
 
-1. Ajouter plusieurs activités à des dates différentes.
-2. Revenir à la Vue générale.
-3. Vérifier que chaque date est entière et lisible sur Chrome, Safari et une largeur de 390 px.
-4. Tester également un zoom navigateur à 125 % et 150 %.
+1. Ajouter un hébergement du 28 au 31 août, arrivée 23:00, départ 10:00.
+2. Vérifier : 28 = arrivée à 23:00 ; 29-30 = bloc séjour compact en haut ; 31 = départ à 10:00.
+3. Vérifier que le budget de l’hébergement n’est compté qu’une fois.
+4. Modifier le séjour depuis une occurrence et vérifier toute la série.
 
-## 4. Carte et recherche de lieux
+## 4. Carte
 
-1. Choisir le français dans les paramètres et ouvrir un voyage au Japon.
-2. Vérifier que les libellés utilisent le français, puis l’anglais ou une écriture latine de repli, sans revenir volontairement aux noms locaux.
-3. Refaire le test en anglais.
-4. Rechercher un lieu depuis l’onglet Carte et sélectionner un résultat.
-5. Vérifier le zoom automatique et l’ouverture de la fenêtre d’ajout.
-6. Ajouter le lieu à l’itinéraire, puis aux lieux enregistrés.
-7. Cliquer sur un repère déjà cartographié et vérifier le recentrage avec zoom.
+1. Dans un voyage en Corse, rechercher explicitement un lieu à Nice et sélectionner la bonne suggestion.
+2. Vérifier que les nouvelles recherches ne sont pas forcées vers la Corse.
+3. Comparer les numéros de la liste latérale aux numéros visibles sur les repères.
+4. Vérifier les couleurs différentes pour hébergement, restauration, transport, activité, destination et lieu enregistré.
+5. Cliquer sur un lieu de la liste : la carte doit se centrer sans ouvrir automatiquement le formulaire.
+6. Ouvrir puis annuler un ajout depuis une recherche : le zoom courant doit être conservé.
+7. Pour une ancienne activité mal localisée, la modifier et resélectionner le lieu exact.
 
-## 5. Carte globale des voyages
+## 5. Lieux enregistrés
 
-1. Créer un voyage en Irlande et un voyage au Japon en choisissant une destination suggérée.
-2. Ouvrir la carte globale de **Mes voyages**.
-3. Vérifier que les deux voyages apparaissent au bon endroit.
-4. Créer un voyage avec une destination saisie manuellement et vérifier que le géocodage de sauvegarde renseigne sa position lorsque le service est disponible.
+1. Ouvrir **Ajouter un lieu** sur ordinateur.
+2. Vérifier que Lieu apparaît avant Nom du lieu et que le nom se génère depuis la suggestion.
+3. Vérifier que la liste de suggestions est entièrement visible dans la fenêtre agrandie.
+4. Saisir une nouvelle liste personnalisée, enregistrer, puis ajouter un autre lieu et vérifier que cette liste est proposée.
 
-## 6. Budget et dépenses de groupe
+## 6. Outils, réservations et documents
 
-1. Vérifier qu’un seul onglet Budget/Dépenses est affiché.
-2. Contrôler les quatre indicateurs : budget du voyage, payé, reste à payer et total prévu.
-3. Ajouter une dépense pour une personne seule : aucune répartition ne doit bloquer l’enregistrement.
-4. Ajouter deux voyageurs et une dépense répartie à parts égales.
-5. Modifier la dépense avec une répartition personnalisée, par exemple 70/30.
-6. Vérifier la répartition par catégorie, les soldes, les remboursements suggérés et le détail des parts.
-7. Enregistrer un transfert d’argent et vérifier qu’il ajuste les soldes.
-8. Sur mobile, vérifier que la liste des voyageurs apparaît avant les soldes.
+1. Ouvrir l’outil Heure locale et vérifier que les secondes avancent sans recharger la page.
+2. Lier un document à une réservation.
+3. Depuis Réservations, utiliser le bouton Documents et vérifier le focus sur le document lié.
+4. Ajouter un PDF ou une image et cliquer **Visualiser**.
+5. Tester un autre format et vérifier l’ouverture navigateur ou le téléchargement de repli.
 
-## 7. Duplication et couverture
+## 7. Budget
 
-1. Créer un voyage avec une image locale puis vérifier son affichage sur la carte voyage et dans son en-tête.
-2. Tester également une URL d’image HTTPS.
-3. Dupliquer le voyage depuis **Mes voyages**.
-4. Vérifier que le contenu et la couverture sont repris, mais que les identifiants internes sont nouveaux et que les fichiers privés ne sont pas dupliqués.
+1. Définir un budget du voyage, par exemple 3000 €.
+2. Ajouter des dépenses et vérifier que les décimales ne sont affichées que lorsqu’elles existent.
+3. Dans un champ de montant, saisir `300/2`, quitter le champ et vérifier 150.
+4. Tester `129,90+20` et une répartition personnalisée.
+5. Revenir à Vue générale : Payé doit être à gauche, Budget du voyage à droite et le reste disponible doit être `budget - payé`.
+6. Confirmer que le budget est propre au voyage ouvert et non un budget global de tous les voyages.
 
-## 8. Checklist
-
-1. Cliquer sur **Ajouter une liste**.
-2. Donner un libellé libre et enregistrer une liste vide.
-3. Ajouter des éléments dans cette liste.
-4. Recharger la page et vérifier que la liste et ses éléments sont toujours présents.
-
-## 9. Identité du navigateur
-
-1. Forcer un rechargement sans cache après déploiement.
-2. Vérifier le favicon mapNplan.
-3. Vérifier le titre exact : `mapNplan - Planifiez. Explorez. Profitez.`
-4. Installer la PWA et vérifier son nom et son icône.
-
-## 10. Contrôles automatiques
+## 8. Contrôles automatiques
 
 ```bash
 npm install
@@ -81,13 +66,3 @@ npm run build
 npm run performance:audit
 npm run release:audit:ci
 ```
-
-## 8. Parcours ajoutés en RC6
-
-1. Coller une URL d’image de faible résolution et confirmer qu’elle remplit la couverture sans mosaïque.
-2. Modifier le libellé sous une date d’itinéraire et recharger la page.
-3. Modifier une activité située en milieu de journée et vérifier que le formulaire reste sous cette activité.
-4. Créer une réservation depuis un transport puis cliquer de nouveau sur le lien de l’activité pour ouvrir la réservation.
-5. Ajouter un hébergement sur trois jours et vérifier sa présence sur les trois dates sans tripler le budget.
-6. Ajouter un coût estimé à une activité, ouvrir Budget, créer la dépense proposée et vérifier le partage égal entre voyageurs.
-7. Vérifier que la pointe de chaque repère reste sur sa coordonnée à différents niveaux de zoom.

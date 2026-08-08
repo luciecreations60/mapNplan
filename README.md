@@ -1,6 +1,6 @@
-# mapNplan — V0.1.27 RC6 / partie 28
+# mapNplan — V0.1.28 RC7 / partie 29
 
-Application de planification de voyages React/Vite, locale et testable sur GitHub Pages.
+Application React/Vite de planification de voyages, locale et testable sur GitHub Pages.
 
 ## Démarrage
 
@@ -15,6 +15,10 @@ npm run dev
 npm run quality
 npm test
 npm run build
+npm run performance:audit
+npm run release:audit:ci
 ```
 
-Cette version démarre avec une bibliothèque de voyages vide. Les nouveaux voyages, budgets, listes, documents et préférences sont enregistrés localement dans le navigateur.
+La partie 29 améliore les parcours de saisie en contexte : itinéraire sans scroll inutile, hébergements multi-jours avec arrivée/départ, repères cartographiques numérotés et colorés, recherche de lieux non forcée vers la destination, documents consultables, calculs directement dans les montants et budget propre à chaque voyage.
+
+Les données restent enregistrées localement dans le navigateur pendant cette phase de test.

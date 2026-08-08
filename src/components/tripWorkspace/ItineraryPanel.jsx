@@ -26,7 +26,7 @@ import { Icon } from '../common/Icon.jsx';
 import { LocationAutocomplete } from '../common/LocationAutocomplete.jsx';
 
 const EMPTY_FORM = Object.freeze({
-  date: '', endDate: '', time: '09:00', type: 'map', title: '', location: '', latitude: '', longitude: '',
+  date: '', endDate: '', time: '09:00', endTime: '10:00', type: 'map', title: '', location: '', latitude: '', longitude: '',
   departureLocation: '', departureLatitude: '', departureLongitude: '', transportMode: 'driving',
   durationHours: 1, durationRemainderMinutes: 0, estimatedCost: 0, notes: '', titleAutofilled: false,
 });
@@ -35,6 +35,7 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null }) {
   const { locale, t } = useI18n();
   const [form, setForm] = useState(() => ({ ...EMPTY_FORM, date: getLastUsedItineraryDate(trip), endDate: getLastUsedItineraryDate(trip) }));
   const [isFormOpen, setFormOpen] = useState(false);
+  const [inlineCreateDate, setInlineCreateDate] = useState(null);
   const [editingActivity, setEditingActivity] = useState(null);
   const [editingDayId, setEditingDayId] = useState(null);
   const [dayTitleDraft, setDayTitleDraft] = useState('');
@@ -55,22 +56,25 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null }) {
     window.requestAnimationFrame(() => formAnchorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   }
 
-  function openCreateForm(date = getLastUsedItineraryDate(trip)) {
+  function openCreateForm(date = getLastUsedItineraryDate(trip), placement = 'top') {
     const selectedDate = date || trip.startDate || '';
     setEditingActivity(null);
+    setInlineCreateDate(placement === 'day' ? selectedDate : null);
     setForm({ ...EMPTY_FORM, date: selectedDate, endDate: selectedDate });
     setFormOpen(true);
-    scrollToCreateForm();
+    if (placement !== 'day') scrollToCreateForm();
   }
 
   function openEditForm(day, activity) {
     const rootActivity = getSeriesRootActivity(trip.itinerary, activity);
     const duration = splitDuration(rootActivity.durationMinutes || activity.durationMinutes || 0);
+    setInlineCreateDate(null);
     setEditingActivity({ dayId: day.id, activityId: activity.id });
     setForm({
       date: activity.stayStartDate || day.date,
       endDate: activity.stayEndDate || day.date,
-      time: activity.time || rootActivity.time || '',
+      time: rootActivity.checkInTime || rootActivity.time || activity.time || '',
+      endTime: rootActivity.checkOutTime || activity.checkOutTime || '10:00',
       type: activity.type || 'map',
       title: activity.title || '',
       location: activity.location || '',
@@ -84,7 +88,7 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null }) {
       durationRemainderMinutes: duration.minutes,
       estimatedCost: rootActivity.estimatedCost || 0,
       notes: activity.notes || '',
-      titleAutofilled: false,
+      titleAutofilled: isAutofilledActivityTitle(rootActivity),
     });
     setFormOpen(true);
   }
@@ -94,7 +98,7 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null }) {
     setForm((current) => {
       if (kind === 'departure') {
         const suggestedTitle = current.location && (current.titleAutofilled || !current.title.trim())
-          ? `${place.name || place.primaryLabel} → ${current.location}`
+          ? `${place.name || place.primaryLabel} → ${deriveTitleFromLocation(current.location)}`
           : current.title;
         return {
           ...current,
@@ -108,7 +112,7 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null }) {
 
       const arrivalLabel = place.name || place.primaryLabel || place.label;
       const suggestedTitle = current.type === 'car' && current.departureLocation
-        ? `${current.departureLocation} → ${arrivalLabel}`
+        ? `${deriveTitleFromLocation(current.departureLocation)} → ${arrivalLabel}`
         : arrivalLabel;
       const shouldAutofill = !current.title.trim() || current.titleAutofilled;
       return {
@@ -122,8 +126,41 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null }) {
     });
   }
 
+  function updateLocationText(value, kind = 'arrival') {
+    setForm((current) => {
+      const shouldAutofill = current.titleAutofilled || !current.title.trim();
+      if (kind === 'departure') {
+        const departureTitle = deriveTitleFromLocation(value);
+        const arrivalTitle = deriveTitleFromLocation(current.location);
+        return {
+          ...current,
+          departureLocation: value,
+          departureLatitude: '',
+          departureLongitude: '',
+          title: shouldAutofill && departureTitle && arrivalTitle ? `${departureTitle} → ${arrivalTitle}` : current.title,
+          titleAutofilled: shouldAutofill,
+        };
+      }
+
+      const arrivalTitle = deriveTitleFromLocation(value);
+      const departureTitle = deriveTitleFromLocation(current.departureLocation);
+      const suggestedTitle = current.type === 'car' && departureTitle
+        ? `${departureTitle} → ${arrivalTitle}`
+        : arrivalTitle;
+      return {
+        ...current,
+        location: value,
+        latitude: '',
+        longitude: '',
+        title: shouldAutofill && suggestedTitle ? suggestedTitle : current.title,
+        titleAutofilled: shouldAutofill,
+      };
+    });
+  }
+
   function closeForm() {
     setFormOpen(false);
+    setInlineCreateDate(null);
     setEditingActivity(null);
   }
 
@@ -139,7 +176,8 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null }) {
 
   function submitActivity(event) {
     event.preventDefault();
-    if (!form.date || !form.title.trim()) return;
+    const resolvedTitle = form.title.trim() || deriveTitleFromLocation(form.location) || t('itinerary.defaultActivityTitle');
+    if (!form.date || !resolvedTitle) return;
     const previousActivity = editingActivity
       ? trip.itinerary.flatMap((day) => day.items).find((item) => item.id === editingActivity.activityId)
       : null;
@@ -148,8 +186,10 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null }) {
     const activity = {
       id: editingActivity?.activityId || createId('activity'),
       time: form.time,
+      checkInTime: form.type === 'hotel' ? form.time : '',
+      checkOutTime: form.type === 'hotel' ? form.endTime : '',
       type: form.type,
-      title: form.title.trim(),
+      title: resolvedTitle,
       location: form.location.trim(),
       latitude: form.latitude === '' ? null : Number(form.latitude),
       longitude: form.longitude === '' ? null : Number(form.longitude),
@@ -157,7 +197,7 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null }) {
       departureLatitude: isTransport && form.departureLatitude !== '' ? Number(form.departureLatitude) : null,
       departureLongitude: isTransport && form.departureLongitude !== '' ? Number(form.departureLongitude) : null,
       transportMode: isTransport ? form.transportMode : '',
-      durationMinutes: combineDuration(form.durationHours, form.durationRemainderMinutes),
+      durationMinutes: form.type === 'hotel' ? 0 : combineDuration(form.durationHours, form.durationRemainderMinutes),
       estimatedCost: Math.max(0, Number(form.estimatedCost) || 0),
       notes: form.notes.trim(),
       reminderMinutes: rootPreviousActivity?.reminderMinutes ?? null,
@@ -232,8 +272,8 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null }) {
       type: reservationType,
       title: sourceActivity.title,
       provider: '', confirmationNumber: '',
-      startDate, startTime: sourceActivity.time || '',
-      endDate: end.date, endTime: end.time,
+      startDate, startTime: sourceActivity.type === 'hotel' ? (sourceActivity.checkInTime || sourceActivity.time || '') : (sourceActivity.time || ''),
+      endDate: end.date, endTime: sourceActivity.type === 'hotel' ? (sourceActivity.checkOutTime || '') : end.time,
       location: sourceActivity.location || sourceActivity.departureLocation || '',
       status: 'pending', amount: Math.max(0, Number(sourceActivity.estimatedCost) || 0), url: '',
       latitude: sourceActivity.latitude ?? null, longitude: sourceActivity.longitude ?? null,
@@ -291,28 +331,66 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null }) {
     return (
       <Card className={`workspace-form-card itinerary-form-card ${className}`.trim()}>
         <form className="workspace-form" onSubmit={submitActivity}>
-          <div className="workspace-form__title-row"><div><p className="eyebrow">{t(editingActivity ? 'itinerary.editEyebrow' : 'itinerary.newEyebrow')}</p><h3>{t(editingActivity ? 'itinerary.editTitle' : 'itinerary.newTitle')}</h3></div></div>
+          <div className="workspace-form__title-row">
+            <div>
+              <p className="eyebrow">{t(editingActivity ? 'itinerary.editEyebrow' : 'itinerary.newEyebrow')}</p>
+              <h3>{t(editingActivity ? 'itinerary.editTitle' : 'itinerary.newTitle')}</h3>
+            </div>
+          </div>
           <div className="workspace-form__grid">
-            <Field label={t(isStay ? 'itinerary.startDate' : 'itinerary.date')}><input name="date" type="date" min={trip.startDate} max={trip.endDate} value={form.date} onChange={updateField} required /></Field>
-            {isStay && <Field label={t('itinerary.endDate')}><input name="endDate" type="date" min={form.date || trip.startDate} max={trip.endDate} value={form.endDate || form.date} onChange={updateField} required /></Field>}
-            <Field label={t('itinerary.time')}><input name="time" type="time" value={form.time} onChange={updateField} /></Field>
-            <Field label={t('itinerary.type')}><select name="type" value={form.type} onChange={updateField}>{ACTIVITY_TYPES.map((type) => <option key={type.id} value={type.id}>{t(type.labelKey)}</option>)}</select></Field>
-            <Field label={t('itinerary.titleLabel')} className="workspace-form__wide"><input name="title" value={form.title} onChange={updateField} placeholder={t('itinerary.titlePlaceholder')} required /></Field>
+            <Field label={t(isStay ? 'itinerary.startDate' : 'itinerary.date')}>
+              <input name="date" type="date" min={trip.startDate} max={trip.endDate} value={form.date} onChange={updateField} required />
+            </Field>
+            {isStay && (
+              <Field label={t('itinerary.endDate')}>
+                <input name="endDate" type="date" min={form.date || trip.startDate} max={trip.endDate} value={form.endDate || form.date} onChange={updateField} required />
+              </Field>
+            )}
+            <Field label={t(isStay ? 'itinerary.checkInTime' : 'itinerary.time')}>
+              <input name="time" type="time" value={form.time} onChange={updateField} />
+            </Field>
+            {isStay && (
+              <Field label={t('itinerary.checkOutTime')}>
+                <input name="endTime" type="time" value={form.endTime} onChange={updateField} />
+              </Field>
+            )}
+            <Field label={t('itinerary.type')}>
+              <select name="type" value={form.type} onChange={updateField}>{ACTIVITY_TYPES.map((type) => <option key={type.id} value={type.id}>{t(type.labelKey)}</option>)}</select>
+            </Field>
 
             {form.type === 'car' && (
               <>
-                <LocationAutocomplete id="itinerary-departure-location" variant="workspace" className="workspace-form__wide" label={t('itinerary.departureLocation')} value={form.departureLocation} placeholder={t('itinerary.departurePlaceholder')} bias={{ latitude: trip.destinationLatitude, longitude: trip.destinationLongitude }} hint={t('placeSearch.locationHint')} onValueChange={(value) => setForm((current) => ({ ...current, departureLocation: value, departureLatitude: '', departureLongitude: '' }))} onPlaceSelect={(place) => selectActivityPlace(place, 'departure')} />
-                <LocationAutocomplete id="itinerary-arrival-location" variant="workspace" className="workspace-form__wide" label={t('itinerary.arrivalLocation')} value={form.location} placeholder={t('itinerary.arrivalPlaceholder')} bias={{ latitude: trip.destinationLatitude, longitude: trip.destinationLongitude }} hint={t('placeSearch.locationHint')} onValueChange={(value) => setForm((current) => ({ ...current, location: value, latitude: '', longitude: '' }))} onPlaceSelect={(place) => selectActivityPlace(place, 'arrival')} />
+                <LocationAutocomplete id="itinerary-departure-location" variant="workspace" className="workspace-form__wide" label={t('itinerary.departureLocation')} value={form.departureLocation} placeholder={t('itinerary.departurePlaceholder')} hint={t('placeSearch.locationHint')} onValueChange={(value) => updateLocationText(value, 'departure')} onPlaceSelect={(place) => selectActivityPlace(place, 'departure')} />
+                <LocationAutocomplete id="itinerary-arrival-location" variant="workspace" className="workspace-form__wide" label={t('itinerary.arrivalLocation')} value={form.location} placeholder={t('itinerary.arrivalPlaceholder')} hint={t('itinerary.locationGeneratesTitleHint')} onValueChange={(value) => updateLocationText(value, 'arrival')} onPlaceSelect={(place) => selectActivityPlace(place, 'arrival')} />
+                <Field label={t('common.latitude')}><input name="latitude" type="number" min="-90" max="90" step="any" value={form.latitude} onChange={updateField} placeholder="35.6762" title={t('itinerary.latitudeHelp')} /></Field>
+                <Field label={t('common.longitude')}><input name="longitude" type="number" min="-180" max="180" step="any" value={form.longitude} onChange={updateField} placeholder="139.6503" title={t('itinerary.longitudeHelp')} /></Field>
                 <Field label={t('itinerary.transportMode')}><select name="transportMode" value={form.transportMode} onChange={updateField}>{TRANSPORT_MODES.map((mode) => <option key={mode.id} value={mode.id}>{t(mode.labelKey)}</option>)}</select></Field>
                 <div className="workspace-field itinerary-estimate-action"><span>{t('itinerary.automaticEstimate')}</span><Button size="small" variant="secondary" icon="clock" disabled={!hasTransportCoordinates} onClick={calculateTransportDuration}>{t('itinerary.calculateDuration')}</Button></div>
               </>
             )}
 
-            {form.type !== 'car' && <LocationAutocomplete id={editingActivity ? `itinerary-location-${editingActivity.activityId}` : 'itinerary-location'} variant="workspace" className="workspace-form__wide" label={t('itinerary.location')} value={form.location} placeholder={t('itinerary.locationPlaceholder')} bias={{ latitude: trip.destinationLatitude, longitude: trip.destinationLongitude }} hint={t('placeSearch.locationHint')} onValueChange={(value) => setForm((current) => ({ ...current, location: value, latitude: '', longitude: '' }))} onPlaceSelect={(place) => selectActivityPlace(place, 'arrival')} />}
+            {form.type !== 'car' && (
+              <>
+                <LocationAutocomplete id={editingActivity ? `itinerary-location-${editingActivity.activityId}` : `itinerary-location-${form.date || 'new'}`} variant="workspace" className="workspace-form__wide" label={t('itinerary.location')} value={form.location} placeholder={t('itinerary.locationPlaceholder')} hint={t('itinerary.locationGeneratesTitleHint')} onValueChange={(value) => updateLocationText(value, 'arrival')} onPlaceSelect={(place) => selectActivityPlace(place, 'arrival')} />
+                <Field label={t('common.latitude')}><input name="latitude" type="number" min="-90" max="90" step="any" value={form.latitude} onChange={updateField} placeholder="35.6762" title={t('itinerary.latitudeHelp')} /></Field>
+                <Field label={t('common.longitude')}><input name="longitude" type="number" min="-180" max="180" step="any" value={form.longitude} onChange={updateField} placeholder="139.6503" title={t('itinerary.longitudeHelp')} /></Field>
+              </>
+            )}
 
-            <Field label={t('common.latitude')}><input name="latitude" type="number" min="-90" max="90" step="any" value={form.latitude} onChange={updateField} placeholder="35.6762" title={t('itinerary.latitudeHelp')} /></Field>
-            <Field label={t('common.longitude')}><input name="longitude" type="number" min="-180" max="180" step="any" value={form.longitude} onChange={updateField} placeholder="139.6503" title={t('itinerary.longitudeHelp')} /></Field>
-            <fieldset className="workspace-field duration-field workspace-form__wide"><legend>{t('itinerary.duration')}</legend><div className="duration-field__controls"><label><span>{t('itinerary.hours')}</span><input name="durationHours" type="number" min="0" max="72" step="1" value={form.durationHours} onChange={updateField} /></label><label><span>{t('itinerary.minutePart')}</span><input name="durationRemainderMinutes" type="number" min="0" max="59" step="1" value={form.durationRemainderMinutes} onChange={updateField} /></label></div></fieldset>
+            <Field label={t('itinerary.titleLabel')} className="workspace-form__wide">
+              <input name="title" value={form.title} onChange={updateField} placeholder={t('itinerary.titleGeneratedPlaceholder')} />
+              <small className="field-hint">{t('itinerary.titleGeneratedHint')}</small>
+            </Field>
+
+            {!isStay && (
+              <fieldset className="workspace-field duration-field workspace-form__wide">
+                <legend>{t('itinerary.duration')}</legend>
+                <div className="duration-field__controls">
+                  <label><span>{t('itinerary.hours')}</span><input name="durationHours" type="number" min="0" max="72" step="1" value={form.durationHours} onChange={updateField} /></label>
+                  <label><span>{t('itinerary.minutePart')}</span><input name="durationRemainderMinutes" type="number" min="0" max="59" step="1" value={form.durationRemainderMinutes} onChange={updateField} /></label>
+                </div>
+              </fieldset>
+            )}
             <Field label={`${t('itinerary.estimatedCost')} (${trip.currency})`}><input name="estimatedCost" type="number" min="0" step="0.01" value={form.estimatedCost} onChange={updateField} /></Field>
             <Field label={t('itinerary.notes')} className="workspace-form__full"><textarea name="notes" rows="3" value={form.notes} onChange={updateField} placeholder={t('itinerary.notesPlaceholder')} /></Field>
           </div>
@@ -320,6 +398,53 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null }) {
           <div className="workspace-form__actions"><Button variant="ghost" onClick={closeForm}>{t('common.cancel')}</Button><Button type="submit" icon={editingActivity ? 'save' : 'plus'}>{t(editingActivity ? 'itinerary.saveChanges' : 'itinerary.add')}</Button></div>
         </form>
       </Card>
+    );
+  }
+
+  function renderItineraryItem(day, item, itemIndex) {
+    const isHotel = item.type === 'hotel';
+    const stayRole = isHotel ? (item.stayRole || 'single') : '';
+    const isStayMiddle = stayRole === 'stay';
+    const isStayCheckout = stayRole === 'checkout';
+    const isStaySecondary = isStayMiddle || isStayCheckout;
+    const categoryLabel = isHotel
+      ? t(stayRole === 'checkin'
+          ? 'itinerary.hotelCheckIn'
+          : stayRole === 'checkout'
+            ? 'itinerary.hotelCheckOut'
+            : stayRole === 'stay'
+              ? 'itinerary.hotelStay'
+              : 'itinerary.hotelSingleDay')
+      : `${getCategoryLabel(ACTIVITY_TYPES, item.type, t)}${item.type === 'car' && item.transportMode ? ` · ${t(`itinerary.transportModes.${item.transportMode}`)}` : ''}`;
+
+    return (
+      <article className={`itinerary-item${isStayMiddle ? ' itinerary-item--stay-continuation' : ''}${isStayCheckout ? ' itinerary-item--stay-checkout' : ''}`}>
+        <time>{isStayMiddle ? '' : (item.time || '—')}</time>
+        <span className={`itinerary-item__icon itinerary-item__icon--${item.type}`}><Icon name={item.type} size={18} /></span>
+        <div className="itinerary-item__content">
+          <span>{categoryLabel}</span>
+          <h4>{item.title}</h4>
+          {item.type === 'car' && item.departureLocation && <p><Icon name="circleDot" size={14} /> {item.departureLocation}</p>}
+          {item.location && <p><Icon name="pin" size={14} /> {item.location}</p>}
+          {isHotel && stayRole === 'single' && item.checkOutTime && <p><Icon name="clock" size={14} /> {t('itinerary.hotelSingleTimes', { checkIn: item.checkInTime || item.time || '—', checkOut: item.checkOutTime })}</p>}
+          {isHotel && !isStaySecondary && item.stayStartDate && item.stayEndDate && <p><Icon name="calendarRange" size={14} /> {t('itinerary.stayDates', { start: formatLocalizedDate(item.stayStartDate, locale, 'compact'), end: formatLocalizedDate(item.stayEndDate, locale, 'compact') })}</p>}
+          {!isStaySecondary && (item.durationMinutes > 0 || item.estimatedCost > 0) && <small>{item.durationMinutes > 0 && formatDuration(item.durationMinutes, t)}{item.durationMinutes > 0 && item.estimatedCost > 0 && ' · '}{item.estimatedCost > 0 && `${Number(item.estimatedCost).toFixed(2)} ${trip.currency}`}</small>}
+          {!isStaySecondary && item.notes && <em>{item.notes}</em>}
+          {!isStaySecondary && item.completedAt && <Badge tone="success" className="itinerary-item__completed">{t('companion.markDone')}</Badge>}
+          {!isStaySecondary && reservationTypeForActivity(item.type) && (
+            <button className="text-link itinerary-item__reservation-link" type="button" onClick={() => createReservationFromActivity(day, item)}>
+              <Icon name="receipt" size={15} /> {item.linkedReservationId ? t('itinerary.openLinkedReservation') : t('itinerary.createReservation')}
+            </button>
+          )}
+          {!isStaySecondary && <DiscussionThread comments={item.comments} currentUserName={getCurrentActorName(trip)} onAdd={(message) => addActivityComment(day.id, item, message)} onRemove={(commentId) => removeActivityComment(day.id, item.id, commentId)} />}
+        </div>
+        <div className="item-actions">
+          {!isHotel && <button className="icon-button icon-button--small" type="button" disabled={itemIndex === 0} aria-label={t('itinerary.moveUp', { name: item.title })} onClick={() => moveActivity(day.id, item.id, 'up')}><Icon name="chevronUp" size={16} /></button>}
+          {!isHotel && <button className="icon-button icon-button--small" type="button" disabled={itemIndex === day.items.length - 1} aria-label={t('itinerary.moveDown', { name: item.title })} onClick={() => moveActivity(day.id, item.id, 'down')}><Icon name="chevronDown" size={16} /></button>}
+          <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.edit')} ${item.title}`} onClick={() => openEditForm(day, item)}><Icon name="edit" size={16} /></button>
+          <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.delete')} ${item.title}`} onClick={() => removeActivity(day.id, item)}><Icon name="trash" size={16} /></button>
+        </div>
+      </article>
     );
   }
 
@@ -332,7 +457,7 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null }) {
         </Button>
       </section>
 
-      {isFormOpen && !editingActivity && (
+      {isFormOpen && !editingActivity && !inlineCreateDate && (
         <>
           <div ref={formAnchorRef} className="workspace-form-anchor" />
           {renderActivityForm('itinerary-form-card--create')}
@@ -359,57 +484,44 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null }) {
                   </div>
                 )}
               </div>
-              <Button size="small" variant="secondary" icon="plus" onClick={() => openCreateForm(day.date)}>{t('itinerary.addForDay')}</Button>
             </header>
             {day.items.length > 0 ? (
               <div className="itinerary-list">
                 {day.items.map((item, itemIndex) => (
                   <Fragment key={item.id}>
-                    <article className="itinerary-item">
-                      <time>{item.time || '—'}</time>
-                      <span className={`itinerary-item__icon itinerary-item__icon--${item.type}`}><Icon name={item.type} size={18} /></span>
-                      <div className="itinerary-item__content">
-                        <span>{getCategoryLabel(ACTIVITY_TYPES, item.type, t)}{item.type === 'car' && item.transportMode ? ` · ${t(`itinerary.transportModes.${item.transportMode}`)}` : ''}</span>
-                        <h4>{item.title}</h4>
-                        {item.type === 'car' && item.departureLocation && <p><Icon name="circleDot" size={14} /> {item.departureLocation}</p>}
-                        {item.location && <p><Icon name="pin" size={14} /> {item.location}</p>}
-                        {item.type === 'hotel' && item.stayStartDate && item.stayEndDate && <p><Icon name="calendarRange" size={14} /> {t('itinerary.stayDates', { start: formatLocalizedDate(item.stayStartDate, locale, 'compact'), end: formatLocalizedDate(item.stayEndDate, locale, 'compact') })}</p>}
-                        {(item.durationMinutes > 0 || item.estimatedCost > 0) && <small>{item.durationMinutes > 0 && formatDuration(item.durationMinutes, t)}{item.durationMinutes > 0 && item.estimatedCost > 0 && ' · '}{item.estimatedCost > 0 && `${Number(item.estimatedCost).toFixed(2)} ${trip.currency}`}</small>}
-                        {item.notes && <em>{item.notes}</em>}
-                        {item.completedAt && <Badge tone="success" className="itinerary-item__completed">{t('companion.markDone')}</Badge>}
-                        {reservationTypeForActivity(item.type) && (
-                          <button
-                            className="text-link itinerary-item__reservation-link"
-                            type="button"
-                            onClick={() => createReservationFromActivity(day, item)}
-                          >
-                            <Icon name="receipt" size={15} /> {item.linkedReservationId ? t('itinerary.openLinkedReservation') : t('itinerary.createReservation')}
-                          </button>
-                        )}
-                        <DiscussionThread comments={item.comments} currentUserName={getCurrentActorName(trip)} onAdd={(message) => addActivityComment(day.id, item, message)} onRemove={(commentId) => removeActivityComment(day.id, item.id, commentId)} />
-                      </div>
-                      <div className="item-actions">
-                        <button className="icon-button icon-button--small" type="button" disabled={itemIndex === 0} aria-label={t('itinerary.moveUp', { name: item.title })} onClick={() => moveActivity(day.id, item.id, 'up')}><Icon name="chevronUp" size={16} /></button>
-                        <button className="icon-button icon-button--small" type="button" disabled={itemIndex === day.items.length - 1} aria-label={t('itinerary.moveDown', { name: item.title })} onClick={() => moveActivity(day.id, item.id, 'down')}><Icon name="chevronDown" size={16} /></button>
-                        <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.edit')} ${item.title}`} onClick={() => openEditForm(day, item)}><Icon name="edit" size={16} /></button>
-                        <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.delete')} ${item.title}`} onClick={() => removeActivity(day.id, item)}><Icon name="trash" size={16} /></button>
-                      </div>
-                    </article>
+                    {renderItineraryItem(day, item, itemIndex)}
                     {isFormOpen && editingActivity?.activityId === item.id && renderActivityForm('itinerary-form-card--inline')}
                   </Fragment>
-                ))}
-              </div>
-            ) : <button className="itinerary-day__empty-action" type="button" onClick={() => openCreateForm(day.date)}><Icon name="plus" size={18} /> {t('itinerary.emptyDayAction')}</button>}
+                ))}              </div>
+            ) : <button className="itinerary-day__empty-action" type="button" onClick={() => openCreateForm(day.date, 'day')}><Icon name="plus" size={18} /> {t('itinerary.emptyDayAction')}</button>}
+            {day.items.length > 0 && !(isFormOpen && !editingActivity && inlineCreateDate === day.date) && (
+              <div className="itinerary-day__inline-add"><Button size="small" variant="secondary" icon="plus" onClick={() => openCreateForm(day.date, 'day')}>{t('itinerary.addForDay')}</Button></div>
+            )}
+            {isFormOpen && !editingActivity && inlineCreateDate === day.date && renderActivityForm('itinerary-form-card--inline itinerary-form-card--inline-create')}
           </Card>
         ))}
       </div>
 
-      <div className="itinerary-bottom-action"><Button icon="plus" onClick={() => openCreateForm(getLastUsedItineraryDate(trip))}>{t('itinerary.addActivityBottom')}</Button><small>{t('itinerary.lastDayHint')}</small></div>
+      <div className="itinerary-bottom-action"><Button icon="plus" onClick={() => openCreateForm(getLastUsedItineraryDate(trip), 'day')}>{t('itinerary.addActivityBottom')}</Button><small>{t('itinerary.lastDayHint')}</small></div>
     </div>
   );
 }
 
 function Field({ label, className = '', children }) { return <label className={`workspace-field ${className}`.trim()}><span>{label}</span>{children}</label>; }
+function deriveTitleFromLocation(value) {
+  return String(value || '').split(',')[0].trim();
+}
+function isAutofilledActivityTitle(activity) {
+  if (!activity) return false;
+  const title = String(activity.title || '').trim();
+  if (!title) return true;
+  if (activity.type === 'car') {
+    const departure = deriveTitleFromLocation(activity.departureLocation);
+    const arrival = deriveTitleFromLocation(activity.location);
+    return Boolean(departure && arrival && title === `${departure} → ${arrival}`);
+  }
+  return title === deriveTitleFromLocation(activity.location);
+}
 function addMinutesToDateTime(date, time, durationMinutes) {
   if (!date || !time || durationMinutes <= 0) return { date: date || '', time: '' };
   const value = new Date(`${date}T${time}:00`);

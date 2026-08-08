@@ -63,10 +63,11 @@ export function createSavedPlace(payload = {}) {
 /**
  * Returns every distinct saved-place list for a trip in display order.
  */
-export function getSavedPlaceLists(places = []) {
-  const custom = places
-    .map((place) => String(place.list || '').trim())
-    .filter((list) => list && !DEFAULT_PLACE_LISTS.includes(list));
+export function getSavedPlaceLists(places = [], storedLists = []) {
+  const custom = [
+    ...storedLists.map((list) => String(list || '').trim()),
+    ...places.map((place) => String(place.list || '').trim()),
+  ].filter((list) => list && !DEFAULT_PLACE_LISTS.includes(list));
   return [...DEFAULT_PLACE_LISTS, ...[...new Set(custom)].sort((a, b) => a.localeCompare(b))];
 }
 
@@ -150,11 +151,11 @@ function categoryToActivityType(category) {
   const mapping = {
     food: 'food',
     accommodation: 'hotel',
-    transport: 'bus',
+    transport: 'car',
     sight: 'map',
     nature: 'map',
     shopping: 'map',
-    nightlife: 'activity',
+    nightlife: 'ticket',
     other: 'map',
   };
   return mapping[category] || 'map';
