@@ -1,13 +1,13 @@
 /**
  * Shared project configuration.
  *
- * Central metadata for the mapNplan release candidate.
+ * Central metadata for the mapnplan release candidate.
  * The application intentionally starts with a clean local trip library in this test release.
  */
 export const PROJECT_CONFIG = Object.freeze({
-  repositoryName: 'mapNplan',
-  codeName: 'mapNplan',
-  brandName: 'mapNplan',
+  repositoryName: 'mapnplan',
+  codeName: 'mapnplan',
+  brandName: 'mapnplan',
   tagline: 'Planifiez. Explorez. Profitez.',
   version: '0.1.28',
   release: Object.freeze({
@@ -18,7 +18,7 @@ export const PROJECT_CONFIG = Object.freeze({
     productionDomain: '',
   }),
   deployment: Object.freeze({
-    siteBaseUrl: 'https://luciecreations60.github.io/mapNplan',
+    siteBaseUrl: 'https://luciecreations60.github.io/mapnplan',
     googleSiteVerification: '',
     defaultSocialImageUrl: '',
   }),
