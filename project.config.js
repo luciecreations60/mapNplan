@@ -5,7 +5,7 @@
  * The application intentionally starts with a clean local trip library in this test release.
  */
 export const PROJECT_CONFIG = Object.freeze({
-  repositoryName: 'travel-planner',
+  repositoryName: 'mapnplan',
   codeName: 'mapNplan',
   brandName: 'mapNplan',
   tagline: 'Planifiez. Explorez. Profitez.',
@@ -18,7 +18,7 @@ export const PROJECT_CONFIG = Object.freeze({
     productionDomain: '',
   }),
   deployment: Object.freeze({
-    siteBaseUrl: 'https://luciecreations60.github.io/travel-planner',
+    siteBaseUrl: 'https://luciecreations60.github.io/mapnplan',
     googleSiteVerification: '',
     defaultSocialImageUrl: '',
   }),
