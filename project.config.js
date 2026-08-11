@@ -1,13 +1,13 @@
 /**
  * Shared project configuration.
  *
- * Central metadata for the mapnplan release candidate.
+ * Central metadata for the mapNplan release candidate.
  * The application intentionally starts with a clean local trip library in this test release.
  */
 export const PROJECT_CONFIG = Object.freeze({
   repositoryName: 'mapnplan',
-  codeName: 'mapnplan',
-  brandName: 'mapnplan',
+  codeName: 'mapNplan',
+  brandName: 'mapNplan',
   tagline: 'Planifiez. Explorez. Profitez.',
   version: '0.1.28',
   release: Object.freeze({
