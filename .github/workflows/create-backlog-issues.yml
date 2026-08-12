@@ -1,0 +1,110 @@
+name: Create backlog issues (one-shot)
+
+on:
+  push:
+    branches:
+      - 'copilot/create-repo-files-and-issues'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  create-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create backlog issues
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issues = [
+              {
+                title: "[Auth][P0] Implement OAuth 2.0 social login (Google & Apple)",
+                body: `## Summary\nAllow users to sign in via Google or Apple OAuth 2.0 instead of email/password only.\n\n## Problem / Motivation\nPassword fatigue increases sign-up drop-off. Social login is expected by modern users.\n\n## Acceptance Criteria\n- [ ] Google Sign-In button present on the login screen\n- [ ] Apple Sign-In button present on the login screen\n- [ ] Successful OAuth callback creates or links a user account\n- [ ] JWT/session token issued after OAuth success\n- [ ] Existing email/password login remains functional\n\n## Priority\n**P0** – Core auth is a blocker for all user-facing features.`,
+                labels: ["enhancement", "auth", "P0"]
+              },
+              {
+                title: "[Auth][P1] Add email-verification flow for new accounts",
+                body: `## Summary\nSend a verification email when a user registers with email/password; prevent full access until verified.\n\n## Problem / Motivation\nUnverified emails lead to spam accounts and poor deliverability.\n\n## Acceptance Criteria\n- [ ] Verification email sent on registration\n- [ ] Unverified users see a banner and have limited access\n- [ ] Clicking the link verifies the account and grants full access\n- [ ] Resend verification link available\n\n## Priority\n**P1** – Important for account integrity; not a launch blocker.`,
+                labels: ["enhancement", "auth", "P1"]
+              },
+              {
+                title: "[Map][P0] Render interactive map with place markers",
+                body: `## Summary\nDisplay an interactive map (Mapbox / Leaflet) with markers for saved trip waypoints.\n\n## Problem / Motivation\nThe core value proposition of mapNplan is visualising trips on a map. Without a working map, the product has no differentiator.\n\n## Acceptance Criteria\n- [ ] Map loads on the trip detail page within 2 s on 4G\n- [ ] Each waypoint renders a marker with a title tooltip\n- [ ] Map is accessible via keyboard (pan/zoom)\n- [ ] Map tiles load over HTTPS\n\n## Priority\n**P0** – Core product feature.`,
+                labels: ["enhancement", "map", "P0"]
+              },
+              {
+                title: "[Map][P2] Add offline map tile caching with Service Worker",
+                body: `## Summary\nCache map tiles using a Service Worker so the map remains usable in low-connectivity environments.\n\n## Problem / Motivation\nTravellers often lose connectivity. A cached map prevents a blank screen.\n\n## Acceptance Criteria\n- [ ] Tiles previously loaded are served from cache when offline\n- [ ] Cache is invalidated after 7 days\n- [ ] User is shown an "Offline mode" banner when using cached data\n\n## Priority\n**P2** – Nice-to-have, low risk.`,
+                labels: ["enhancement", "map", "P2"]
+              },
+              {
+                title: "[Planning][P0] Create, edit, and delete trip itinerary items",
+                body: `## Summary\nUsers must be able to create a trip, add/edit/remove itinerary items (date, time, location, notes).\n\n## Problem / Motivation\nItinerary management is the primary planning workflow.\n\n## Acceptance Criteria\n- [ ] Create a new trip with a name and date range\n- [ ] Add itinerary items with title, date, time, and optional location pin\n- [ ] Edit any field of an existing item inline\n- [ ] Delete an item with a confirmation dialog\n- [ ] Changes persist after page refresh\n\n## Priority\n**P0** – Without this, no planning is possible.`,
+                labels: ["enhancement", "planning", "P0"]
+              },
+              {
+                title: "[Planning][P1] Drag-and-drop reordering of itinerary items",
+                body: `## Summary\nAllow users to reorder itinerary items via drag-and-drop within a day.\n\n## Problem / Motivation\nPlans change; manual reordering via delete/re-add is cumbersome.\n\n## Acceptance Criteria\n- [ ] Items can be dragged to a new position within the same day\n- [ ] New order is persisted immediately\n- [ ] Fallback: arrow-key reordering for keyboard/assistive-technology users\n\n## Priority\n**P1** – High UX value.`,
+                labels: ["enhancement", "planning", "P1"]
+              },
+              {
+                title: "[Sharing][P1] Generate a read-only share link for a trip",
+                body: `## Summary\nOwners can generate a public, read-only URL for a trip to share with non-users.\n\n## Problem / Motivation\nUsers want to share plans with travel companions who may not have accounts.\n\n## Acceptance Criteria\n- [ ] "Share" button on trip detail page generates a unique URL\n- [ ] Shared URL is accessible without login\n- [ ] Shared view is read-only (no edit controls)\n- [ ] Owner can revoke the link at any time\n\n## Priority\n**P1** – Viral growth lever.`,
+                labels: ["enhancement", "sharing", "P1"]
+              },
+              {
+                title: "[Sharing][P2] Collaborate on a trip with role-based access (viewer / editor)",
+                body: `## Summary\nTrip owners can invite other registered users as viewers or editors.\n\n## Problem / Motivation\nGroup travel requires collaborative editing.\n\n## Acceptance Criteria\n- [ ] Owner can invite users by email with viewer or editor role\n- [ ] Editors can add/edit/delete itinerary items\n- [ ] Viewers can only read\n- [ ] Owner can change roles or remove collaborators\n\n## Priority\n**P2** – Collaborative feature, post-MVP.`,
+                labels: ["enhancement", "sharing", "P2"]
+              },
+              {
+                title: "[Notifications][P1] In-app and email notifications for trip changes",
+                body: `## Summary\nNotify collaborators via in-app toast and email when a shared trip is updated.\n\n## Problem / Motivation\nCollaborators need to know when the plan changes without refreshing manually.\n\n## Acceptance Criteria\n- [ ] In-app notification shown when a collaborator edits the trip while the user is active\n- [ ] Email digest sent when the user is offline and the trip changes\n- [ ] User can opt out of email notifications per trip\n- [ ] Notifications link directly to the changed item\n\n## Priority\n**P1** – Required for usable collaboration.`,
+                labels: ["enhancement", "notifications", "P1"]
+              },
+              {
+                title: "[Observability][P1] Add structured logging, error tracking, and core Web Vitals monitoring",
+                body: `## Summary\nIntegrate structured server-side logging (e.g., Pino), a front-end error tracker (e.g., Sentry), and a Web Vitals dashboard.\n\n## Problem / Motivation\nWithout observability, production incidents are invisible and performance regressions are undetected.\n\n## Acceptance Criteria\n- [ ] All API routes emit structured JSON logs (request id, method, path, status, latency)\n- [ ] Uncaught front-end exceptions are captured and grouped in Sentry (or equivalent)\n- [ ] Core Web Vitals (LCP, CLS, INP) are tracked per route\n- [ ] A Grafana / dashboard link is documented in DEPLOYMENT.md\n- [ ] Alerts fire on error rate > 1 % for 5 min\n\n## Priority\n**P1** – Required before production launch.`,
+                labels: ["enhancement", "observability", "P1"]
+              }
+            ];
+
+            for (const issue of issues) {
+              // Check if issue already exists to avoid duplicates
+              const existing = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                per_page: 100
+              });
+              const alreadyExists = existing.data.some(i => i.title === issue.title);
+              if (alreadyExists) {
+                console.log(`Skipping (already exists): ${issue.title}`);
+                continue;
+              }
+
+              // Create labels if they don't exist
+              for (const label of issue.labels) {
+                try {
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: label,
+                    color: label === 'P0' ? 'd73a4a' : label === 'P1' ? 'e4e669' : label === 'P2' ? '0075ca' : 'cfd3d7'
+                  });
+                } catch (e) {
+                  // Label likely already exists
+                }
+              }
+
+              const result = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: issue.title,
+                body: issue.body,
+                labels: issue.labels
+              });
+              console.log(`Created issue #${result.data.number}: ${issue.title}`);
+            }
