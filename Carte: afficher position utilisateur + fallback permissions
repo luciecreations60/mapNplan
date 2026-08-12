@@ -1,0 +1,39 @@
+## ✅ Résumé
+Implémentation de l’affichage de la position utilisateur sur la carte avec gestion des permissions.
+
+Cette PR ajoute :
+- la demande de permission de localisation,
+- l’affichage de la position si permission accordée,
+- un état fallback clair si permission refusée/indisponible,
+- une gestion d’erreur pour éviter les crashs liés au GPS.
+
+## 🔗 Issue liée
+Closes #5
+
+## 🧪 Vérifications
+- [x] Lint OK
+- [x] Tests unitaires OK
+- [x] Test manuel effectué
+- [x] Aucun secret exposé
+- [ ] Migration/rollback décrit (si DB)
+
+## 📸 Preuves
+- Permission demandée au premier accès carte
+- Position visible sur la carte quand permission accordée
+- Message fallback affiché si permission refusée
+- Aucun crash en cas d’erreur de géolocalisation
+
+## ⚠️ Risques & rollback
+- Risques:
+  - Variations de comportement selon OS/navigateur
+  - Timeout géolocalisation sur connexions lentes
+- Plan rollback:
+  - Revert de la PR
+  - Désactivation du composant de géolocalisation si nécessaire
+
+## 📝 Notes reviewer
+Points à vérifier en priorité :
+1. Flux permission (allow/deny) complet
+2. Fallback lisible et actionnable pour l’utilisateur
+3. Robustesse sur erreurs GPS (timeout, indisponible)
+4. Pas de régression sur le rendu carte
