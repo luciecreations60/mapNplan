@@ -175,11 +175,31 @@ export function MapPanel({ trip, onOpenTab, onUpdate }) {
           variant="workspace"
          
           onValueChange={setSearchValue}
-          onPlaceSelect={(place) => {
-            if (!place) return;
-            setSearchValue(place.label);
-            selectMapPoint({ latitude: place.latitude, longitude: place.longitude }, place);
-          }}
+onPlaceSelect={(place) => {
+  if (!place) {
+    setNotice({
+      tone: 'warning',
+      title: t('map.searchNoResultTitle'),
+      text: t('map.searchNoResultText'),
+    });
+    return;
+  }
+
+  const latitude = Number(place.latitude);
+  const longitude = Number(place.longitude);
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+    setNotice({
+      tone: 'warning',
+      title: t('map.searchInvalidResultTitle'),
+      text: t('map.searchInvalidResultText'),
+    });
+    return;
+  }
+
+  setNotice(null);
+  setSearchValue(place.label || '');
+  selectMapPoint({ latitude, longitude }, place);
+}}
         />
         <p className="map-language-note"><Icon name="globe" size={15} /> {t('map.languageNote')}</p>
       </div>
