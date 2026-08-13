@@ -2,7 +2,6 @@ import { lazy, Suspense } from 'react';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ErrorBoundary } from './components/feedback/ErrorBoundary.jsx';
 import { RouteLoading } from './components/feedback/RouteLoading.jsx';
-import { LocalizationProvider } from './contexts/LocalizationContext.jsx';
 import { AppLayout } from './layouts/AppLayout.jsx';
 
 function lazyNamed(importer, exportName) {
@@ -23,27 +22,25 @@ const TripsPage = lazyNamed(() => import('./pages/TripsPage.jsx'), 'TripsPage');
 export default function App() {
   return (
     <ErrorBoundary>
-      <LocalizationProvider>
-        <HashRouter>
-          <Suspense fallback={<RouteLoading />}>
-            <Routes>
-              <Route path="/trips/:tripId/print" element={<PrintTripPage />} />
-              <Route path="/shared" element={<SharedTripPage />} />
-              <Route path="/guides/:slug" element={<PublicDestinationPage />} />
-              <Route element={<AppLayout />}>
-                <Route index element={<Navigate replace to="/dashboard" />} />
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/trips" element={<TripsPage />} />
-                <Route path="/trips/:tripId" element={<TripWorkspacePage />} />
-                <Route path="/templates" element={<TemplatesPage />} />
-                <Route path="/explore" element={<ExplorePage />} />
-                <Route path="/settings" element={<SettingsPage />} />
-                <Route path="*" element={<NotFoundPage />} />
-              </Route>
-            </Routes>
-          </Suspense>
-        </HashRouter>
-      </LocalizationProvider>
+      <HashRouter>
+        <Suspense fallback={<RouteLoading />}>
+          <Routes>
+            <Route path="/trips/:tripId/print" element={<PrintTripPage />} />
+            <Route path="/shared" element={<SharedTripPage />} />
+            <Route path="/guides/:slug" element={<PublicDestinationPage />} />
+            <Route element={<AppLayout />}>
+              <Route index element={<Navigate replace to="/dashboard" />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/trips" element={<TripsPage />} />
+              <Route path="/trips/:tripId" element={<TripWorkspacePage />} />
+              <Route path="/templates" element={<TemplatesPage />} />
+              <Route path="/explore" element={<ExplorePage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Route>
+          </Routes>
+        </Suspense>
+      </HashRouter>
     </ErrorBoundary>
   );
 }
