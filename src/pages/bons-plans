@@ -1,0 +1,24 @@
+import AffiliateLink from '../components/AffiliateLink.jsx';
+
+export default function BonsPlansPage() {
+  return (
+    <main className="page page--bons-plans">
+      <h1>Bons plans voyage</h1>
+      <p>
+        Certains liens ci-dessous sont affiliés. Si vous achetez via ces liens, mapNplan peut
+        recevoir une commission, sans coût supplémentaire pour vous.
+      </p>
+
+      <ul>
+        <li>
+          <AffiliateLink
+            href="https://example-partner.com/hotel-deals"
+            partnerName="ExamplePartner"
+          >
+            Voir les offres hôtels
+          </AffiliateLink>
+        </li>
+      </ul>
+    </main>
+  );
+}
