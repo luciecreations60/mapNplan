@@ -33,7 +33,7 @@ La Partie 19 ajoute une publication réellement indexable :
 Les URLs générées ont cette forme :
 
 ```text
-https://luciecreations60.github.io/travel-planner/guides/three-days-in-paris/
+https://luciecreations60.github.io/mapnplan/guides/three-days-in-paris/
 ```
 
 Elles ne contiennent pas `#` et peuvent être explorées directement.
@@ -85,11 +85,11 @@ content: publish destination guides
 Ouvrir ces URLs :
 
 ```text
-https://luciecreations60.github.io/travel-planner/guides/
-https://luciecreations60.github.io/travel-planner/guides/three-days-in-paris/
-https://luciecreations60.github.io/travel-planner/sitemap.xml
-https://luciecreations60.github.io/travel-planner/robots.txt
-https://luciecreations60.github.io/travel-planner/seo-status.json
+https://luciecreations60.github.io/mapnplan/guides/
+https://luciecreations60.github.io/mapnplan/guides/three-days-in-paris/
+https://luciecreations60.github.io/mapnplan/sitemap.xml
+https://luciecreations60.github.io/mapnplan/robots.txt
+https://luciecreations60.github.io/mapnplan/seo-status.json
 ```
 
 Contrôles à effectuer :
@@ -107,7 +107,7 @@ Contrôles à effectuer :
 Créer une propriété de type **Préfixe de l’URL** avec :
 
 ```text
-https://luciecreations60.github.io/travel-planner/
+https://luciecreations60.github.io/mapnplan/
 ```
 
 ### Vérification par balise HTML
@@ -116,7 +116,7 @@ Google fournit une valeur de vérification. Copier uniquement la valeur du champ
 
 ```js
 // project.config.js
-siteBaseUrl: 'https://luciecreations60.github.io/travel-planner',
+siteBaseUrl: 'https://luciecreations60.github.io/mapnplan',
 googleSiteVerification: 'VALEUR_FOURNIE_PAR_GOOGLE',
 ```
 
@@ -158,7 +158,7 @@ La méthode la plus fiable est **Inspection de l’URL** dans Search Console.
 La recherche suivante peut donner une indication, mais elle n’est pas un rapport exhaustif :
 
 ```text
-site:luciecreations60.github.io/travel-planner/guides/
+site:luciecreations60.github.io/mapnplan/guides/
 ```
 
 ## 10. Comprendre les statistiques
