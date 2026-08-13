@@ -1,6 +1,6 @@
 import { validateBackupPayload } from '../validation/ImportValidationService.js';
 
-const BACKUP_FORMAT = 'travel-planner-backup';
+const BACKUP_FORMAT = 'mapnplan-backup';
 const BACKUP_VERSION = 2;
 const MAX_BACKUP_SIZE = 120 * 1024 * 1024;
 
