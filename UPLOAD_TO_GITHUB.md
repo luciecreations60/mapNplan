@@ -1,7 +1,7 @@
 # Mise en ligne de la partie 29 avec GitHub Desktop
 
-1. Décompresser `travel-planner-v0.1-part29.zip`.
-2. Dans GitHub Desktop, sélectionner le dépôt `travel-planner`, puis **Repository → Show in Explorer**.
+1. Décompresser `mapnplan-v0.1-part29.zip`.
+2. Dans GitHub Desktop, sélectionner le dépôt `mapnplan`, puis **Repository → Show in Explorer**.
 3. Remplacer le contenu du projet local par le contenu décompressé sans supprimer le dossier caché `.git`.
 4. Revenir dans GitHub Desktop et vérifier les fichiers ajoutés/modifiés/supprimés.
 5. Commit conseillé : `mapNplan V0.1.28 RC7 - partie 29`.
