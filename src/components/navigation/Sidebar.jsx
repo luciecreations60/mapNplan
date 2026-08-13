@@ -17,7 +17,7 @@ function NavigationGroup({ items, onNavigate }) {
           key={item.path}
           className={({ isActive }) => `sidebar__link ${isActive ? 'sidebar__link--active' : ''}`}
           to={item.path}
-          onClick={onNavigate}
+          onClick={() => onNavigate?.()}
         >
           <Icon name={item.icon} size={19} aria-hidden="true" />
           <span>{t(item.labelKey)}</span>
@@ -58,7 +58,7 @@ export function Sidebar({ isOpen, isMobile, onClose }) {
         </div>
 
         <div className="sidebar__primary">
-          <NavigationGroup items={PRIMARY_NAVIGATION} onNavigate={onClose} />
+          <NavigationGroup items={PRIMARY_NAVIGATION} onNavigate={isMobile ? onClose : undefined} />
         </div>
 
         <div className="sidebar__upgrade">
@@ -68,7 +68,7 @@ export function Sidebar({ isOpen, isMobile, onClose }) {
         </div>
 
         <div className="sidebar__secondary">
-          <NavigationGroup items={SECONDARY_NAVIGATION} onNavigate={onClose} />
+          <NavigationGroup items={SECONDARY_NAVIGATION} onNavigate={isMobile ? onClose : undefined} />
           <div className="sidebar__version">v{APP_CONFIG.version} · {t('nav.foundation')}</div>
         </div>
       </aside>
