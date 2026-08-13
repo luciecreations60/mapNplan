@@ -11,12 +11,19 @@ function rootMetadataPlugin() {
     transformIndexHtml(html) {
       const siteBaseUrl = PROJECT_CONFIG.deployment.siteBaseUrl.replace(/\/+$/, '');
       const indexingEnabled = PROJECT_CONFIG.release.publicIndexingEnabled;
+
+      const robots = indexingEnabled
+        ? '<meta name="robots" content="index, follow, max-image-preview:large">'
+        : '<meta name="robots" content="noindex, nofollow, noarchive">';
+
       const verification = indexingEnabled && PROJECT_CONFIG.deployment.googleSiteVerification
         ? `<meta name="google-site-verification" content="${PROJECT_CONFIG.deployment.googleSiteVerification}">`
         : '';
+
       const canonical = indexingEnabled
         ? `<link rel="canonical" href="${siteBaseUrl}/">`
-        : '<!-- Canonical intentionally omitted until the final brand and domain are approved. -->';
+        : '<!-- Canonical intentionally omitted until domain/indexing is enabled. -->';
+
       const schema = indexingEnabled
         ? `<script type="application/ld+json">${JSON.stringify({
             '@context': 'https://schema.org',
@@ -26,14 +33,17 @@ function rootMetadataPlugin() {
             url: `${siteBaseUrl}/`,
             applicationCategory: 'TravelApplication',
             operatingSystem: 'Any',
-          }).replaceAll('<', '\u003c')}</script>`
-        : '<!-- Structured public brand metadata disabled during stabilization. -->';
-      return html.replace(
-        '<!-- SEO_BUILD_METADATA -->',
-        `${canonical}
+          }).replaceAll('<', '\\u003c')}</script>`
+        : '<!-- Structured data disabled until public indexing is enabled. -->';
+
+      return html
+        .replace('<!-- SEO_ROBOTS -->', robots)
+        .replace(
+          '<!-- SEO_BUILD_METADATA -->',
+          `${canonical}
     ${verification}
     ${schema}`,
-      );
+        );
     },
   };
 }
