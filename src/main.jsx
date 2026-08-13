@@ -5,6 +5,7 @@ import { AuthProvider } from './auth/AuthContext.jsx';
 import { LocalizationProvider } from './contexts/LocalizationContext.jsx';
 import { ThemeProvider } from './contexts/ThemeContext.jsx';
 import { TripProvider } from './contexts/TripContext.jsx';
+import { TemplateProvider } from './contexts/TemplateContext.jsx';
 import './styles/tokens.css';
 import './styles/global.css';
 import './styles/layout.css';
@@ -19,7 +20,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <ThemeProvider>
         <AuthProvider>
           <TripProvider>
-            <App />
+            <TemplateProvider>
+              <App />
+            </TemplateProvider>
           </TripProvider>
         </AuthProvider>
       </ThemeProvider>
