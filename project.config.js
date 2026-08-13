@@ -1,8 +1,5 @@
 /**
  * Shared project configuration.
- *
- * Central metadata for the mapNplan release candidate.
- * The application intentionally starts with a clean local trip library in this test release.
  */
 export const PROJECT_CONFIG = Object.freeze({
   repositoryName: 'mapnplan',
@@ -14,12 +11,21 @@ export const PROJECT_CONFIG = Object.freeze({
     stage: 'release-candidate',
     candidate: 'rc.7',
     brandFinalized: true,
+
+    // false tant que tu n'as pas branché le domaine + Search Console
     publicIndexingEnabled: false,
+
+    // mets ton domaine final ici ce week-end (ex: 'www.mapnplan.com')
     productionDomain: '',
   }),
   deployment: Object.freeze({
+    // Pendant GitHub Pages repo URL:
     siteBaseUrl: 'https://luciecreations60.github.io/mapnplan',
+
+    // À remplir après création propriété Search Console
     googleSiteVerification: '',
+
+    // image sociale absolue quand prête
     defaultSocialImageUrl: '',
   }),
 });
