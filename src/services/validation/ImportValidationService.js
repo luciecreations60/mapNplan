@@ -1,4 +1,4 @@
-const BACKUP_FORMAT = 'travel-planner-backup';
+const BACKUP_FORMAT = 'mapnplan-backup';
 const SHARE_FORMAT = 'mapnplan-share';
 
 export const IMPORT_LIMITS = Object.freeze({
@@ -50,7 +50,7 @@ function containsOversizedString(value, seen = new WeakSet()) {
 
 export function validateBackupPayload(payload) {
   if (!isPlainObject(payload) || payload.format !== BACKUP_FORMAT) {
-    throw new ImportValidationError('This file is not a compatible travel-planner backup.', 'INVALID_FORMAT');
+    throw new ImportValidationError('This file is not a compatible mapnplan backup.', 'INVALID_FORMAT');
   }
 
   const version = Number(payload.version) || 1;
