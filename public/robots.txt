@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
 
-# Public indexing is disabled by page-level noindex metadata.
+# When publicIndexingEnabled=true and custom domain is active,
+# update sitemap host to your production domain.
+Sitemap: https://luciecreations60.github.io/mapnplan/sitemap.xml
