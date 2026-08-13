@@ -3,12 +3,12 @@ import assert from 'node:assert/strict';
 import { validateBackupPayload, validateSharedTripPayload } from '../src/services/validation/ImportValidationService.js';
 
 test('accepts a compatible backup', () => {
-  assert.deepEqual(validateBackupPayload({ format: 'travel-planner-backup', version: 2, trips: [], attachments: [] }), { trips: [], attachments: [], version: 2 });
+  assert.deepEqual(validateBackupPayload({ format: 'mapnplan-backup', version: 2, trips: [], attachments: [] }), { trips: [], attachments: [], version: 2 });
 });
 
 test('rejects unsupported backup versions and remote attachment URLs', () => {
-  assert.throws(() => validateBackupPayload({ format: 'travel-planner-backup', version: 99, trips: [] }), /not supported/);
-  assert.throws(() => validateBackupPayload({ format: 'travel-planner-backup', version: 2, trips: [], attachments: [{ id: 'a', tripId: 't', documentId: 'd', dataUrl: 'https://example.com' }] }), /invalid binary data/);
+  assert.throws(() => validateBackupPayload({ format: 'mapnplan-backup', version: 99, trips: [] }), /not supported/);
+  assert.throws(() => validateBackupPayload({ format: 'mapnplan-backup', version: 2, trips: [], attachments: [{ id: 'a', tripId: 't', documentId: 'd', dataUrl: 'https://example.com' }] }), /invalid binary data/);
 });
 
 test('shared snapshots require array collections', () => {
