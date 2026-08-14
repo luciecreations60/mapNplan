@@ -12,9 +12,7 @@ function rootMetadataPlugin() {
       const siteBaseUrl = PROJECT_CONFIG.deployment.siteBaseUrl.replace(/\/+$/, '');
       const indexingEnabled = PROJECT_CONFIG.release.publicIndexingEnabled;
 
-      const robots = indexingEnabled
-        ? '<meta name="robots" content="index, follow, max-image-preview:large">'
-        : '<meta name="robots" content="noindex, nofollow, noarchive">';
+      const robots = '';
 
       const verification = indexingEnabled && PROJECT_CONFIG.deployment.googleSiteVerification
         ? `<meta name="google-site-verification" content="${PROJECT_CONFIG.deployment.googleSiteVerification}">`
