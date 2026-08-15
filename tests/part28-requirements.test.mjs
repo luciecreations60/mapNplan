@@ -51,7 +51,8 @@ test('linked reservation button navigates to the reservations tab and focuses th
   ]);
   assert.match(itinerary, /onOpenReservation\?\.\(existing\.id\)/);
   assert.match(itinerary, /itinerary\.openLinkedReservation/);
-  assert.match(page, /nextParams\.set\('tab', 'reservations'\)/);
+  assert.match(page, /nextParams\.set\('tab', 'booking'\)/);
+  assert.match(page, /nextParams\.set\('view', 'reservations'\)/);
   assert.match(page, /nextParams\.set\('reservation', reservationId\)/);
   assert.match(page, /focusedReservationId=\{searchParams\.get\('reservation'\)\}/);
   assert.match(reservations, /reservation-\$\{focusedReservationId\}/);

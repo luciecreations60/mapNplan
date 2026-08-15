@@ -19,6 +19,10 @@ export const AFFILIATE_CATEGORIES = Object.freeze([
 export const AFFILIATE_TEMPLATE_TOKENS = Object.freeze([
   'destination',
   'country',
+  'location',
+  'city',
+  'departure',
+  'arrival',
   'startDate',
   'endDate',
   'travelers',

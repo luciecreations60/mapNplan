@@ -6,11 +6,15 @@ import { useI18n } from '../hooks/useI18n.js';
 
 const MOBILE_NAVIGATION_QUERY = '(max-width: 960px)';
 
+function viewportUsesMobileNavigation() {
+  return window.matchMedia(MOBILE_NAVIGATION_QUERY).matches;
+}
+
 export function AppLayout() {
   const { t } = useI18n();
   const location = useLocation();
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [isMobileNavigation, setMobileNavigation] = useState(() => window.matchMedia(MOBILE_NAVIGATION_QUERY).matches);
+  const [isMobileNavigation, setMobileNavigation] = useState(viewportUsesMobileNavigation);
+  const [isSidebarOpen, setSidebarOpen] = useState(() => !viewportUsesMobileNavigation());
   const menuButtonRef = useRef(null);
   const mainRef = useRef(null);
 
@@ -19,10 +23,10 @@ export function AppLayout() {
 
     function handleViewportChange(event) {
       setMobileNavigation(event.matches);
-      if (!event.matches) setSidebarOpen(false);
+      // Desktop: visible by default. Tablet/mobile: closed until requested.
+      setSidebarOpen(!event.matches);
     }
 
-    handleViewportChange(mediaQuery);
     if (mediaQuery.addEventListener) mediaQuery.addEventListener('change', handleViewportChange);
     else mediaQuery.addListener(handleViewportChange);
 
@@ -40,18 +44,25 @@ export function AppLayout() {
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     mainRef.current?.focus({ preventScroll: true });
-  }, [location.pathname]);
+    if (isMobileNavigation) setSidebarOpen(false);
+  }, [location.pathname, isMobileNavigation]);
 
   function closeSidebar() {
     setSidebarOpen(false);
+    window.requestAnimationFrame(() => menuButtonRef.current?.focus({ preventScroll: true }));
   }
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell${isSidebarOpen ? ' app-shell--sidebar-open' : ''}`}>
       <a className="skip-link" href="#main-content">{t('a11y.skipToContent')}</a>
       <Sidebar isOpen={isSidebarOpen} isMobile={isMobileNavigation} onClose={closeSidebar} />
       <div className="app-shell__main">
-        <TopBar menuButtonRef={menuButtonRef} onOpenMenu={() => setSidebarOpen(true)} />
+        <TopBar
+          menuButtonRef={menuButtonRef}
+          isSidebarOpen={isSidebarOpen}
+          isMobileNavigation={isMobileNavigation}
+          onOpenMenu={() => setSidebarOpen(true)}
+        />
         <main ref={mainRef} id="main-content" className="page-container" tabIndex="-1">
           <Outlet />
         </main>

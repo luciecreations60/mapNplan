@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { CollaborationPanel } from '../components/tripWorkspace/CollaborationPanel.jsx';
 import { CalendarPanel } from '../components/tripWorkspace/CalendarPanel.jsx';
@@ -19,9 +19,31 @@ import { TripHero } from '../components/tripWorkspace/TripHero.jsx';
 import { TodayPanel } from '../components/tripWorkspace/TodayPanel.jsx';
 import { EditTripDialog } from '../components/trips/EditTripDialog.jsx';
 import { InlineNotice } from '../components/feedback/InlineNotice.jsx';
-import { TRIP_TABS, TripTabs } from '../components/tripWorkspace/TripTabs.jsx';
+import {
+  TRIP_TABS,
+  TripSubNavigation,
+  TripTabs,
+  getDefaultViewForGroup,
+  getWorkspaceGroupForView,
+  getWorkspaceViewIds,
+} from '../components/tripWorkspace/TripTabs.jsx';
 import { useI18n } from '../hooks/useI18n.js';
 import { useTrips } from '../hooks/useTrips.js';
+import { rememberProviderSearch } from '../utils/bookingOptions.js';
+
+function resolveWorkspaceLocation(requestedTab, requestedView) {
+  const requestedGroup = TRIP_TABS.some((tab) => tab.id === requestedTab)
+    ? requestedTab
+    : getWorkspaceGroupForView(requestedTab);
+  const activeGroup = requestedGroup || 'overview';
+  const viewIds = getWorkspaceViewIds(activeGroup);
+  const legacyView = viewIds.includes(requestedTab) ? requestedTab : null;
+  const activeView = viewIds.includes(requestedView)
+    ? requestedView
+    : legacyView || getDefaultViewForGroup(activeGroup);
+
+  return { activeGroup, activeView };
+}
 
 export function TripWorkspacePage() {
   const { tripId } = useParams();
@@ -30,15 +52,21 @@ export function TripWorkspacePage() {
   const { t } = useI18n();
   const { getTripById, updateTrip } = useTrips();
   const requestedTab = searchParams.get('tab');
-  const activeTab = TRIP_TABS.some((tab) => tab.id === requestedTab) ? requestedTab : 'overview';
+  const requestedView = searchParams.get('view');
+  const { activeGroup, activeView } = useMemo(
+    () => resolveWorkspaceLocation(requestedTab, requestedView),
+    [requestedTab, requestedView],
+  );
   const [isEditOpen, setEditOpen] = useState(false);
   const [notice, setNotice] = useState(null);
+  const [bookingContext, setBookingContext] = useState(null);
   const tabsRef = useRef(null);
   const shouldFocusTabsRef = useRef(false);
   const trip = getTripById(tripId);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' });
+    setBookingContext(null);
   }, [tripId]);
 
   useEffect(() => {
@@ -52,7 +80,7 @@ export function TripWorkspacePage() {
         inline: 'center',
       });
     });
-  }, [activeTab]);
+  }, [activeGroup, activeView]);
 
   if (!trip) {
     return (
@@ -71,23 +99,50 @@ export function TripWorkspacePage() {
     updateTrip(trip.id, patch);
   }
 
-  function handleTabChange(tab) {
-    if (!TRIP_TABS.some((item) => item.id === tab)) return;
-    shouldFocusTabsRef.current = true;
+  function handleTabChange(target) {
+    const targetIsGroup = TRIP_TABS.some((item) => item.id === target);
+    const targetGroup = targetIsGroup ? target : getWorkspaceGroupForView(target);
+    if (!targetGroup) return;
+
+    const targetView = targetIsGroup
+      ? getDefaultViewForGroup(targetGroup)
+      : target;
     const nextParams = new URLSearchParams(searchParams);
+
     nextParams.delete('reservation');
     nextParams.delete('document');
-    if (tab === 'overview') nextParams.delete('tab');
-    else nextParams.set('tab', tab);
+
+    if (targetGroup === 'overview') {
+      nextParams.delete('tab');
+      nextParams.delete('view');
+    } else {
+      nextParams.set('tab', targetGroup);
+      if (targetView && targetView !== getDefaultViewForGroup(targetGroup)) nextParams.set('view', targetView);
+      else nextParams.delete('view');
+    }
+
+    shouldFocusTabsRef.current = true;
     setSearchParams(nextParams, { replace: true });
+  }
+
+  function handleOpenBookingContext(context) {
+    setBookingContext(context || null);
+    handleTabChange('booking');
+  }
+
+  function handleRememberBookingSearch(payload) {
+    const nextOptions = rememberProviderSearch(trip.bookingOptions || [], payload, trip.currency);
+    if (nextOptions !== trip.bookingOptions) handleUpdate({ bookingOptions: nextOptions });
   }
 
   function handleOpenReservation(reservationId) {
     if (!reservationId) return;
     shouldFocusTabsRef.current = true;
     const nextParams = new URLSearchParams(searchParams);
-    nextParams.set('tab', 'reservations');
+    nextParams.set('tab', 'booking');
+    nextParams.set('view', 'reservations');
     nextParams.set('reservation', reservationId);
+    nextParams.delete('document');
     setSearchParams(nextParams, { replace: true });
   }
 
@@ -95,8 +150,9 @@ export function TripWorkspacePage() {
     if (!documentId) return;
     shouldFocusTabsRef.current = true;
     const nextParams = new URLSearchParams(searchParams);
+    nextParams.set('tab', 'trip');
+    nextParams.set('view', 'documents');
     nextParams.delete('reservation');
-    nextParams.set('tab', 'documents');
     nextParams.set('document', documentId);
     setSearchParams(nextParams, { replace: true });
   }
@@ -109,31 +165,54 @@ export function TripWorkspacePage() {
         </InlineNotice>
       )}
       <TripHero trip={trip} onEdit={() => setEditOpen(true)} />
-      <TripTabs navRef={tabsRef} activeTab={activeTab} onChange={handleTabChange} />
+      <TripTabs navRef={tabsRef} activeTab={activeGroup} onChange={handleTabChange} />
+      <TripSubNavigation activeGroup={activeGroup} activeView={activeView} onChange={handleTabChange} />
 
       <div
-        id={`trip-panel-${activeTab}`}
+        id={`trip-panel-${activeGroup}`}
         className="trip-workspace__content"
         role="tabpanel"
-        aria-labelledby={`trip-tab-${activeTab}`}
+        aria-labelledby={`trip-tab-${activeGroup}`}
         tabIndex="0"
       >
-        {activeTab === 'overview' && <OverviewPanel trip={trip} onOpenTab={handleTabChange} />}
-        {activeTab === 'today' && <TodayPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} />}
-        {activeTab === 'itinerary' && <ItineraryPanel trip={trip} onUpdate={handleUpdate} onOpenReservation={handleOpenReservation} />}
-        {activeTab === 'route' && <RouteOptimizerPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} />}
-        {activeTab === 'calendar' && <CalendarPanel trip={trip} onOpenTab={handleTabChange} onUpdate={handleUpdate} />}
-        {activeTab === 'map' && <MapPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} />}
-        {activeTab === 'places' && <SavedPlacesPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} />}
-        {activeTab === 'tools' && <TravelToolsPanel trip={trip} onOpenTab={handleTabChange} />}
-        {activeTab === 'booking' && <BookingPanel trip={trip} onUpdate={handleUpdate} />}
-        {activeTab === 'reservations' && <ReservationsPanel trip={trip} onUpdate={handleUpdate} onOpenDocument={handleOpenDocument} focusedReservationId={searchParams.get('reservation')} />}
-        {activeTab === 'budget' && <BudgetHubPanel trip={trip} onUpdate={handleUpdate} />}
-        {activeTab === 'statistics' && <StatisticsPanel trip={trip} />}
-        {activeTab === 'checklist' && <ChecklistPanel trip={trip} onUpdate={handleUpdate} />}
-        {activeTab === 'documents' && <DocumentsPanel trip={trip} onUpdate={handleUpdate} focusedDocumentId={searchParams.get('document')} />}
-        {activeTab === 'notes' && <NotesPanel trip={trip} onUpdate={handleUpdate} />}
-        {activeTab === 'collaboration' && <CollaborationPanel trip={trip} onUpdate={handleUpdate} />}
+        {activeGroup === 'overview' && <OverviewPanel trip={trip} onOpenTab={handleTabChange} />}
+
+        {activeGroup === 'planning' && activeView === 'today' && <TodayPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} />}
+        {activeGroup === 'planning' && activeView === 'itinerary' && (
+          <ItineraryPanel
+            trip={trip}
+            onUpdate={handleUpdate}
+            onOpenReservation={handleOpenReservation}
+            onOpenBooking={handleOpenBookingContext}
+            onRememberBookingSearch={handleRememberBookingSearch}
+          />
+        )}
+        {activeGroup === 'planning' && activeView === 'route' && <RouteOptimizerPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} />}
+        {activeGroup === 'planning' && activeView === 'calendar' && <CalendarPanel trip={trip} onOpenTab={handleTabChange} onUpdate={handleUpdate} />}
+        {activeGroup === 'planning' && activeView === 'map' && (
+          <MapPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} onOpenBooking={handleOpenBookingContext} onRememberBookingSearch={handleRememberBookingSearch} />
+        )}
+        {activeGroup === 'planning' && activeView === 'places' && <SavedPlacesPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} />}
+
+        {activeGroup === 'booking' && activeView === 'booking' && (
+          <BookingPanel trip={trip} onUpdate={handleUpdate} context={bookingContext} onClearContext={() => setBookingContext(null)} />
+        )}
+        {activeGroup === 'booking' && activeView === 'reservations' && (
+          <ReservationsPanel
+            trip={trip}
+            onUpdate={handleUpdate}
+            onOpenDocument={handleOpenDocument}
+            focusedReservationId={searchParams.get('reservation')}
+          />
+        )}
+
+        {activeGroup === 'trip' && activeView === 'budget' && <BudgetHubPanel trip={trip} onUpdate={handleUpdate} />}
+        {activeGroup === 'trip' && activeView === 'statistics' && <StatisticsPanel trip={trip} />}
+        {activeGroup === 'trip' && activeView === 'checklist' && <ChecklistPanel trip={trip} onUpdate={handleUpdate} />}
+        {activeGroup === 'trip' && activeView === 'documents' && <DocumentsPanel trip={trip} onUpdate={handleUpdate} focusedDocumentId={searchParams.get('document')} />}
+        {activeGroup === 'trip' && activeView === 'notes' && <NotesPanel trip={trip} onUpdate={handleUpdate} />}
+        {activeGroup === 'trip' && activeView === 'collaboration' && <CollaborationPanel trip={trip} onUpdate={handleUpdate} />}
+        {activeGroup === 'trip' && activeView === 'tools' && <TravelToolsPanel trip={trip} onOpenTab={handleTabChange} />}
       </div>
 
       <EditTripDialog

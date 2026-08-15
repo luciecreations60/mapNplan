@@ -151,6 +151,7 @@ export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focus
       comments: previousReservation?.comments || [],
       sourceActivityId: previousReservation?.sourceActivityId || form.sourceActivityId || null,
       sourceActivitySeriesId: previousReservation?.sourceActivitySeriesId || form.sourceActivitySeriesId || null,
+      sourceBookingOptionId: previousReservation?.sourceBookingOptionId || null,
       createdAt: previousReservation?.createdAt || new Date().toISOString(),
     };
 

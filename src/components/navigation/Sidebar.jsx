@@ -47,7 +47,7 @@ export function Sidebar({ isOpen, isMobile, onClose }) {
         role={isMobile ? 'dialog' : undefined}
         aria-modal={isMobile && isOpen ? 'true' : undefined}
         aria-label={isMobile ? t('nav.mobileNavigation') : undefined}
-        aria-hidden={isMobile && !isOpen ? 'true' : undefined}
+        aria-hidden={!isOpen ? 'true' : undefined}
         tabIndex={isMobile ? -1 : undefined}
       >
         <div className="sidebar__brand-row">

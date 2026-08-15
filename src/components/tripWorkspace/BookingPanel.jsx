@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AFFILIATE_CATEGORIES } from '../../config/affiliate.config.js';
 import { useAffiliate } from '../../hooks/useAffiliate.js';
@@ -8,6 +8,8 @@ import {
   normalizeBookingOption,
   summarizeBookingOptions,
 } from '../../utils/bookingOptions.js';
+import { inferBookingCategories, normalizeBookingContext } from '../../utils/bookingContext.js';
+import { syncBookedOptionToTrip } from '../../utils/bookingReservations.js';
 import { Button } from '../common/Button.jsx';
 import { Card } from '../common/Card.jsx';
 import { Icon } from '../common/Icon.jsx';
@@ -25,7 +27,7 @@ const EMPTY_FORM = Object.freeze({
   notes: '',
 });
 
-export function BookingPanel({ trip, onUpdate }) {
+export function BookingPanel({ trip, onUpdate, context = null, onClearContext = null }) {
   const navigate = useNavigate();
   const { locale, t } = useI18n();
   const {
@@ -39,6 +41,12 @@ export function BookingPanel({ trip, onUpdate }) {
   const [form, setForm] = useState({ ...EMPTY_FORM, currency: trip.currency });
   const [editingId, setEditingId] = useState(null);
   const [notice, setNotice] = useState(null);
+  const normalizedContext = useMemo(() => normalizeBookingContext(context, trip), [context, trip]);
+
+  useEffect(() => {
+    const [firstCategory] = inferBookingCategories(normalizedContext);
+    if (firstCategory) setActiveCategory(firstCategory);
+  }, [normalizedContext]);
 
   const options = Array.isArray(trip.bookingOptions) ? trip.bookingOptions : [];
   const summary = useMemo(() => summarizeBookingOptions(options), [options]);
@@ -80,6 +88,8 @@ export function BookingPanel({ trip, onUpdate }) {
 
     const provider = providers.find((item) => item.id === form.providerId);
     const normalized = normalizeBookingOption({
+      ...(editingId ? options.find((option) => option.id === editingId) : {}),
+      ...(normalizedContext || {}),
       ...form,
       id: editingId || undefined,
       providerName: provider?.name || form.providerName || t('affiliate.otherProvider'),
@@ -92,8 +102,10 @@ export function BookingPanel({ trip, onUpdate }) {
     const nextOptions = editingId
       ? options.map((option) => (option.id === editingId ? normalized : option))
       : [...options, normalized];
-    onUpdate({ bookingOptions: nextOptions });
     const previousOption = editingId ? options.find((option) => option.id === editingId) : null;
+    const bookingPatch = { bookingOptions: nextOptions };
+    if (normalized.status === 'booked') Object.assign(bookingPatch, syncBookedOptionToTrip(trip, normalized));
+    onUpdate(bookingPatch);
     if (normalized.status === 'booked' && previousOption?.status !== 'booked') {
       recordConversion({
         providerId: normalized.providerId,
@@ -143,7 +155,9 @@ export function BookingPanel({ trip, onUpdate }) {
       bookedAt: status === 'booked' ? new Date().toISOString() : null,
       updatedAt: new Date().toISOString(),
     }, trip.currency);
-    onUpdate({ bookingOptions: options.map((item) => (item.id === option.id ? updated : item)) });
+    const bookingPatch = { bookingOptions: options.map((item) => (item.id === option.id ? updated : item)) };
+    if (status === 'booked') Object.assign(bookingPatch, syncBookedOptionToTrip(trip, updated));
+    onUpdate(bookingPatch);
     if (status === 'booked' && option.status !== 'booked') {
       recordConversion({
         providerId: updated.providerId,
@@ -164,7 +178,7 @@ export function BookingPanel({ trip, onUpdate }) {
   }
 
   function openProvider(provider) {
-    const result = buildProviderLink(provider.id, trip, locale);
+    const result = buildProviderLink(provider.id, trip, locale, normalizedContext);
     if (!result.url) {
       setNotice({ tone: 'warning', title: t('affiliate.providerUnavailable'), message: t('affiliate.configureProviderText') });
       return;
@@ -200,6 +214,17 @@ export function BookingPanel({ trip, onUpdate }) {
           {t('affiliate.managePartners')}
         </Button>
       </header>
+
+      {normalizedContext && (
+        <div className="booking-context-banner">
+          <div>
+            <p className="eyebrow">{t('affiliate.contextEyebrow')}</p>
+            <strong>{normalizedContext.location || trip.destination}</strong>
+            <span>{t('affiliate.contextReadyText')}</span>
+          </div>
+          {onClearContext && <Button size="small" variant="ghost" onClick={onClearContext}>{t('affiliate.useWholeTrip')}</Button>}
+        </div>
+      )}
 
       {notice && (
         <InlineNotice tone={notice.tone} title={notice.title}>
@@ -238,7 +263,7 @@ export function BookingPanel({ trip, onUpdate }) {
         <div className="booking-provider-grid">
           {visibleProviders.map((provider) => {
             const category = AFFILIATE_CATEGORIES.find((item) => item.id === provider.category);
-            const link = buildProviderLink(provider.id, trip, locale);
+            const link = buildProviderLink(provider.id, trip, locale, normalizedContext);
             return (
               <article key={provider.id} className={provider.enabled ? 'booking-provider booking-provider--active' : 'booking-provider'}>
                 <span className="booking-provider__icon"><Icon name={category?.icon || 'externalLink'} /></span>

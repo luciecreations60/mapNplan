@@ -14,6 +14,7 @@ import { InlineNotice } from '../feedback/InlineNotice.jsx';
 import { LocationAutocomplete } from '../common/LocationAutocomplete.jsx';
 import { Modal } from '../common/Modal.jsx';
 import { TripMap } from './TripMap.jsx';
+import { BookingContextCard } from './BookingContextCard.jsx';
 
 function createInitialForm(trip) {
   return {
@@ -30,7 +31,7 @@ function createInitialForm(trip) {
   };
 }
 
-export function MapPanel({ trip, onOpenTab, onUpdate }) {
+export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null, onRememberBookingSearch = null }) {
   const { language, locale, t } = useI18n();
   const points = useMemo(() => getTripMapPoints(trip), [trip]);
   const dates = useMemo(() => buildTripDateRange(trip.startDate, trip.endDate), [trip.startDate, trip.endDate]);
@@ -284,6 +285,26 @@ onPlaceSelect={(place) => {
             <label className="workspace-field workspace-form__wide"><span>{t('itinerary.notes')}</span><textarea name="notes" rows="3" value={form.notes} onChange={updateField} /></label>
           </div>
           {selection && <small className="map-add-form__coordinates">{selection.latitude.toFixed(5)}, {selection.longitude.toFixed(5)}</small>}
+          {form.location.trim() && (
+            <BookingContextCard
+              trip={trip}
+              context={{
+                source: 'map',
+                activityType: form.type,
+                title: form.title,
+                location: form.location,
+                arrivalLocation: form.location,
+                startDate: form.date,
+                endDate: form.type === 'hotel' ? form.endDate : form.date,
+                travelers: trip.travelers,
+                currency: trip.currency,
+              }}
+              categories={form.type === 'map' ? ['hotels', 'activities', 'cars'] : null}
+              compact
+              onOpenBooking={onOpenBooking}
+              onRememberSearch={onRememberBookingSearch}
+            />
+          )}
           <div className="workspace-form__actions map-add-form__actions">
             <Button variant="ghost" onClick={closeEditor}>{t('common.cancel')}</Button>
             <Button type="button" variant="secondary" icon="pin" disabled={status === 'loading'} onClick={saveSelectionToPlaces}>{t('map.saveToPlaces')}</Button>

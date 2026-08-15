@@ -70,7 +70,8 @@ test('travel time ticks every second and reservations link to their documents', 
   ]);
   assert.match(clock, /setInterval\([\s\S]*?, 1000\)/);
   assert.match(reservations, /reservations\.openDocuments/);
-  assert.match(page, /nextParams\.set\('tab', 'documents'\)/);
+  assert.match(page, /nextParams\.set\('tab', 'trip'\)/);
+  assert.match(page, /nextParams\.set\('view', 'documents'\)/);
   assert.match(documents, /documents\.view/);
   assert.match(documents, /previewAttachment/);
 });

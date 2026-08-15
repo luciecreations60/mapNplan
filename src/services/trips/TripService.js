@@ -146,6 +146,7 @@ class TripService {
         id: createId('reservation'),
         sourceActivityId: null,
         sourceActivitySeriesId: null,
+        sourceBookingOptionId: null,
         createdAt: now,
         comments: [],
         externalCalendarUid: '',
@@ -168,6 +169,8 @@ class TripService {
         ...option,
         id: createId('booking-option'),
         status: option.status === 'booked' ? 'saved' : option.status,
+        sourceActivityId: '',
+        searchContextKey: '',
         bookedAt: null,
         createdAt: now,
         updatedAt: now,
@@ -595,6 +598,7 @@ class TripService {
       comments: this.#normalizeComments(reservation.comments),
       sourceActivityId: reservation.sourceActivityId ? String(reservation.sourceActivityId) : null,
       sourceActivitySeriesId: reservation.sourceActivitySeriesId ? String(reservation.sourceActivitySeriesId) : null,
+      sourceBookingOptionId: reservation.sourceBookingOptionId ? String(reservation.sourceBookingOptionId) : null,
       createdAt: reservation.createdAt || new Date().toISOString(),
     }));
   }

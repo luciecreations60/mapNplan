@@ -26,12 +26,61 @@ export function normalizeBookingOption(option, fallbackCurrency = 'EUR') {
     url: normalizeExternalUrl(option?.url || '') || '',
     status: BOOKING_OPTION_STATUSES.includes(option?.status) ? option.status : 'saved',
     notes: String(option?.notes || '').trim(),
+    source: String(option?.source || '').trim(),
+    sourceActivityId: String(option?.sourceActivityId || '').trim(),
+    location: String(option?.location || '').trim(),
+    startDate: String(option?.startDate || '').trim(),
+    endDate: String(option?.endDate || '').trim(),
+    departureLocation: String(option?.departureLocation || '').trim(),
+    arrivalLocation: String(option?.arrivalLocation || '').trim(),
+    travelers: Math.max(1, Number(option?.travelers) || 1),
+    searchContextKey: String(option?.searchContextKey || '').trim(),
     createdAt: option?.createdAt || new Date().toISOString(),
     updatedAt: option?.updatedAt || option?.createdAt || new Date().toISOString(),
     bookedAt: option?.status === 'booked'
       ? (option?.bookedAt || new Date().toISOString())
       : null,
   };
+}
+
+
+export function rememberProviderSearch(options = [], { provider, url, context } = {}, fallbackCurrency = 'EUR') {
+  if (!provider || !url || !context) return options;
+  const sourceKey = [
+    context.sourceActivityId || context.source || 'trip',
+    provider.id,
+    provider.category,
+    context.location || context.arrivalLocation || '',
+    context.startDate || '',
+    context.endDate || '',
+  ].join('|');
+
+  const existing = options.find((option) => option.searchContextKey === sourceKey && option.status !== 'booked');
+  const normalized = normalizeBookingOption({
+    ...(existing || {}),
+    category: provider.category,
+    providerId: provider.id,
+    providerName: provider.name,
+    title: context.title || `${provider.name} · ${context.location || context.destination || ''}`.replace(/ · $/, ''),
+    currency: context.currency || fallbackCurrency,
+    url,
+    status: existing?.status || 'saved',
+    source: context.source,
+    sourceActivityId: context.sourceActivityId,
+    location: context.location,
+    startDate: context.startDate,
+    endDate: context.endDate,
+    departureLocation: context.departureLocation,
+    arrivalLocation: context.arrivalLocation,
+    travelers: context.travelers,
+    searchContextKey: sourceKey,
+    createdAt: existing?.createdAt,
+    updatedAt: new Date().toISOString(),
+  }, fallbackCurrency);
+
+  return existing
+    ? options.map((option) => (option.id === existing.id ? normalized : option))
+    : [...options, normalized];
 }
 
 export function summarizeBookingOptions(options = []) {

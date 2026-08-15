@@ -46,7 +46,7 @@ export function AffiliateProvider({ children }) {
     updateProvider,
     resetProviders,
     clearAnalytics,
-    buildProviderLink: (providerId, trip, locale) => affiliateService.buildProviderLink(providerId, trip, locale),
+    buildProviderLink: (providerId, trip, locale, context) => affiliateService.buildProviderLink(providerId, trip, locale, context),
     recordClick,
     recordConversion,
     refresh,

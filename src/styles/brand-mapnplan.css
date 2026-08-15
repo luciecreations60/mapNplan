@@ -170,3 +170,35 @@ h1, h2, h3 { font-weight: 700; }
 @media (max-width: 420px) {
   .quick-actions { grid-template-columns: 1fr; }
 }
+/* ========================================================================== */
+/* V0.1.29 — Brand-safe empty dashboard state                                 */
+/* ========================================================================== */
+
+.upcoming-card--empty {
+  min-height: clamp(270px, 28vw, 350px);
+  padding: clamp(28px, 4vw, 48px);
+  color: #ffffff;
+  background: linear-gradient(125deg, #167f98 0%, #22afa7 58%, #48ca83 135%);
+  box-shadow: 0 24px 55px rgba(31, 144, 173, .22);
+}
+
+.upcoming-card--empty h2 {
+  max-width: 860px;
+  margin-inline: auto;
+  color: #ffffff;
+  font-size: clamp(1.65rem, 3.3vw, 3rem);
+  line-height: 1.12;
+}
+
+.upcoming-card--empty p {
+  max-width: 620px;
+  margin-inline: auto;
+  color: rgba(255, 255, 255, .9);
+  font-size: clamp(.9rem, 1.4vw, 1.05rem);
+}
+
+.upcoming-card--empty .upcoming-card__empty-icon {
+  color: #1F90AD;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, .12);
+}

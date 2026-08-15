@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import { AuthProvider } from './auth/AuthContext.jsx';
+import { AffiliateProvider } from './contexts/AffiliateContext.jsx';
 import { LocalizationProvider } from './contexts/LocalizationContext.jsx';
 import { ThemeProvider } from './contexts/ThemeContext.jsx';
 import { TripProvider } from './contexts/TripContext.jsx';
@@ -19,11 +20,13 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <LocalizationProvider>
       <ThemeProvider>
         <AuthProvider>
-          <TripProvider>
-            <TemplateProvider>
-              <App />
-            </TemplateProvider>
-          </TripProvider>
+          <AffiliateProvider>
+            <TripProvider>
+              <TemplateProvider>
+                <App />
+              </TemplateProvider>
+            </TripProvider>
+          </AffiliateProvider>
         </AuthProvider>
       </ThemeProvider>
     </LocalizationProvider>

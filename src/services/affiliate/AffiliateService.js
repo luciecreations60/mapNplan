@@ -76,18 +76,22 @@ class AffiliateService {
     return this.getSettings();
   }
 
-  buildProviderLink(providerId, trip, locale = 'en-GB') {
+  buildProviderLink(providerId, trip, locale = 'en-GB', context = null) {
     const provider = this.getSettings().providers.find((item) => item.id === providerId);
     if (!provider) return { provider: null, url: null, isAffiliate: false, reason: 'missing-provider' };
     if (!provider.enabled) return { provider, url: null, isAffiliate: false, reason: 'disabled' };
 
     const values = {
-      destination: trip?.destination || '',
-      country: trip?.country || '',
-      startDate: trip?.startDate || '',
-      endDate: trip?.endDate || '',
-      travelers: trip?.travelers || 1,
-      currency: trip?.currency || 'EUR',
+      destination: context?.destination || context?.location || context?.arrivalLocation || trip?.destination || '',
+      country: context?.country || trip?.country || '',
+      location: context?.location || context?.arrivalLocation || context?.destination || trip?.destination || '',
+      city: context?.city || context?.location || context?.arrivalLocation || trip?.destination || '',
+      departure: context?.departureLocation || '',
+      arrival: context?.arrivalLocation || context?.location || context?.destination || trip?.destination || '',
+      startDate: context?.startDate || context?.date || trip?.startDate || '',
+      endDate: context?.endDate || context?.startDate || context?.date || trip?.endDate || '',
+      travelers: context?.travelers ?? trip?.travelers ?? 1,
+      currency: context?.currency || trip?.currency || 'EUR',
       locale,
       category: provider.category,
     };

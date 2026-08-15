@@ -24,6 +24,7 @@ import { Button } from '../common/Button.jsx';
 import { Card } from '../common/Card.jsx';
 import { Icon } from '../common/Icon.jsx';
 import { LocationAutocomplete } from '../common/LocationAutocomplete.jsx';
+import { BookingContextCard } from './BookingContextCard.jsx';
 
 const EMPTY_FORM = Object.freeze({
   date: '', endDate: '', time: '09:00', endTime: '10:00', type: 'map', title: '', location: '', latitude: '', longitude: '',
@@ -31,7 +32,7 @@ const EMPTY_FORM = Object.freeze({
   durationHours: 1, durationRemainderMinutes: 0, estimatedCost: 0, notes: '', titleAutofilled: false,
 });
 
-export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null }) {
+export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null, onOpenBooking = null, onRememberBookingSearch = null }) {
   const { locale, t } = useI18n();
   const [form, setForm] = useState(() => ({ ...EMPTY_FORM, date: getLastUsedItineraryDate(trip), endDate: getLastUsedItineraryDate(trip) }));
   const [isFormOpen, setFormOpen] = useState(false);
@@ -395,6 +396,28 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null }) {
             <Field label={t('itinerary.notes')} className="workspace-form__full"><textarea name="notes" rows="3" value={form.notes} onChange={updateField} placeholder={t('itinerary.notesPlaceholder')} /></Field>
           </div>
           {isStay && <p className="field-hint itinerary-stay-hint">{t('itinerary.stayRangeHint')}</p>}
+          {form.location.trim() && (
+            <BookingContextCard
+              trip={trip}
+              context={{
+                source: 'itinerary',
+                activityType: form.type,
+                transportMode: form.transportMode,
+                title: form.title,
+                location: form.location,
+                arrivalLocation: form.location,
+                departureLocation: form.departureLocation,
+                startDate: form.date,
+                endDate: isStay ? form.endDate : form.date,
+                travelers: trip.travelers,
+                currency: trip.currency,
+                sourceActivityId: editingActivity?.activityId || '',
+              }}
+              compact
+              onOpenBooking={onOpenBooking}
+              onRememberSearch={onRememberBookingSearch}
+            />
+          )}
           <div className="workspace-form__actions"><Button variant="ghost" onClick={closeForm}>{t('common.cancel')}</Button><Button type="submit" icon={editingActivity ? 'save' : 'plus'}>{t(editingActivity ? 'itinerary.saveChanges' : 'itinerary.add')}</Button></div>
         </form>
       </Card>

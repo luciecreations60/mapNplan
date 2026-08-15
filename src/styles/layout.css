@@ -618,3 +618,57 @@
     width: 100%;
   }
 }
+/* ========================================================================== */
+/* V0.1.29 — Collapsible desktop navigation + Chrome-safe responsive shell    */
+/* ========================================================================== */
+
+.app-shell {
+  grid-template-columns: 0 minmax(0, 1fr);
+  transition: grid-template-columns var(--transition-base);
+}
+
+.app-shell--sidebar-open {
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  transform: translateX(-100%);
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform var(--transition-base), visibility var(--transition-base);
+}
+
+.sidebar--open {
+  transform: translateX(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.sidebar__close {
+  display: inline-grid;
+}
+
+.topbar__navigation-trigger {
+  display: flex;
+  min-width: 0;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 960px) {
+  .app-shell,
+  .app-shell--sidebar-open {
+    display: block;
+  }
+
+  .sidebar {
+    width: min(86vw, 310px);
+    transform: translateX(-105%);
+  }
+
+  .sidebar--open {
+    transform: translateX(0);
+  }
+}

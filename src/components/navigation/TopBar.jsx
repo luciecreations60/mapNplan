@@ -10,20 +10,31 @@ import { NotificationCenter } from './NotificationCenter.jsx';
 
 const ALL_NAVIGATION = [...PRIMARY_NAVIGATION, ...SECONDARY_NAVIGATION];
 
-export function TopBar({ menuButtonRef, onOpenMenu }) {
+export function TopBar({ menuButtonRef, isSidebarOpen, isMobileNavigation, onOpenMenu }) {
   const location = useLocation();
   const { t } = useI18n();
   const { resolvedTheme, setTheme } = useTheme();
   const currentPage = ALL_NAVIGATION.find((item) => item.path === location.pathname);
+  const showMenuTrigger = isMobileNavigation || !isSidebarOpen;
 
   return (
     <header className="topbar">
-      <div className="topbar__mobile-brand">
-        <button ref={menuButtonRef} className="icon-button" type="button" aria-controls="application-navigation" aria-label={t('nav.openMenu')} onClick={onOpenMenu}>
-          <Icon name="menu" />
-        </button>
-        <Brand compact />
-      </div>
+      {showMenuTrigger && (
+        <div className="topbar__navigation-trigger">
+          <button
+            ref={menuButtonRef}
+            className="icon-button"
+            type="button"
+            aria-controls="application-navigation"
+            aria-expanded={isSidebarOpen}
+            aria-label={t('nav.openMenu')}
+            onClick={onOpenMenu}
+          >
+            <Icon name="menu" />
+          </button>
+          {isMobileNavigation && <Brand compact />}
+        </div>
+      )}
 
       <div className="topbar__title">
         <span>{currentPage ? t(currentPage.labelKey) : APP_CONFIG.brandName}</span>
