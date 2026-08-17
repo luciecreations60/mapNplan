@@ -11,20 +11,36 @@ export function toDateKey(date) {
 export function getTripCalendarEvents(trip) {
   const events = [];
   const emittedStaySeries = new Set();
+  const emittedStaySignatures = new Set();
+  const itineraryActivityIds = new Set();
+  const itinerarySeriesIds = new Set();
 
   for (const day of trip.itinerary || []) {
     for (const item of day.items || []) {
       if (!day.date) continue;
-
-      // A multi-day accommodation is one calendar event, not one timed event
-      // per night. This prevents false "missing time" warnings for the stay
-      // occurrences that intentionally have no clock time.
-      if (item.type === 'hotel' && item.seriesId) {
-        if (emittedStaySeries.has(item.seriesId) || item.stayRole === 'stay' || item.stayRole === 'checkout') continue;
-        emittedStaySeries.add(item.seriesId);
-      }
+      if (item.id) itineraryActivityIds.add(String(item.id));
+      if (item.seriesId) itinerarySeriesIds.add(String(item.seriesId));
 
       const isAccommodation = item.type === 'hotel';
+      if (isAccommodation) {
+        if (item.stayRole === 'stay' || item.stayRole === 'checkout') continue;
+        if (item.seriesId && emittedStaySeries.has(String(item.seriesId))) continue;
+
+        const stayStartDate = item.stayStartDate || day.date;
+        const stayEndDate = item.stayEndDate || day.date;
+        const signature = [
+          String(item.title || '').trim().toLocaleLowerCase(),
+          String(item.location || '').trim().toLocaleLowerCase(),
+          stayStartDate,
+          stayEndDate,
+          item.checkInTime || item.time || '',
+          item.checkOutTime || '',
+        ].join('|');
+        if (emittedStaySignatures.has(signature)) continue;
+        emittedStaySignatures.add(signature);
+        if (item.seriesId) emittedStaySeries.add(String(item.seriesId));
+      }
+
       events.push({
         id: isAccommodation && item.seriesId ? `activity-series-${item.seriesId}` : `activity-${item.id}`,
         sourceId: item.id,
@@ -51,6 +67,16 @@ export function getTripCalendarEvents(trip) {
 
   for (const reservation of trip.reservations || []) {
     if (!reservation.startDate) continue;
+
+    const isLinkedToItinerary = (
+      reservation.sourceActivityId
+      && itineraryActivityIds.has(String(reservation.sourceActivityId))
+    ) || (
+      reservation.sourceActivitySeriesId
+      && itinerarySeriesIds.has(String(reservation.sourceActivitySeriesId))
+    );
+    if (isLinkedToItinerary) continue;
+
     const isAccommodation = reservation.type === 'accommodation';
     events.push({
       id: `reservation-${reservation.id}`,

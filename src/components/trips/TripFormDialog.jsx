@@ -139,7 +139,6 @@ export function TripFormDialog({ isOpen, mode = 'create', trip = null, initialVa
             }))}
           />
           <TextField id="trip-country" label={t('createTrip.country')} name="country" placeholder={t('createTrip.countryPlaceholder')} value={form.country} onChange={updateField} />
-          <TextField id="trip-country-code" label={t('editTrip.countryCode')} name="countryCode" placeholder="FR, JP, US…" maxLength="3" value={form.countryCode} onChange={updateField} />
           <TextField id="trip-travelers" label={t('createTrip.travellers')} name="travelers" type="number" min="1" max="30" value={form.travelers} onChange={updateField} />
           <DateRangeField
             label={t('createTrip.travelDates')}
@@ -147,11 +146,9 @@ export function TripFormDialog({ isOpen, mode = 'create', trip = null, initialVa
             endDate={form.endDate}
             locale={locale}
             error={submitted ? (errors.startDate || errors.endDate) : ''}
-            startLabel={t('createTrip.departure')}
-            endLabel={t('createTrip.return')}
             previousMonthLabel={t('createTrip.previousMonth')}
             nextMonthLabel={t('createTrip.nextMonth')}
-            instruction={t('createTrip.dateRangeHint')}
+            placeholder={t('createTrip.dateRangePlaceholder')}
             onChange={({ startDate, endDate }) => setForm((current) => ({ ...current, startDate, endDate }))}
           />
           <TextField id="trip-budget" label={t('createTrip.budget')} name="budget" type="number" min="0" step="50" value={form.budget} onChange={updateField} />

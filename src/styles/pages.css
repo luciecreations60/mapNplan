@@ -5846,3 +5846,116 @@
     flex-wrap: nowrap;
   }
 }
+
+/* ========================================================================== */
+/* Part 32 passage 1 — dates, modal safety and money expressions             */
+/* ========================================================================== */
+.date-range-field__popover {
+  position: fixed;
+  z-index: 180;
+  top: 50%;
+  left: 50%;
+  width: min(720px, calc(100vw - 48px));
+  max-height: calc(100vh - 48px);
+  padding: 16px;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+}
+.date-range-field__summary {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  text-align: center;
+}
+.date-range-field__summary small {
+  color: var(--color-text-muted);
+  font-size: .7rem;
+}
+.date-range-field__months {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.date-range-field__month {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+}
+.date-range-field__month-label {
+  text-align: center;
+  font-size: .9rem;
+}
+.date-range-field__day {
+  min-height: 36px;
+  aspect-ratio: auto;
+}
+
+.money-expression-field {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+}
+.money-expression-field__input-row {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+.money-expression-field__result {
+  margin: 0;
+  color: var(--color-primary-strong);
+  font-size: .7rem;
+  font-weight: 750;
+}
+
+.modal__panel,
+.modal__body,
+.workspace-form,
+.workspace-form__grid,
+.workspace-field,
+.workspace-field > *,
+.shared-expense-form,
+.shared-expense-form * {
+  min-width: 0;
+}
+.modal__body {
+  overflow-x: hidden;
+}
+.modal__body p,
+.modal__body small,
+.modal__body label,
+.field-hint,
+.workspace-muted-copy,
+.shared-expense-row__notes,
+.settlement-history-row small {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .date-range-field__popover {
+    width: min(420px, calc(100vw - 24px));
+    max-height: calc(100vh - 24px);
+    padding: 12px;
+  }
+  .date-range-field__months {
+    grid-template-columns: 1fr;
+  }
+  .date-range-field__months > :nth-child(2) {
+    display: none;
+  }
+}
+.share-amount-field > span:not(.sr-only) {
+  color: var(--color-text-muted);
+  font-size: .78rem;
+  font-weight: 700;
+}
+.share-amount-field .money-expression-field__result {
+  grid-column: 1 / -1;
+}
+.settlement-form__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}

@@ -1,12 +1,12 @@
 export const TRIP_ACCENTS = Object.freeze([
-  { id: 'violet', swatch: 'linear-gradient(135deg, #157a95, #1f90ad 52%, #2cbb6b)' },
-  { id: 'aqua', swatch: 'linear-gradient(135deg, #167f98, #22afa7 55%, #4aca83)' },
-  { id: 'coral', swatch: 'linear-gradient(135deg, #1f90ad, #2cbb6b 62%, #f4a06b)' },
-  { id: 'lagoon', swatch: 'linear-gradient(135deg, #0f6f86, #1f90ad, #5bd0b6)' },
-  { id: 'forest', swatch: 'linear-gradient(135deg, #176d62, #2cbb6b, #7fc66a)' },
-  { id: 'sunset', swatch: 'linear-gradient(135deg, #1f90ad, #d79a42, #f08a6e)' },
-  { id: 'rose', swatch: 'linear-gradient(135deg, #1f90ad, #b76ca8, #e7859a)' },
-  { id: 'night', swatch: 'linear-gradient(135deg, #0f172a, #1f5f78, #1f90ad)' },
+  { id: 'violet', swatch: 'linear-gradient(135deg, #157A95, #1F90AD 52%, #2CBB6B)' },
+  { id: 'aqua', swatch: 'linear-gradient(135deg, #1557B0, #2787D8, #73C7F5)' },
+  { id: 'coral', swatch: 'linear-gradient(135deg, #D94B45, #F17361, #FFB07B)' },
+  { id: 'lagoon', swatch: 'linear-gradient(135deg, #087F8C, #10B8B0, #72DDD2)' },
+  { id: 'forest', swatch: 'linear-gradient(135deg, #1E6338, #2C9B55, #77C66E)' },
+  { id: 'sunset', swatch: 'linear-gradient(135deg, #E77A16, #F3A62D, #FFD36A)' },
+  { id: 'rose', swatch: 'linear-gradient(135deg, #B83280, #E65B9B, #F7A4C6)' },
+  { id: 'night', swatch: 'linear-gradient(135deg, #0F172A, #243B63, #416A9C)' },
 ]);
 
 export const TRIP_ACCENT_IDS = Object.freeze(TRIP_ACCENTS.map((accent) => accent.id));

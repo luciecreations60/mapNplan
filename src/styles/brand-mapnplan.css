@@ -142,13 +142,13 @@ h1, h2, h3 { font-weight: 700; }
 .quick-actions small { margin-top: 2px; font-size: .69rem; }
 
 .trip-card { border-radius: 20px; }
-.trip-card__visual { background: linear-gradient(135deg, #157a95, #1f90ad 52%, #2cbb6b); }
-.trip-card--aqua .trip-card__visual { background: linear-gradient(135deg, #167f98, #22afa7 55%, #4aca83); }
-.trip-card--coral .trip-card__visual { background: linear-gradient(135deg, #1f90ad, #2cbb6b 62%, #f4a06b); }
+.trip-card__visual { background: linear-gradient(135deg, #157A95, #1F90AD 52%, #2CBB6B); }
+.trip-card--aqua .trip-card__visual { background: linear-gradient(135deg, #1557B0, #2787D8, #73C7F5); }
+.trip-card--coral .trip-card__visual { background: linear-gradient(135deg, #D94B45, #F17361, #FFB07B); }
 
-.trip-workspace-hero { background: linear-gradient(125deg, #0f667d 0%, #1f90ad 55%, #2cbb6b 138%); box-shadow: 0 24px 55px rgba(31,144,173,.22); }
-.trip-workspace-hero--aqua { background: linear-gradient(125deg, #0e7181 0%, #22afa7 58%, #50cb83 140%); }
-.trip-workspace-hero--coral { background: linear-gradient(125deg, #166e84 0%, #1f90ad 54%, #f28a6c 145%); }
+.trip-workspace-hero { background: linear-gradient(125deg, #0F667D 0%, #1F90AD 55%, #2CBB6B 138%); box-shadow: 0 24px 55px rgba(31,144,173,.22); }
+.trip-workspace-hero--aqua { background: linear-gradient(125deg, #1557B0 0%, #2787D8 58%, #73C7F5 140%); }
+.trip-workspace-hero--coral { background: linear-gradient(125deg, #D94B45 0%, #F17361 58%, #FFB07B 145%); }
 .trip-tabs__button--active { color: var(--color-primary-strong); background: var(--brand-gradient-soft); }
 .trip-day__header, .itinerary-day__header { border-color: color-mix(in srgb, var(--color-primary) 20%, var(--color-border)); background: linear-gradient(90deg, rgba(31,144,173,.11), rgba(44,187,107,.09)); }
 
@@ -207,16 +207,16 @@ h1, h2, h3 { font-weight: 700; }
 /* Part 31 — preserve mapNplan identity while improving responsive readability */
 /* ========================================================================== */
 
-.trip-card--lagoon .trip-card__visual { background: linear-gradient(135deg, #0f6f86, #1f90ad, #5bd0b6); }
-.trip-card--forest .trip-card__visual { background: linear-gradient(135deg, #176d62, #2cbb6b, #7fc66a); }
-.trip-card--sunset .trip-card__visual { background: linear-gradient(135deg, #1f90ad, #d79a42, #f08a6e); }
-.trip-card--rose .trip-card__visual { background: linear-gradient(135deg, #1f90ad, #b76ca8, #e7859a); }
-.trip-card--night .trip-card__visual { background: linear-gradient(135deg, #0f172a, #1f5f78, #1f90ad); }
-.trip-workspace-hero--lagoon { background: linear-gradient(125deg, #0f6f86, #1f90ad 56%, #5bd0b6 140%); }
-.trip-workspace-hero--forest { background: linear-gradient(125deg, #176d62, #2cbb6b 62%, #7fc66a 145%); }
-.trip-workspace-hero--sunset { background: linear-gradient(125deg, #166f88, #1f90ad 48%, #f08a6e 145%); }
-.trip-workspace-hero--rose { background: linear-gradient(125deg, #176f88, #9076ad 62%, #e7859a 145%); }
-.trip-workspace-hero--night { background: linear-gradient(125deg, #0f172a, #1f5f78 60%, #1f90ad 145%); }
+.trip-card--lagoon .trip-card__visual { background: linear-gradient(135deg, #087F8C, #10B8B0, #72DDD2); }
+.trip-card--forest .trip-card__visual { background: linear-gradient(135deg, #1E6338, #2C9B55, #77C66E); }
+.trip-card--sunset .trip-card__visual { background: linear-gradient(135deg, #E77A16, #F3A62D, #FFD36A); }
+.trip-card--rose .trip-card__visual { background: linear-gradient(135deg, #B83280, #E65B9B, #F7A4C6); }
+.trip-card--night .trip-card__visual { background: linear-gradient(135deg, #0F172A, #243B63, #416A9C); }
+.trip-workspace-hero--lagoon { background: linear-gradient(125deg, #087F8C, #10B8B0 58%, #72DDD2 140%); }
+.trip-workspace-hero--forest { background: linear-gradient(125deg, #1E6338, #2C9B55 60%, #77C66E 145%); }
+.trip-workspace-hero--sunset { background: linear-gradient(125deg, #E77A16, #F3A62D 58%, #FFD36A 145%); }
+.trip-workspace-hero--rose { background: linear-gradient(125deg, #B83280, #E65B9B 60%, #F7A4C6 145%); }
+.trip-workspace-hero--night { background: linear-gradient(125deg, #0F172A, #243B63 60%, #416A9C 145%); }
 
 .upcoming-card--empty h2 {
   width: 100%;
