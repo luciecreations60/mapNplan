@@ -35,7 +35,7 @@ export function TripHero({ trip, onEdit }) {
         <p className="trip-workspace-hero__destination"><Icon name="pin" size={17} />{trip.destination}</p>
         <h1>{trip.name}</h1>
         <p className="trip-workspace-hero__dates"><Icon name="calendar" size={17} />{formatDateRange(trip.startDate, trip.endDate, locale, t('trips.datesTbc'))}<span>·</span><Icon name="users" size={17} />{t(trip.travelers === 1 ? 'trips.traveller' : 'trips.travellers', { count: trip.travelers })}</p>
-        <p className="trip-workspace-hero__summary">{trip.summary}</p>
+        {trip.summary && <p className="trip-workspace-hero__summary">{trip.summary}</p>}
       </div>
       <div className="trip-workspace-hero__metrics">
         <div><span>{status === 'upcoming' ? t('workspace.countdown') : t('workspace.status')}</span><strong>{status === 'upcoming' ? t(daysUntil === 1 ? 'workspace.dayToGo' : 'workspace.daysToGo', { count: daysUntil }) : statusLabel}</strong></div>

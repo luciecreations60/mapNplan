@@ -202,3 +202,32 @@ h1, h2, h3 { font-weight: 700; }
   background: rgba(255, 255, 255, .92);
   box-shadow: 0 12px 32px rgba(15, 23, 42, .12);
 }
+
+/* ========================================================================== */
+/* Part 31 — preserve mapNplan identity while improving responsive readability */
+/* ========================================================================== */
+
+.trip-card--lagoon .trip-card__visual { background: linear-gradient(135deg, #0f6f86, #1f90ad, #5bd0b6); }
+.trip-card--forest .trip-card__visual { background: linear-gradient(135deg, #176d62, #2cbb6b, #7fc66a); }
+.trip-card--sunset .trip-card__visual { background: linear-gradient(135deg, #1f90ad, #d79a42, #f08a6e); }
+.trip-card--rose .trip-card__visual { background: linear-gradient(135deg, #1f90ad, #b76ca8, #e7859a); }
+.trip-card--night .trip-card__visual { background: linear-gradient(135deg, #0f172a, #1f5f78, #1f90ad); }
+.trip-workspace-hero--lagoon { background: linear-gradient(125deg, #0f6f86, #1f90ad 56%, #5bd0b6 140%); }
+.trip-workspace-hero--forest { background: linear-gradient(125deg, #176d62, #2cbb6b 62%, #7fc66a 145%); }
+.trip-workspace-hero--sunset { background: linear-gradient(125deg, #166f88, #1f90ad 48%, #f08a6e 145%); }
+.trip-workspace-hero--rose { background: linear-gradient(125deg, #176f88, #9076ad 62%, #e7859a 145%); }
+.trip-workspace-hero--night { background: linear-gradient(125deg, #0f172a, #1f5f78 60%, #1f90ad 145%); }
+
+.upcoming-card--empty h2 {
+  width: 100%;
+  max-width: none;
+  font-size: clamp(1.65rem, 2.65vw, 2.9rem);
+}
+
+@media (min-width: 1300px) {
+  .upcoming-card--empty h2 { white-space: nowrap; }
+}
+
+@media (max-width: 1299px) {
+  .upcoming-card--empty h2 { text-wrap: balance; }
+}

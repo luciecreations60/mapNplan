@@ -136,43 +136,74 @@ export function buildParticipantBalances(trip) {
 }
 
 export function buildSettlementSuggestions(trip) {
-  const balances = buildParticipantBalances(trip);
-  const creditors = balances
-    .filter((participant) => participant.balance > 0.005)
-    .map((participant) => ({ ...participant }))
-    .sort((left, right) => right.balance - left.balance);
-  const debtors = balances
-    .filter((participant) => participant.balance < -0.005)
-    .map((participant) => ({ ...participant, debt: roundMoney(Math.abs(participant.balance)) }))
-    .sort((left, right) => right.debt - left.debt);
+  const participants = Array.isArray(trip?.travelParty) ? trip.travelParty : [];
+  const participantById = new Map(participants.map((participant) => [participant.id, participant]));
+  const debts = new Map();
 
-  const suggestions = [];
-  let creditorIndex = 0;
-  let debtorIndex = 0;
+  const keyFor = (fromId, toId) => `${fromId}::${toId}`;
+  const getDebt = (fromId, toId) => debts.get(keyFor(fromId, toId)) || 0;
+  const setDebt = (fromId, toId, amount) => {
+    const key = keyFor(fromId, toId);
+    const rounded = roundMoney(amount);
+    if (rounded > 0.005) debts.set(key, rounded);
+    else debts.delete(key);
+  };
 
-  while (creditorIndex < creditors.length && debtorIndex < debtors.length) {
-    const creditor = creditors[creditorIndex];
-    const debtor = debtors[debtorIndex];
-    const amount = roundMoney(Math.min(creditor.balance, debtor.debt));
+  // Keep each person's obligation to the person who actually paid. This makes
+  // overpayments reversible to the original sender instead of rerouting money
+  // through another traveller, which is easier to understand and audit.
+  function addDebt(fromId, toId, amount) {
+    let remainder = Math.max(0, roundMoney(amount));
+    if (!fromId || !toId || fromId === toId || remainder <= 0.005) return;
 
-    if (amount > 0.005) {
-      suggestions.push({
-        fromParticipantId: debtor.id,
-        fromName: debtor.name,
-        toParticipantId: creditor.id,
-        toName: creditor.name,
-        amount,
-      });
+    const reverse = getDebt(toId, fromId);
+    if (reverse > 0.005) {
+      const offset = Math.min(reverse, remainder);
+      setDebt(toId, fromId, reverse - offset);
+      remainder = roundMoney(remainder - offset);
     }
-
-    creditor.balance = roundMoney(creditor.balance - amount);
-    debtor.debt = roundMoney(debtor.debt - amount);
-
-    if (creditor.balance <= 0.005) creditorIndex += 1;
-    if (debtor.debt <= 0.005) debtorIndex += 1;
+    if (remainder > 0.005) setDebt(fromId, toId, getDebt(fromId, toId) + remainder);
   }
 
-  return suggestions;
+  for (const expense of trip?.expenses || []) {
+    const paidAmount = getExpensePaidAmount(expense);
+    if (paidAmount <= 0) continue;
+    const payerId = participantById.has(expense.paidById) ? expense.paidById : participants[0]?.id;
+    if (!payerId) continue;
+    for (const share of getExpenseShares(expense, participants)) {
+      if (share.participantId !== payerId) addDebt(share.participantId, payerId, share.amount);
+    }
+  }
+
+  // A recorded reimbursement first reduces the matching debt. If it exceeds
+  // what was owed, the excess becomes an explicit refund owed back to the
+  // sender instead of being silently redistributed to a third traveller.
+  for (const settlement of trip?.settlements || []) {
+    const fromId = settlement.fromParticipantId;
+    const toId = settlement.toParticipantId;
+    let amount = Math.max(0, roundMoney(settlement.amount));
+    if (!participantById.has(fromId) || !participantById.has(toId) || amount <= 0.005) continue;
+
+    const currentDebt = getDebt(fromId, toId);
+    const applied = Math.min(currentDebt, amount);
+    setDebt(fromId, toId, currentDebt - applied);
+    amount = roundMoney(amount - applied);
+    if (amount > 0.005) addDebt(toId, fromId, amount);
+  }
+
+  return [...debts.entries()]
+    .map(([key, amount]) => {
+      const [fromParticipantId, toParticipantId] = key.split('::');
+      return {
+        fromParticipantId,
+        fromName: participantById.get(fromParticipantId)?.name || '',
+        toParticipantId,
+        toName: participantById.get(toParticipantId)?.name || '',
+        amount: roundMoney(amount),
+      };
+    })
+    .filter((item) => item.amount > 0.005)
+    .sort((left, right) => right.amount - left.amount);
 }
 
 export function calculateSharedExpenseSummary(trip) {

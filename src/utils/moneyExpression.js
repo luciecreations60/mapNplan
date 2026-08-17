@@ -1,7 +1,7 @@
 /**
  * Evaluate a small arithmetic expression used in money inputs.
- * Supports decimal commas, +, -, *, / and parentheses. No identifiers or
- * executable JavaScript are accepted.
+ * Supports decimal commas, +, -, *, /, x, percentages and parentheses.
+ * No identifiers or executable JavaScript are accepted.
  */
 export function evaluateMoneyExpression(value) {
   const source = String(value ?? '').trim();
@@ -11,9 +11,10 @@ export function evaluateMoneyExpression(value) {
     .replace(/\s+/g, '')
     .replace(/,/g, '.')
     .replace(/[×x]/gi, '*')
-    .replace(/÷/g, '/');
+    .replace(/÷/g, '/')
+    .replace(/[−–—]/g, '-');
 
-  if (!/^[0-9.+\-*/()]+$/.test(normalized)) return null;
+  if (!/^[0-9.+\-*/()%]+$/.test(normalized)) return null;
 
   let index = 0;
 
@@ -35,10 +36,10 @@ export function evaluateMoneyExpression(value) {
     const number = Number(normalized.slice(start, index));
     return Number.isFinite(number) ? number : null;
   }
-  function parseFactor() {
-    if (consume('+')) return parseFactor();
+  function parsePrimary() {
+    if (consume('+')) return parsePrimary();
     if (consume('-')) {
-      const value = parseFactor();
+      const value = parsePrimary();
       return value === null ? null : -value;
     }
     if (consume('(')) {
@@ -47,6 +48,12 @@ export function evaluateMoneyExpression(value) {
       return value;
     }
     return parseNumber();
+  }
+  function parseFactor() {
+    let value = parsePrimary();
+    if (value === null) return null;
+    while (consume('%')) value /= 100;
+    return value;
   }
   function parseTerm() {
     let value = parseFactor();

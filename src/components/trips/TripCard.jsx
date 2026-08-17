@@ -110,7 +110,7 @@ export function TripCard({
           <Icon name="calendar" size={16} />
           {formatDateRange(trip.startDate, trip.endDate, locale, t('trips.datesTbc'))}
         </p>
-        <p className="trip-card__summary">{trip.summary}</p>
+        {trip.summary && <p className="trip-card__summary">{trip.summary}</p>}
 
         <div className="trip-card__budget">
           <div className="trip-card__budget-label">
@@ -126,7 +126,7 @@ export function TripCard({
             {t(trip.travelers === 1 ? 'trips.traveller' : 'trips.travellers', { count: trip.travelers })}
           </span>
           {!trip.archivedAt && (
-            <Link className="text-link" to={`/trips/${trip.id}`}>
+            <Link className="trip-card__open-planning" to={`/trips/${trip.id}`}>
               {t('trips.openPlanner')} <Icon name="arrowRight" size={16} />
             </Link>
           )}

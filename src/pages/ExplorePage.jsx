@@ -5,6 +5,7 @@ import { Card } from '../components/common/Card.jsx';
 import { Icon } from '../components/common/Icon.jsx';
 import { LocationAutocomplete } from '../components/common/LocationAutocomplete.jsx';
 import { InlineNotice } from '../components/feedback/InlineNotice.jsx';
+import { CreateTripDialog } from '../components/trips/CreateTripDialog.jsx';
 import { useI18n } from '../hooks/useI18n.js';
 import { useTrips } from '../hooks/useTrips.js';
 import { createSavedPlace, SAVED_PLACE_CATEGORIES } from '../utils/savedPlaces.js';
@@ -28,6 +29,7 @@ export function ExplorePage() {
   const [list, setList] = useState('ideas');
   const [query, setQuery] = useState('');
   const [notice, setNotice] = useState(null);
+  const [starterIdea, setStarterIdea] = useState(null);
 
   const allSavedPlaces = useMemo(() => activeTrips
     .flatMap((trip) => (trip.savedPlaces || []).map((place) => ({ ...place, tripId: trip.id, tripName: trip.name })))
@@ -71,10 +73,13 @@ export function ExplorePage() {
   }
 
   function useStarterIdea(destination) {
-    setLocationValue(`${destination.city}, ${destination.country}`);
-    setName(destination.city);
-    setSelectedPlace(null);
-    window.requestAnimationFrame(() => document.getElementById('explore-place-search')?.focus());
+    setStarterIdea({
+      name: destination.city,
+      destination: `${destination.city}, ${destination.country}`,
+      country: destination.country,
+      accent: destination.accent,
+      summary: '',
+    });
   }
 
   return (
@@ -204,12 +209,22 @@ export function ExplorePage() {
                 <span>{t(destination.tagKey)}</span>
                 <h3>{destination.city}</h3>
                 <p>{destination.country} · {t('explore.days', { range: destination.range })}</p>
-                <button className="text-link" type="button" onClick={() => useStarterIdea(destination)}>{t('places.saveIdea')} <Icon name="arrowRight" size={16} /></button>
+                <button className="text-link" type="button" onClick={() => useStarterIdea(destination)}>{t('explore.addIdeaToTrips')} <Icon name="arrowRight" size={16} /></button>
               </div>
             </Card>
           ))}
         </div>
       </section>
+
+      <CreateTripDialog
+        isOpen={Boolean(starterIdea)}
+        initialValues={starterIdea}
+        onClose={() => setStarterIdea(null)}
+        onCreated={(createdTrip) => {
+          setStarterIdea(null);
+          if (createdTrip?.id) navigate(`/trips/${createdTrip.id}`);
+        }}
+      />
     </div>
   );
 }

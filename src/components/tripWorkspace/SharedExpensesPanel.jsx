@@ -57,6 +57,7 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
   const [settlementForm, setSettlementForm] = useState(() => createEmptySettlementForm(participants));
   const [filters, setFilters] = useState({ search: '', participantId: 'all', category: 'all', status: 'all', sort: 'dateDesc' });
   const [notice, setNotice] = useState(null);
+  const [expenseValidationError, setExpenseValidationError] = useState('');
   const [pendingDelete, setPendingDelete] = useState(null);
 
   const summary = useMemo(() => calculateSharedExpenseSummary(trip), [trip]);
@@ -108,6 +109,7 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
 
   function openNewExpense(activity = null) {
     const empty = createEmptyExpenseForm(participants);
+    setExpenseValidationError('');
     setExpenseForm(activity ? applyActivityToExpenseForm(empty, activity, participants) : empty);
     setExpenseModalOpen(true);
   }
@@ -118,6 +120,7 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
       activity.activityId === expense.sourceActivityId
       || (expense.sourceActivitySeriesId && activity.seriesId === expense.sourceActivitySeriesId)
     ));
+    setExpenseValidationError('');
     setExpenseForm({
       id: expense.id,
       label: expense.label,
@@ -138,6 +141,7 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
 
   function updateExpenseField(event) {
     const { name, value } = event.target;
+    setExpenseValidationError('');
     if (name === 'sourceActivityId') {
       const activity = budgetedActivities.find((candidate) => candidate.activityId === value);
       setExpenseForm((current) => activity
@@ -149,21 +153,30 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
   }
 
   function normalizeMoneyField(fieldName) {
-    setExpenseForm((current) => {
-      const normalized = normalizeMoneyExpression(current[fieldName]);
-      return normalized === null ? current : { ...current, [fieldName]: normalized };
-    });
+    const normalized = normalizeMoneyExpression(expenseForm[fieldName]);
+    if (normalized === null) {
+      setExpenseValidationError(t('sharedExpenses.invalidCalculation'));
+      return;
+    }
+    setExpenseValidationError('');
+    setExpenseForm((current) => ({ ...current, [fieldName]: normalized }));
   }
 
   function normalizeShareAmount(participantId) {
-    setExpenseForm((current) => {
-      const normalized = normalizeMoneyExpression(current.shareAmounts[participantId]);
-      if (normalized === null) return current;
-      return { ...current, shareAmounts: { ...current.shareAmounts, [participantId]: normalized } };
-    });
+    const normalized = normalizeMoneyExpression(expenseForm.shareAmounts[participantId]);
+    if (normalized === null) {
+      setExpenseValidationError(t('sharedExpenses.invalidCalculation'));
+      return;
+    }
+    setExpenseValidationError('');
+    setExpenseForm((current) => ({
+      ...current,
+      shareAmounts: { ...current.shareAmounts, [participantId]: normalized },
+    }));
   }
 
   function updateShareAmount(participantId, value) {
+    setExpenseValidationError('');
     setExpenseForm((current) => ({
       ...current,
       shareAmounts: { ...current.shareAmounts, [participantId]: value },
@@ -185,8 +198,17 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
 
   function submitExpense(event) {
     event.preventDefault();
-    const amount = Math.max(0, evaluateMoneyExpression(expenseForm.amount) ?? 0);
-    const paidAmount = Math.min(amount, Math.max(0, evaluateMoneyExpression(expenseForm.paidAmount) ?? 0));
+    const evaluatedAmount = evaluateMoneyExpression(expenseForm.amount);
+    const evaluatedPaidAmount = String(expenseForm.paidAmount || '').trim() === ''
+      ? 0
+      : evaluateMoneyExpression(expenseForm.paidAmount);
+    if (evaluatedAmount === null || evaluatedPaidAmount === null) {
+      setExpenseValidationError(t('sharedExpenses.invalidCalculation'));
+      return;
+    }
+    const amount = Math.max(0, evaluatedAmount);
+    const paidAmount = Math.min(amount, Math.max(0, evaluatedPaidAmount));
+    setExpenseValidationError('');
     const selectedIds = expenseForm.splitBetweenIds.length > 0
       ? expenseForm.splitBetweenIds
       : participants.length === 1
@@ -198,12 +220,17 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
       return;
     }
 
-    const splitShares = expenseForm.splitMode === 'custom'
-      ? selectedIds.map((participantId) => ({
-          participantId,
-          amount: Math.max(0, evaluateMoneyExpression(expenseForm.shareAmounts[participantId]) ?? 0),
-        }))
+    const rawCustomShares = expenseForm.splitMode === 'custom'
+      ? selectedIds.map((participantId) => ({ participantId, value: expenseForm.shareAmounts[participantId] }))
       : [];
+    if (rawCustomShares.some((share) => evaluateMoneyExpression(share.value) === null)) {
+      setExpenseValidationError(t('sharedExpenses.invalidCalculation'));
+      return;
+    }
+    const splitShares = rawCustomShares.map((share) => ({
+      participantId: share.participantId,
+      amount: Math.max(0, evaluateMoneyExpression(share.value) || 0),
+    }));
     const customTotal = splitShares.reduce((sum, share) => sum + share.amount, 0);
     if (expenseForm.splitMode === 'custom' && Math.abs(customTotal - amount) > 0.009) {
       showNotice(
@@ -637,7 +664,8 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
         budgetedActivities={budgetedActivities}
         locale={locale}
         t={t}
-        onClose={() => setExpenseModalOpen(false)}
+        validationError={expenseValidationError}
+        onClose={() => { setExpenseModalOpen(false); setExpenseValidationError(''); }}
         onFieldChange={updateExpenseField}
         onMoneyBlur={normalizeMoneyField}
         onToggleParticipant={toggleSplitParticipant}
@@ -659,7 +687,7 @@ export function SharedExpensesPanel({ trip, onUpdate }) {
   );
 }
 
-function ExpenseDialog({ isOpen, form, participants, currency, itineraryDates, budgetedActivities, locale, t, onClose, onFieldChange, onMoneyBlur, onToggleParticipant, onShareAmountChange, onShareAmountBlur, onSubmit }) {
+function ExpenseDialog({ isOpen, form, participants, currency, itineraryDates, budgetedActivities, locale, t, validationError, onClose, onFieldChange, onMoneyBlur, onToggleParticipant, onShareAmountChange, onShareAmountBlur, onSubmit }) {
   const customTotal = form.splitBetweenIds.reduce(
     (sum, participantId) => sum + Math.max(0, evaluateMoneyExpression(form.shareAmounts[participantId]) ?? 0),
     0,
@@ -672,8 +700,10 @@ function ExpenseDialog({ isOpen, form, participants, currency, itineraryDates, b
       title={form.id ? t('sharedExpenses.editExpense') : t('sharedExpenses.newExpense')}
       description={t('sharedExpenses.expenseFormDescription')}
       onClose={onClose}
+      size="large"
     >
       <form className="workspace-form shared-expense-form" onSubmit={onSubmit}>
+        {validationError && <InlineNotice tone="danger" title={t('sharedExpenses.validationTitle')}>{validationError}</InlineNotice>}
         <div className="workspace-form__grid">
           {budgetedActivities.length > 0 && (
             <label className="workspace-field workspace-form__full activity-budget-picker">
@@ -853,4 +883,3 @@ function getInitials(name) {
 function formatDate(date, locale) {
   return formatLocalizedDate(date, locale, 'short');
 }
-

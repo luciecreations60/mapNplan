@@ -10,34 +10,48 @@ export function toDateKey(date) {
 
 export function getTripCalendarEvents(trip) {
   const events = [];
+  const emittedStaySeries = new Set();
 
   for (const day of trip.itinerary || []) {
     for (const item of day.items || []) {
       if (!day.date) continue;
+
+      // A multi-day accommodation is one calendar event, not one timed event
+      // per night. This prevents false "missing time" warnings for the stay
+      // occurrences that intentionally have no clock time.
+      if (item.type === 'hotel' && item.seriesId) {
+        if (emittedStaySeries.has(item.seriesId) || item.stayRole === 'stay' || item.stayRole === 'checkout') continue;
+        emittedStaySeries.add(item.seriesId);
+      }
+
+      const isAccommodation = item.type === 'hotel';
       events.push({
-        id: `activity-${item.id}`,
+        id: isAccommodation && item.seriesId ? `activity-series-${item.seriesId}` : `activity-${item.id}`,
         sourceId: item.id,
         dayId: day.id,
         source: 'activity',
-        date: day.date,
-        time: item.time || '',
-        endDate: day.date,
-        endTime: '',
+        date: item.stayStartDate || day.date,
+        time: isAccommodation ? (item.checkInTime || item.time || '') : (item.time || ''),
+        endDate: isAccommodation ? (item.stayEndDate || day.date) : day.date,
+        endTime: isAccommodation ? (item.checkOutTime || '') : (item.endTime || ''),
         title: item.title,
         subtitle: item.location || day.title || '',
         location: item.location || '',
         notes: item.notes || '',
-        durationMinutes: Math.max(0, Number(item.durationMinutes) || 0),
+        durationMinutes: isAccommodation ? 0 : Math.max(0, Number(item.durationMinutes) || 0),
         reminderMinutes: item.reminderMinutes ?? null,
         externalCalendarUid: item.externalCalendarUid || '',
         type: item.type || 'map',
         tab: 'itinerary',
+        requiresTime: !isAccommodation,
+        nonBlocking: isAccommodation,
       });
     }
   }
 
   for (const reservation of trip.reservations || []) {
     if (!reservation.startDate) continue;
+    const isAccommodation = reservation.type === 'accommodation';
     events.push({
       id: `reservation-${reservation.id}`,
       sourceId: reservation.id,
@@ -56,6 +70,8 @@ export function getTripCalendarEvents(trip) {
       type: reservation.type || 'activity',
       status: reservation.status,
       tab: 'reservations',
+      requiresTime: !isAccommodation,
+      nonBlocking: isAccommodation,
     });
   }
 

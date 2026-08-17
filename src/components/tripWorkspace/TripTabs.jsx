@@ -126,6 +126,7 @@ export function TripSubNavigation({ activeGroup, activeView, onChange }) {
   if (!group) return null;
 
   const moreIsActive = group.more.some((item) => item.id === activeView);
+  const allItems = [...group.primary, ...group.more];
 
   const renderButton = (item, className = '') => (
     <button
@@ -142,22 +143,27 @@ export function TripSubNavigation({ activeGroup, activeView, onChange }) {
 
   return (
     <nav className="trip-subnav" aria-label={t('workspace.sectionNavigation')}>
-      <div className="trip-subnav__primary">
-        {group.primary.map((item) => renderButton(item))}
+      <div className="trip-subnav__desktop">
+        {allItems.map((item) => renderButton(item))}
       </div>
 
-      {group.more.length > 0 && (
-        <details className="trip-subnav__more" open={moreIsActive || undefined}>
-          <summary className={moreIsActive ? 'trip-subnav__more-summary trip-subnav__more-summary--active' : 'trip-subnav__more-summary'}>
-            <Icon name="more" size={17} />
-            <span>{t('workspace.more')}</span>
-            <Icon name="chevronDown" size={15} />
-          </summary>
-          <div className="trip-subnav__more-menu">
-            {group.more.map((item) => renderButton(item, 'trip-subnav__button--menu'))}
-          </div>
-        </details>
-      )}
+      <div className="trip-subnav__mobile">
+        <div className="trip-subnav__primary">
+          {group.primary.map((item) => renderButton(item))}
+        </div>
+        {group.more.length > 0 && (
+          <details className="trip-subnav__more" open={moreIsActive || undefined}>
+            <summary className={moreIsActive ? 'trip-subnav__more-summary trip-subnav__more-summary--active' : 'trip-subnav__more-summary'}>
+              <Icon name="more" size={17} />
+              <span>{t('workspace.more')}</span>
+              <Icon name="chevronDown" size={15} />
+            </summary>
+            <div className="trip-subnav__more-menu">
+              {group.more.map((item) => renderButton(item, 'trip-subnav__button--menu'))}
+            </div>
+          </details>
+        )}
+      </div>
     </nav>
   );
 }

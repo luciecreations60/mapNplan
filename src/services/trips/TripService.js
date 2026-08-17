@@ -1,4 +1,5 @@
 import { APP_CONFIG } from '../../config/app.config.js';
+import { TRIP_ACCENT_IDS } from '../../config/trip-accents.config.js';
 import { createId } from '../../utils/id.js';
 import { hasValidCoordinates } from '../../utils/map.js';
 import { normalizeExternalUrl } from '../../utils/url.js';
@@ -291,7 +292,7 @@ class TripService {
       checklistTotal: checklist.length > 0
         ? checklist.length
         : Math.max(0, Number(trip.checklistTotal) || 0),
-      accent: ['violet', 'aqua', 'coral'].includes(trip.accent) ? trip.accent : 'violet',
+      accent: TRIP_ACCENT_IDS.includes(trip.accent) ? trip.accent : 'violet',
       coverImageUrl: normalizeExternalUrl(trip.coverImageUrl, { allowDataUrl: true }),
       summary: String(trip.summary || '').trim(),
       sourceTemplateId: trip.sourceTemplateId ? String(trip.sourceTemplateId) : null,
@@ -503,6 +504,7 @@ class TripService {
           ? day.items.map((item) => ({
               id: item.id || createId('activity'),
               time: item.time || '',
+              endTime: String(item.endTime || '').trim(),
               type: String(item.type || 'map').trim(),
               title: String(item.title || 'Activity').trim(),
               location: String(item.location || '').trim(),
@@ -516,6 +518,12 @@ class TripService {
                 : '',
               durationMinutes: Math.max(0, Number(item.durationMinutes) || 0),
               estimatedCost: Math.max(0, Number(item.estimatedCost) || 0),
+              routeDistanceKm: Math.max(0, Number(item.routeDistanceKm) || 0),
+              vehicleType: String(item.vehicleType || '').trim(),
+              fuelType: String(item.fuelType || '').trim(),
+              consumptionLPer100Km: Math.max(0, Number(item.consumptionLPer100Km) || 0),
+              fuelPricePerLiter: Math.max(0, Number(item.fuelPricePerLiter) || 0),
+              tolls: Math.max(0, Number(item.tolls) || 0),
               notes: String(item.notes || '').trim(),
               reminderMinutes: this.#normalizeReminderMinutes(item.reminderMinutes),
               externalCalendarUid: String(item.externalCalendarUid || '').trim(),

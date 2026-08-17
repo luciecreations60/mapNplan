@@ -60,6 +60,7 @@ export function TripWorkspacePage() {
   const [isEditOpen, setEditOpen] = useState(false);
   const [notice, setNotice] = useState(null);
   const [bookingContext, setBookingContext] = useState(null);
+  const [itineraryCreateRequest, setItineraryCreateRequest] = useState(null);
   const tabsRef = useRef(null);
   const shouldFocusTabsRef = useRef(false);
   const trip = getTripById(tripId);
@@ -125,6 +126,12 @@ export function TripWorkspacePage() {
     setSearchParams(nextParams, { replace: true });
   }
 
+  function handleAddCalendarEvent(date) {
+    const targetDate = date || trip.startDate || '';
+    setItineraryCreateRequest({ id: `${Date.now()}-${targetDate}`, date: targetDate });
+    handleTabChange('itinerary');
+  }
+
   function handleOpenBookingContext(context) {
     setBookingContext(context || null);
     handleTabChange('booking');
@@ -184,11 +191,11 @@ export function TripWorkspacePage() {
             onUpdate={handleUpdate}
             onOpenReservation={handleOpenReservation}
             onOpenBooking={handleOpenBookingContext}
-            onRememberBookingSearch={handleRememberBookingSearch}
+            createRequest={itineraryCreateRequest}
           />
         )}
         {activeGroup === 'planning' && activeView === 'route' && <RouteOptimizerPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} />}
-        {activeGroup === 'planning' && activeView === 'calendar' && <CalendarPanel trip={trip} onOpenTab={handleTabChange} onUpdate={handleUpdate} />}
+        {activeGroup === 'planning' && activeView === 'calendar' && <CalendarPanel trip={trip} onOpenTab={handleTabChange} onUpdate={handleUpdate} onAddEvent={handleAddCalendarEvent} />}
         {activeGroup === 'planning' && activeView === 'map' && (
           <MapPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} onOpenBooking={handleOpenBookingContext} onRememberBookingSearch={handleRememberBookingSearch} />
         )}

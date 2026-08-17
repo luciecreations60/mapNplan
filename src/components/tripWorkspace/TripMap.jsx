@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import maplibregl from 'maplibre-gl';
 import { useI18n } from '../../hooks/useI18n.js';
 import { MAP_CONFIG } from '../../config/map.config.js';
@@ -25,6 +25,29 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
   const selectionMarkerRef = useRef(null);
   const clickHandlerRef = useRef(onMapClick);
   const pointSelectHandlerRef = useRef(onPointSelect);
+  const pointsRef = useRef(points);
+  const tRef = useRef(t);
+  const lastViewportSignatureRef = useRef('');
+
+  pointsRef.current = points;
+  tRef.current = t;
+
+  const markerSignature = useMemo(() => (points || []).map((point) => [
+    point.id,
+    point.latitude,
+    point.longitude,
+    point.title,
+    point.subtitle,
+    point.type,
+    point.source,
+    point.transportMode,
+  ].join('|')).join('::'), [points]);
+
+  const viewportSignature = useMemo(() => (points || []).map((point) => [
+    point.id,
+    point.latitude,
+    point.longitude,
+  ].join('|')).join('::'), [points]);
 
   useEffect(() => { clickHandlerRef.current = onMapClick; }, [onMapClick]);
   useEffect(() => { pointSelectHandlerRef.current = onPointSelect; }, [onPointSelect]);
@@ -42,7 +65,10 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
     });
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
-    map.on('load', () => applyMapLanguage(map, language));
+    map.on('load', () => {
+      applyMapLanguage(map, language);
+      window.requestAnimationFrame(() => map.resize());
+    });
     map.on('styledata', () => applyMapLanguage(map, language));
     map.on('click', (event) => {
       if (!clickHandlerRef.current) return;
@@ -50,10 +76,15 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
     });
 
     mapRef.current = map;
-    const resizeObserver = new ResizeObserver(() => map.resize());
+    let resizeFrame = null;
+    const resizeObserver = new ResizeObserver(() => {
+      if (resizeFrame) window.cancelAnimationFrame(resizeFrame);
+      resizeFrame = window.requestAnimationFrame(() => map.resize());
+    });
     resizeObserver.observe(containerRef.current);
 
     return () => {
+      if (resizeFrame) window.cancelAnimationFrame(resizeFrame);
       resizeObserver.disconnect();
       markersRef.current.forEach(({ marker }) => marker.remove());
       selectionMarkerRef.current?.remove();
@@ -61,6 +92,7 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
       mapRef.current = null;
       markersRef.current = [];
       selectionMarkerRef.current = null;
+      lastViewportSignatureRef.current = '';
     };
   }, []);
 
@@ -75,17 +107,13 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
+    const currentPoints = pointsRef.current || [];
 
     markersRef.current.forEach(({ marker }) => marker.remove());
     markersRef.current = [];
 
-    if (points.length === 0) {
-      map.easeTo({ center: MAP_CONFIG.defaultCenter, zoom: MAP_CONFIG.defaultZoom, duration: 350 });
-      return;
-    }
-
     const bounds = new maplibregl.LngLatBounds();
-    points.forEach((point, index) => {
+    currentPoints.forEach((point, index) => {
       const longitude = Number(point.longitude);
       const latitude = Number(point.latitude);
       if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
@@ -107,42 +135,64 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
 
       const marker = new maplibregl.Marker({ element, anchor: 'bottom' })
         .setLngLat(coordinates)
-        .setPopup(new maplibregl.Popup({ offset: 18, closeButton: false }).setDOMContent(createPopupNode(point, t)))
+        .setPopup(new maplibregl.Popup({ offset: 18, closeButton: false }).setDOMContent(createPopupNode(point, tRef.current)))
         .addTo(map);
       markersRef.current.push({ id: point.id, marker, element });
     });
-
-    if (bounds.isEmpty()) return;
-    if (points.length === 1) map.easeTo({ center: bounds.getCenter(), zoom: MAP_CONFIG.focusedZoom, duration: 450 });
-    else map.fitBounds(bounds, { padding: 54, maxZoom: MAP_CONFIG.tripOverviewZoom, duration: 500 });
-  }, [points, t]);
+  }, [markerSignature]);
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !focusedPointId) return;
-    const point = points.find((candidate) => candidate.id === focusedPointId);
+    const currentPoints = pointsRef.current || [];
+    if (!map || lastViewportSignatureRef.current === viewportSignature) return;
+    lastViewportSignatureRef.current = viewportSignature;
+
+    if (currentPoints.length === 0) {
+      map.easeTo({ center: MAP_CONFIG.defaultCenter, zoom: MAP_CONFIG.defaultZoom, duration: 250 });
+      return;
+    }
+
+    const bounds = new maplibregl.LngLatBounds();
+    currentPoints.forEach((point) => {
+      const longitude = Number(point.longitude);
+      const latitude = Number(point.latitude);
+      if (Number.isFinite(latitude) && Number.isFinite(longitude)) bounds.extend([longitude, latitude]);
+    });
+    if (bounds.isEmpty()) return;
+    if (currentPoints.length === 1) map.easeTo({ center: bounds.getCenter(), zoom: MAP_CONFIG.focusedZoom, duration: 350 });
+    else map.fitBounds(bounds, { padding: 54, maxZoom: MAP_CONFIG.tripOverviewZoom, duration: 400 });
+  }, [viewportSignature]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    markersRef.current.forEach(({ id, element }) => element.classList.toggle('maplibre-point-marker--focused', id === focusedPointId));
+    if (!focusedPointId) return;
+    const point = (pointsRef.current || []).find((candidate) => candidate.id === focusedPointId);
     if (!point) return;
     const latitude = Number(point.latitude);
     const longitude = Number(point.longitude);
     if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
-
-    markersRef.current.forEach(({ id, element }) => element.classList.toggle('maplibre-point-marker--focused', id === focusedPointId));
     map.flyTo({ center: [longitude, latitude], zoom: Math.max(map.getZoom(), MAP_CONFIG.focusedZoom), speed: 1.25, essential: true });
-  }, [focusedPointId, points]);
+  }, [focusedPointId, viewportSignature]);
+
+  const selectionSignature = selection && Number.isFinite(selection.latitude) && Number.isFinite(selection.longitude)
+    ? `${selection.latitude}|${selection.longitude}`
+    : '';
 
   useEffect(() => {
     const map = mapRef.current;
     selectionMarkerRef.current?.remove();
     selectionMarkerRef.current = null;
-    if (!map || !selection || !Number.isFinite(selection.latitude) || !Number.isFinite(selection.longitude)) return;
+    if (!map || !selectionSignature) return;
 
-    const coordinates = [selection.longitude, selection.latitude];
-    const element = createMapMarkerElement({ color: '#f4a62a', size: 24, label: t('map.selectedPoint'), number: '+' });
+    const [latitude, longitude] = selectionSignature.split('|').map(Number);
+    const coordinates = [longitude, latitude];
+    const element = createMapMarkerElement({ color: '#f4a62a', size: 24, label: tRef.current('map.selectedPoint'), number: '+' });
     element.classList.add('maplibre-point-marker--selected');
     selectionMarkerRef.current = new maplibregl.Marker({ element, anchor: 'bottom' }).setLngLat(coordinates).addTo(map);
-
     map.flyTo({ center: coordinates, zoom: Math.max(map.getZoom(), MAP_CONFIG.focusedZoom), speed: 1.25, essential: true });
-  }, [selection, t]);
+  }, [selectionSignature]);
 
   return <div ref={containerRef} className="trip-map" aria-label={t('map.aria')} />;
 }

@@ -5549,3 +5549,300 @@
     flex-direction: column;
   }
 }
+
+/* ========================================================================== */
+/* Part 31 — Chrome desktop polish, compact planning and no-reentry flows     */
+/* ========================================================================== */
+
+/* Trip creation: one range picker and colour previews. */
+.date-range-field,
+.trip-accent-picker {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+}
+
+.date-range-field__trigger,
+.trip-accent-picker__trigger {
+  display: grid;
+  width: 100%;
+  min-height: 44px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.date-range-field__trigger:focus-visible,
+.trip-accent-picker__trigger:focus-visible {
+  outline: 0;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 14%, transparent);
+}
+
+.date-range-field__popover,
+.trip-accent-picker__menu {
+  position: absolute;
+  z-index: 80;
+  top: calc(100% + 7px);
+  left: 0;
+  width: min(390px, calc(100vw - 48px));
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.date-range-field__header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.date-range-field__instruction {
+  margin: 0 0 8px;
+  color: var(--color-text-muted);
+  font-size: .69rem;
+  line-height: 1.45;
+}
+
+.date-range-field__weekdays,
+.date-range-field__calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px;
+}
+
+.date-range-field__weekdays span {
+  padding: 4px 0;
+  color: var(--color-text-soft);
+  font-size: .62rem;
+  font-weight: 750;
+  text-align: center;
+}
+
+.date-range-field__day {
+  min-width: 0;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 9px;
+  color: var(--color-text);
+  background: transparent;
+  font: inherit;
+  font-size: .72rem;
+  cursor: pointer;
+}
+
+.date-range-field__day:hover { background: var(--color-primary-soft); }
+.date-range-field__day--outside { color: var(--color-text-soft); opacity: .5; }
+.date-range-field__day--range { border-radius: 3px; background: color-mix(in srgb, var(--color-primary) 11%, var(--color-surface)); }
+.date-range-field__day--selected { color: #fff; background: var(--brand-gradient); font-weight: 800; }
+.date-range-field--error .date-range-field__trigger { border-color: var(--color-danger); }
+
+.trip-accent-picker__menu { width: min(310px, calc(100vw - 48px)); }
+.trip-accent-picker__swatch {
+  width: 30px;
+  height: 24px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(255,255,255,.55);
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px var(--color-border);
+}
+.trip-accent-picker__menu { display: grid; gap: 4px; }
+.trip-accent-picker__option {
+  display: grid;
+  width: 100%;
+  min-height: 43px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 10px;
+  color: var(--color-text);
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.trip-accent-picker__option:hover,
+.trip-accent-picker__option--active { background: var(--brand-gradient-soft); }
+
+/* Trip cards: make the main action obvious without changing the identity. */
+.trip-card__open-planning {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  border-radius: 10px;
+  color: #fff;
+  background: var(--brand-gradient);
+  box-shadow: 0 8px 18px rgba(31, 144, 173, .16);
+  font-size: .72rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+.trip-card__open-planning:hover { filter: brightness(.97); transform: translateY(-1px); }
+
+/* Desktop shows every contextual sub-tab; “More” remains a mobile affordance. */
+.trip-subnav__desktop {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.trip-subnav__mobile { display: none; width: 100%; }
+
+/* Itinerary: compact form and clearly delimited activity blocks. */
+.itinerary-item {
+  grid-template-columns: 58px 42px minmax(0, 1fr) auto;
+  grid-template-areas: "time icon content actions";
+  gap: 13px;
+  margin: 10px 0;
+  padding: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 15px;
+  background: var(--color-surface);
+}
+.itinerary-item:not(:last-child) { border-bottom: 1px solid var(--color-border); }
+.itinerary-item > time { grid-area: time; }
+.itinerary-item > .itinerary-item__icon { grid-area: icon; }
+.itinerary-item > .itinerary-item__content { grid-area: content; }
+.itinerary-item > .item-actions {
+  grid-area: actions;
+  display: grid;
+  width: auto;
+  grid-template-columns: repeat(2, 36px);
+  align-self: start;
+  justify-self: end;
+  gap: 6px;
+  padding: 0;
+}
+.itinerary-item > .item-actions .icon-button { width: 36px; min-width: 36px; height: 36px; }
+.itinerary-item--hotel {
+  border-color: color-mix(in srgb, #7559c8 25%, var(--color-border));
+  background: color-mix(in srgb, #7559c8 3.5%, var(--color-surface));
+}
+.itinerary-item--stay-continuation,
+.itinerary-item--stay-checkout {
+  border-color: color-mix(in srgb, #7559c8 25%, var(--color-border));
+  background: color-mix(in srgb, #7559c8 6%, var(--color-surface));
+}
+
+.transport-cost-calculator {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 18%, var(--color-border));
+  border-radius: 14px;
+  background: var(--brand-gradient-soft);
+}
+.transport-cost-calculator__actions {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+}
+
+/* Calendar is useful before the first event too. */
+.calendar-panel__heading-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.calendar-agenda__empty { gap: 8px; }
+.calendar-agenda__empty p { margin: 0; }
+
+/* Expense dialog: use the available desktop space and keep scrolling internal. */
+@media (min-width: 761px) {
+  .modal--large {
+    width: min(1120px, calc(100vw - 64px));
+    max-height: calc(100vh - 48px);
+    overflow: hidden;
+  }
+  .modal--large .modal__body {
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+  .shared-expense-form { width: 100%; min-width: 0; }
+  .shared-expense-form .workspace-form__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 16px;
+  }
+  .shared-expense-form .workspace-form__wide,
+  .shared-expense-form .workspace-form__full,
+  .shared-expense-form .participant-split-field {
+    grid-column: 1 / -1;
+  }
+  .shared-expense-form textarea { min-height: 76px; }
+}
+
+@media (max-width: 760px) {
+  .trip-subnav__desktop { display: none; }
+  .trip-subnav__mobile { display: grid; gap: 7px; }
+  .transport-cost-calculator { grid-template-columns: 1fr 1fr; }
+  .calendar-panel__heading-actions { width: 100%; justify-content: space-between; }
+  .itinerary-item {
+    grid-template-columns: 50px 38px minmax(0, 1fr);
+    grid-template-areas:
+      "time icon content"
+      ". . actions";
+    padding: 12px;
+  }
+  .itinerary-item > .item-actions {
+    width: 100%;
+    grid-template-columns: repeat(4, minmax(40px, 1fr));
+    justify-self: stretch;
+  }
+}
+
+@media (max-width: 520px) {
+  .transport-cost-calculator { grid-template-columns: 1fr; }
+  .transport-cost-calculator__actions { grid-column: 1; }
+  .workspace-form__actions { align-items: stretch; flex-direction: column-reverse; }
+  .workspace-form__actions .button { width: 100%; }
+  .date-range-field__popover,
+  .trip-accent-picker__menu { position: fixed; z-index: 120; inset: auto 12px 12px; width: auto; max-height: min(70vh, 520px); overflow-y: auto; }
+}
+.transport-cost-calculator__grid {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.transport-cost-calculator legend {
+  padding: 0 6px;
+  color: var(--color-text);
+  font-size: .76rem;
+  font-weight: 800;
+}
+@media (max-width: 760px) { .transport-cost-calculator__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .transport-cost-calculator__grid { grid-template-columns: 1fr; } }
+@media (min-width: 761px) {
+  .itinerary-item > .item-actions {
+    display: flex;
+    width: auto;
+    grid-template-columns: none;
+    flex-wrap: nowrap;
+  }
+}

@@ -4,10 +4,12 @@ import { useI18n } from '../../hooks/useI18n.js';
 import { geocodingService } from '../../services/geocoding/GeocodingService.js';
 import { createTripCoverDataUrl } from '../../utils/image.js';
 import { Button } from '../common/Button.jsx';
+import { DateRangeField } from '../common/DateRangeField.jsx';
 import { LocationAutocomplete } from '../common/LocationAutocomplete.jsx';
 import { Modal } from '../common/Modal.jsx';
 import { TextField } from '../common/TextField.jsx';
 import { InlineNotice } from '../feedback/InlineNotice.jsx';
+import { TripAccentPicker } from './TripAccentPicker.jsx';
 
 const EMPTY_FORM = Object.freeze({
   name: '', destination: '', destinationLatitude: '', destinationLongitude: '',
@@ -15,24 +17,23 @@ const EMPTY_FORM = Object.freeze({
   budget: 0, currency: 'EUR', destinationCurrency: 'EUR', accent: 'violet',
   summary: '', coverImageUrl: '',
 });
-const ACCENTS = Object.freeze(['violet', 'aqua', 'coral']);
 
 /** Shared trip form used for both creation and edition. */
-export function TripFormDialog({ isOpen, mode = 'create', trip = null, onSubmit, onClose }) {
+export function TripFormDialog({ isOpen, mode = 'create', trip = null, initialValues = null, onSubmit, onClose }) {
   const { language, locale, t } = useI18n();
   const currencyNames = useMemo(() => new Intl.DisplayNames([locale], { type: 'currency' }), [locale]);
-  const [form, setForm] = useState(() => buildForm(trip));
+  const [form, setForm] = useState(() => buildForm(trip, initialValues));
   const [submitted, setSubmitted] = useState(false);
   const [isSaving, setSaving] = useState(false);
   const [coverError, setCoverError] = useState('');
 
   useEffect(() => {
     if (!isOpen) return;
-    setForm(buildForm(trip));
+    setForm(buildForm(trip, initialValues));
     setSubmitted(false);
     setSaving(false);
     setCoverError('');
-  }, [isOpen, trip]);
+  }, [initialValues, isOpen, trip]);
 
   const errors = useMemo(() => ({
     name: !form.name.trim() ? t('createTrip.nameRequired') : '',
@@ -140,13 +141,29 @@ export function TripFormDialog({ isOpen, mode = 'create', trip = null, onSubmit,
           <TextField id="trip-country" label={t('createTrip.country')} name="country" placeholder={t('createTrip.countryPlaceholder')} value={form.country} onChange={updateField} />
           <TextField id="trip-country-code" label={t('editTrip.countryCode')} name="countryCode" placeholder="FR, JP, US…" maxLength="3" value={form.countryCode} onChange={updateField} />
           <TextField id="trip-travelers" label={t('createTrip.travellers')} name="travelers" type="number" min="1" max="30" value={form.travelers} onChange={updateField} />
-          <TextField id="trip-start" label={t('createTrip.departure')} name="startDate" type="date" value={form.startDate} error={submitted ? errors.startDate : ''} onChange={updateField} />
-          <TextField id="trip-end" label={t('createTrip.return')} name="endDate" type="date" value={form.endDate} error={submitted ? errors.endDate : ''} onChange={updateField} />
+          <DateRangeField
+            label={t('createTrip.travelDates')}
+            startDate={form.startDate}
+            endDate={form.endDate}
+            locale={locale}
+            error={submitted ? (errors.startDate || errors.endDate) : ''}
+            startLabel={t('createTrip.departure')}
+            endLabel={t('createTrip.return')}
+            previousMonthLabel={t('createTrip.previousMonth')}
+            nextMonthLabel={t('createTrip.nextMonth')}
+            instruction={t('createTrip.dateRangeHint')}
+            onChange={({ startDate, endDate }) => setForm((current) => ({ ...current, startDate, endDate }))}
+          />
           <TextField id="trip-budget" label={t('createTrip.budget')} name="budget" type="number" min="0" step="50" value={form.budget} onChange={updateField} />
 
           <div className="field"><label className="field__label" htmlFor="trip-currency">{t('createTrip.budgetCurrency')}</label><select id="trip-currency" className="field__input" name="currency" value={form.currency} onChange={updateField}>{SUPPORTED_CURRENCIES.map((currency) => <option key={currency.code} value={currency.code}>{currency.code} — {currencyNames.of(currency.code) || currency.label}</option>)}</select></div>
           <div className="field"><label className="field__label" htmlFor="trip-destination-currency">{t('createTrip.destinationCurrency')}</label><select id="trip-destination-currency" className="field__input" name="destinationCurrency" value={form.destinationCurrency} onChange={updateField}>{SUPPORTED_CURRENCIES.map((currency) => <option key={currency.code} value={currency.code}>{currency.code} — {currencyNames.of(currency.code) || currency.label}</option>)}</select></div>
-          <div className="field"><label className="field__label" htmlFor="trip-accent">{t('editTrip.accent')}</label><select id="trip-accent" className="field__input" name="accent" value={form.accent} onChange={updateField}>{ACCENTS.map((accent) => <option key={accent} value={accent}>{t(`editTrip.accents.${accent}`)}</option>)}</select></div>
+          <TripAccentPicker
+            value={form.accent}
+            label={t('editTrip.accent')}
+            getLabel={(accent) => t(`editTrip.accents.${accent}`)}
+            onChange={(accent) => setForm((current) => ({ ...current, accent }))}
+          />
 
           <div className="field trip-form__full trip-cover-field">
             <span className="field__label">{t('editTrip.coverImage')}</span>
@@ -169,8 +186,8 @@ export function TripFormDialog({ isOpen, mode = 'create', trip = null, onSubmit,
   );
 }
 
-function buildForm(trip) {
-  if (!trip) return { ...EMPTY_FORM };
+function buildForm(trip, initialValues = null) {
+  if (!trip) return { ...EMPTY_FORM, ...(initialValues || {}) };
   return {
     name: trip.name || '', destination: trip.destination || '', destinationLatitude: trip.destinationLatitude ?? '',
     destinationLongitude: trip.destinationLongitude ?? '', country: trip.country || '', countryCode: trip.countryCode || '',

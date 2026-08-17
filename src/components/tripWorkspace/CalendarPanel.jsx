@@ -32,7 +32,7 @@ const EVENT_ICONS = {
   calendar: 'calendar',
 };
 
-export function CalendarPanel({ trip, onOpenTab, onUpdate }) {
+export function CalendarPanel({ trip, onOpenTab, onUpdate, onAddEvent = null }) {
   const { locale, t } = useI18n();
   const fileInputRef = useRef(null);
   const [visibleMonth, setVisibleMonth] = useState(() => getInitialCalendarMonth(trip));
@@ -139,7 +139,9 @@ export function CalendarPanel({ trip, onOpenTab, onUpdate }) {
           <h2>{t('calendar.title')}</h2>
           <p>{t('calendar.intro')}</p>
         </div>
-        <div className="calendar-panel__navigation" aria-label={t('calendar.monthNavigation')}>
+        <div className="calendar-panel__heading-actions">
+          <Button size="small" icon="plus" onClick={() => onAddEvent?.(selectedDate)}>{t('calendar.addEvent')}</Button>
+          <div className="calendar-panel__navigation" aria-label={t('calendar.monthNavigation')}>
           <button className="icon-button icon-button--small" type="button" aria-label={t('calendar.previousMonth')} onClick={() => setVisibleMonth((month) => shiftCalendarMonth(month, -1))}>
             <Icon name="arrowLeft" size={17} />
           </button>
@@ -147,6 +149,7 @@ export function CalendarPanel({ trip, onOpenTab, onUpdate }) {
           <button className="icon-button icon-button--small" type="button" aria-label={t('calendar.nextMonth')} onClick={() => setVisibleMonth((month) => shiftCalendarMonth(month, 1))}>
             <Icon name="arrowRight" size={17} />
           </button>
+          </div>
         </div>
       </section>
 
@@ -251,17 +254,7 @@ export function CalendarPanel({ trip, onOpenTab, onUpdate }) {
         </section>
       )}
 
-      {events.length === 0 ? (
-        <div className="workspace-large-empty workspace-large-empty--compact">
-          <span><Icon name="calendarRange" size={28} /></span>
-          <h3>{t('calendar.emptyTitle')}</h3>
-          <p>{t('calendar.emptyText')}</p>
-          <button className="button button--primary button--small" type="button" onClick={() => onOpenTab('itinerary')}>
-            <Icon name="plus" size={16} /> {t('calendar.addActivity')}
-          </button>
-        </div>
-      ) : (
-        <div className="calendar-layout">
+      <div className="calendar-layout">
           <div className="calendar-grid-wrap">
             <div className="calendar-weekdays" aria-hidden="true">
               {weekdayLabels.map((label) => <span key={label}>{label}</span>)}
@@ -350,11 +343,11 @@ export function CalendarPanel({ trip, onOpenTab, onUpdate }) {
               <div className="calendar-agenda__empty">
                 <Icon name="calendar" size={24} />
                 <p>{t('calendar.noEvents')}</p>
+                <Button size="small" icon="plus" onClick={() => onAddEvent?.(selectedDate)}>{t('calendar.addEvent')}</Button>
               </div>
             )}
           </aside>
         </div>
-      )}
     </div>
   );
 }

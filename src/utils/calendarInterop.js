@@ -56,7 +56,7 @@ export function analyseCalendarEvents(events, trip) {
     const start = toLocalDateTime(event.date, event.time);
     const end = getCalendarEventEnd(event);
 
-    if (!event.time) {
+    if (!event.time && event.requiresTime !== false) {
       issues.push({ id: `missing-time-${event.id}`, type: 'missingTime', eventIds: [event.id], date: event.date });
     }
 
@@ -70,7 +70,7 @@ export function analyseCalendarEvents(events, trip) {
       continue;
     }
 
-    if (start && end && event.time) timedEvents.push({ event, start, end });
+    if (start && end && event.time && !event.nonBlocking) timedEvents.push({ event, start, end });
   }
 
   const grouped = timedEvents.reduce((result, entry) => {
