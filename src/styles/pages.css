@@ -5975,3 +5975,52 @@
 .reservation-card__headline-actions { display:flex; flex:0 0 auto; align-items:center; gap:6px; }
 .reservation-card__actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin-top:10px; }
 .reservation-card__amount-sync { font-weight:750; }
+
+/* ========================================================================== */
+/* Part 34 — Chrome MapLibre stability hotfix                                 */
+/* ========================================================================== */
+.map-card--interactive {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-self: start;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.map-card--interactive .trip-map--stable {
+  width: 100%;
+  height: clamp(520px, 62vh, 690px);
+  min-height: 0;
+  contain: layout paint;
+  isolation: isolate;
+}
+
+.map-card--interactive .trip-map--stable .maplibregl-map,
+.map-card--interactive .trip-map--stable .maplibregl-canvas-container,
+.map-card--interactive .trip-map--stable .maplibregl-canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.map-card__instruction {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 8px 2px;
+  color: var(--color-text-muted);
+  font-size: .75rem;
+  line-height: 1.35;
+}
+
+@media (max-width: 1100px) {
+  .map-card--interactive .trip-map--stable { height: clamp(480px, 58vh, 620px); }
+}
+
+@media (max-width: 720px) {
+  .map-card--interactive .trip-map--stable { height: 460px; }
+}
+
+@media (max-width: 520px) {
+  .map-card--interactive .trip-map--stable { height: 390px; }
+}

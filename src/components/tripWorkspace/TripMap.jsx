@@ -17,31 +17,28 @@ const TYPE_COLORS = Object.freeze({
   savedPlace: '#d89422',
 });
 
-function whenMapLoaded(map, callback) {
-  if (!map) return () => {};
-  if (map.loaded()) {
-    callback();
-    return () => {};
-  }
-  map.once('load', callback);
-  return () => map.off('load', callback);
-}
-
 export function TripMap({ points, onMapClick = null, onPointSelect = null, selection = null, focusedPointId = null }) {
   const { language, t } = useI18n();
   const containerRef = useRef(null);
   const mapRef = useRef(null);
+  const mapReadyRef = useRef(false);
   const markersRef = useRef([]);
   const selectionMarkerRef = useRef(null);
   const clickHandlerRef = useRef(onMapClick);
   const pointSelectHandlerRef = useRef(onPointSelect);
-  const pointsRef = useRef(points);
+  const pointsRef = useRef(points || []);
+  const languageRef = useRef(language);
   const tRef = useRef(t);
+  const focusedPointIdRef = useRef(focusedPointId);
+  const selectionRef = useRef(selection);
   const lastViewportSignatureRef = useRef('');
-  const lastContainerSizeRef = useRef({ width: 0, height: 0 });
+  const lastContainerWidthRef = useRef(0);
 
-  pointsRef.current = points;
+  pointsRef.current = points || [];
+  languageRef.current = language;
   tRef.current = t;
+  focusedPointIdRef.current = focusedPointId;
+  selectionRef.current = selection;
 
   const markerSignature = useMemo(() => (points || []).map((point) => [
     point.id,
@@ -60,14 +57,19 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
     point.longitude,
   ].join('|')).join('::'), [points]);
 
+  const selectionSignature = selection && Number.isFinite(selection.latitude) && Number.isFinite(selection.longitude)
+    ? `${selection.latitude}|${selection.longitude}`
+    : '';
+
   useEffect(() => { clickHandlerRef.current = onMapClick; }, [onMapClick]);
   useEffect(() => { pointSelectHandlerRef.current = onPointSelect; }, [onPointSelect]);
 
   useEffect(() => {
-    if (!containerRef.current || mapRef.current) return undefined;
+    const container = containerRef.current;
+    if (!container || mapRef.current) return undefined;
 
     const map = new maplibregl.Map({
-      container: containerRef.current,
+      container,
       style: MAP_CONFIG.styleUrl,
       center: MAP_CONFIG.defaultCenter,
       zoom: MAP_CONFIG.defaultZoom,
@@ -75,148 +77,194 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
       attributionControl: true,
     });
 
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
-    map.on('load', () => window.requestAnimationFrame(() => map.resize()));
-    map.on('click', (event) => {
-      if (!clickHandlerRef.current) return;
-      clickHandlerRef.current({ latitude: Number(event.lngLat.lat), longitude: Number(event.lngLat.lng) });
-    });
-
     mapRef.current = map;
-    let resizeFrame = null;
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+
+    const handleClick = (event) => {
+      if (!clickHandlerRef.current) return;
+      clickHandlerRef.current({
+        latitude: Number(event.lngLat.lat),
+        longitude: Number(event.lngLat.lng),
+      });
+    };
+
+    const handleLoad = () => {
+      mapReadyRef.current = true;
+      applyMapLanguage(map, languageRef.current);
+      rebuildMarkers(map, pointsRef.current, markersRef, pointSelectHandlerRef, tRef);
+      applyInitialViewport(map, pointsRef.current, viewportSignature, lastViewportSignatureRef);
+      syncFocusedPoint(map, pointsRef.current, focusedPointIdRef.current, markersRef);
+      syncSelection(map, selectionRef.current, selectionMarkerRef, tRef);
+      window.requestAnimationFrame(() => map.resize());
+    };
+
+    map.on('click', handleClick);
+    map.once('load', handleLoad);
+
+    // Only width changes need a MapLibre resize here. The map has a stable CSS
+    // height, so observing height as well can create a ResizeObserver/layout
+    // feedback loop in Chrome when the card and canvas size each other.
+    let resizeFrame = 0;
     const resizeObserver = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (!entry) return;
-      const width = Math.round(entry.contentRect.width);
-      const height = Math.round(entry.contentRect.height);
-      const previous = lastContainerSizeRef.current;
-      if (Math.abs(previous.width - width) < 2 && Math.abs(previous.height - height) < 2) return;
-      lastContainerSizeRef.current = { width, height };
+      const width = Math.round(entries[0]?.contentRect?.width || 0);
+      if (!width || Math.abs(width - lastContainerWidthRef.current) < 2) return;
+      lastContainerWidthRef.current = width;
+      if (!mapReadyRef.current) return;
       if (resizeFrame) window.cancelAnimationFrame(resizeFrame);
       resizeFrame = window.requestAnimationFrame(() => map.resize());
     });
-    resizeObserver.observe(containerRef.current);
+    resizeObserver.observe(container);
 
     return () => {
       if (resizeFrame) window.cancelAnimationFrame(resizeFrame);
       resizeObserver.disconnect();
+      map.off('click', handleClick);
+      map.off('load', handleLoad);
       markersRef.current.forEach(({ marker }) => marker.remove());
+      markersRef.current = [];
       selectionMarkerRef.current?.remove();
+      selectionMarkerRef.current = null;
+      mapReadyRef.current = false;
+      lastViewportSignatureRef.current = '';
+      lastContainerWidthRef.current = 0;
       map.remove();
       mapRef.current = null;
-      markersRef.current = [];
-      selectionMarkerRef.current = null;
-      lastViewportSignatureRef.current = '';
-      lastContainerSizeRef.current = { width: 0, height: 0 };
     };
   }, []);
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map) return undefined;
-    return whenMapLoaded(map, () => applyMapLanguage(map, language));
+    if (!map || !mapReadyRef.current || !map.isStyleLoaded()) return;
+    applyMapLanguage(map, language);
   }, [language]);
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map) return undefined;
-
-    return whenMapLoaded(map, () => {
-      const currentPoints = pointsRef.current || [];
-      markersRef.current.forEach(({ marker }) => marker.remove());
-      markersRef.current = [];
-
-      currentPoints.forEach((point, index) => {
-        const longitude = Number(point.longitude);
-        const latitude = Number(point.latitude);
-        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
-
-        const coordinates = [longitude, latitude];
-        const element = createMapMarkerElement({
-          color: getPointColor(point),
-          size: point.source === 'destination' ? 22 : 20,
-          label: `${index + 1}. ${point.title}`,
-          number: index + 1,
-        });
-        element.dataset.pointId = point.id;
-        element.addEventListener('click', (event) => {
-          event.stopPropagation();
-          map.flyTo({ center: coordinates, zoom: MAP_CONFIG.focusedZoom, essential: true });
-          pointSelectHandlerRef.current?.(point);
-        });
-
-        const marker = new maplibregl.Marker({ element, anchor: 'bottom' })
-          .setLngLat(coordinates)
-          .setPopup(new maplibregl.Popup({ offset: 18, closeButton: false }).setDOMContent(createPopupNode(point, tRef.current)))
-          .addTo(map);
-        markersRef.current.push({ id: point.id, marker, element });
-      });
-    });
+    if (!map || !mapReadyRef.current) return;
+    rebuildMarkers(map, pointsRef.current, markersRef, pointSelectHandlerRef, tRef);
+    syncFocusedPoint(map, pointsRef.current, focusedPointIdRef.current, markersRef);
   }, [markerSignature]);
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || lastViewportSignatureRef.current === viewportSignature) return undefined;
-
-    return whenMapLoaded(map, () => {
-      if (lastViewportSignatureRef.current === viewportSignature) return;
-      lastViewportSignatureRef.current = viewportSignature;
-      const currentPoints = pointsRef.current || [];
-
-      if (currentPoints.length === 0) {
-        map.jumpTo({ center: MAP_CONFIG.defaultCenter, zoom: MAP_CONFIG.defaultZoom });
-        return;
-      }
-
-      const bounds = new maplibregl.LngLatBounds();
-      currentPoints.forEach((point) => {
-        const longitude = Number(point.longitude);
-        const latitude = Number(point.latitude);
-        if (Number.isFinite(latitude) && Number.isFinite(longitude)) bounds.extend([longitude, latitude]);
-      });
-      if (bounds.isEmpty()) return;
-      if (currentPoints.length === 1) map.jumpTo({ center: bounds.getCenter(), zoom: MAP_CONFIG.focusedZoom });
-      else map.fitBounds(bounds, { padding: 54, maxZoom: MAP_CONFIG.tripOverviewZoom, duration: 0 });
-    });
+    if (!map || !mapReadyRef.current || lastViewportSignatureRef.current === viewportSignature) return;
+    applyInitialViewport(map, pointsRef.current, viewportSignature, lastViewportSignatureRef);
   }, [viewportSignature]);
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map) return undefined;
-    return whenMapLoaded(map, () => {
-      markersRef.current.forEach(({ id, element }) => element.classList.toggle('maplibre-point-marker--focused', id === focusedPointId));
-      if (!focusedPointId) return;
-      const point = (pointsRef.current || []).find((candidate) => candidate.id === focusedPointId);
-      if (!point) return;
-      const latitude = Number(point.latitude);
-      const longitude = Number(point.longitude);
-      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
-      map.flyTo({ center: [longitude, latitude], zoom: Math.max(map.getZoom(), MAP_CONFIG.focusedZoom), speed: 1.25, essential: true });
-    });
-  }, [focusedPointId, viewportSignature]);
-
-  const selectionSignature = selection && Number.isFinite(selection.latitude) && Number.isFinite(selection.longitude)
-    ? `${selection.latitude}|${selection.longitude}`
-    : '';
+    if (!map || !mapReadyRef.current) return;
+    syncFocusedPoint(map, pointsRef.current, focusedPointId, markersRef, true);
+  }, [focusedPointId]);
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map) return undefined;
-    return whenMapLoaded(map, () => {
-      selectionMarkerRef.current?.remove();
-      selectionMarkerRef.current = null;
-      if (!selectionSignature) return;
-
-      const [latitude, longitude] = selectionSignature.split('|').map(Number);
-      const coordinates = [longitude, latitude];
-      const element = createMapMarkerElement({ color: '#f4a62a', size: 24, label: tRef.current('map.selectedPoint'), number: '+' });
-      element.classList.add('maplibre-point-marker--selected');
-      selectionMarkerRef.current = new maplibregl.Marker({ element, anchor: 'bottom' }).setLngLat(coordinates).addTo(map);
-      map.flyTo({ center: coordinates, zoom: Math.max(map.getZoom(), MAP_CONFIG.focusedZoom), speed: 1.25, essential: true });
-    });
+    if (!map || !mapReadyRef.current) return;
+    syncSelection(map, selection, selectionMarkerRef, tRef, true);
   }, [selectionSignature]);
 
-  return <div ref={containerRef} className="trip-map" aria-label={t('map.aria')} />;
+  return <div ref={containerRef} className="trip-map trip-map--stable" aria-label={t('map.aria')} />;
+}
+
+function rebuildMarkers(map, points, markersRef, pointSelectHandlerRef, tRef) {
+  markersRef.current.forEach(({ marker }) => marker.remove());
+  markersRef.current = [];
+
+  (points || []).forEach((point, index) => {
+    const longitude = Number(point.longitude);
+    const latitude = Number(point.latitude);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
+
+    const coordinates = [longitude, latitude];
+    const element = createMapMarkerElement({
+      color: getPointColor(point),
+      size: point.source === 'destination' ? 22 : 20,
+      label: `${index + 1}. ${point.title}`,
+      number: index + 1,
+    });
+    element.dataset.pointId = point.id;
+    element.addEventListener('click', (event) => {
+      event.stopPropagation();
+      map.flyTo({ center: coordinates, zoom: MAP_CONFIG.focusedZoom, essential: true });
+      pointSelectHandlerRef.current?.(point);
+    });
+
+    const marker = new maplibregl.Marker({ element, anchor: 'bottom' })
+      .setLngLat(coordinates)
+      .setPopup(new maplibregl.Popup({ offset: 18, closeButton: false }).setDOMContent(createPopupNode(point, tRef.current)))
+      .addTo(map);
+    markersRef.current.push({ id: point.id, marker, element });
+  });
+}
+
+function applyInitialViewport(map, points, signature, lastViewportSignatureRef) {
+  lastViewportSignatureRef.current = signature;
+  const validPoints = (points || []).filter((point) => (
+    Number.isFinite(Number(point.latitude)) && Number.isFinite(Number(point.longitude))
+  ));
+
+  if (validPoints.length === 0) {
+    map.jumpTo({ center: MAP_CONFIG.defaultCenter, zoom: MAP_CONFIG.defaultZoom });
+    return;
+  }
+
+  const bounds = new maplibregl.LngLatBounds();
+  validPoints.forEach((point) => bounds.extend([Number(point.longitude), Number(point.latitude)]));
+  if (validPoints.length === 1) {
+    map.jumpTo({ center: bounds.getCenter(), zoom: MAP_CONFIG.focusedZoom });
+    return;
+  }
+  map.fitBounds(bounds, { padding: 54, maxZoom: MAP_CONFIG.tripOverviewZoom, duration: 0 });
+}
+
+function syncFocusedPoint(map, points, focusedPointId, markersRef, move = false) {
+  markersRef.current.forEach(({ id, element }) => {
+    element.classList.toggle('maplibre-point-marker--focused', id === focusedPointId);
+  });
+  if (!focusedPointId || !move) return;
+
+  const point = (points || []).find((candidate) => candidate.id === focusedPointId);
+  if (!point) return;
+  const latitude = Number(point.latitude);
+  const longitude = Number(point.longitude);
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
+  map.flyTo({
+    center: [longitude, latitude],
+    zoom: Math.max(map.getZoom(), MAP_CONFIG.focusedZoom),
+    speed: 1.25,
+    essential: true,
+  });
+}
+
+function syncSelection(map, selection, selectionMarkerRef, tRef, move = false) {
+  selectionMarkerRef.current?.remove();
+  selectionMarkerRef.current = null;
+  if (!selection) return;
+
+  const latitude = Number(selection.latitude);
+  const longitude = Number(selection.longitude);
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
+
+  const coordinates = [longitude, latitude];
+  const element = createMapMarkerElement({
+    color: '#f4a62a',
+    size: 24,
+    label: tRef.current('map.selectedPoint'),
+    number: '+',
+  });
+  element.classList.add('maplibre-point-marker--selected');
+  selectionMarkerRef.current = new maplibregl.Marker({ element, anchor: 'bottom' })
+    .setLngLat(coordinates)
+    .addTo(map);
+
+  if (move) {
+    map.flyTo({
+      center: coordinates,
+      zoom: Math.max(map.getZoom(), MAP_CONFIG.focusedZoom),
+      speed: 1.25,
+      essential: true,
+    });
+  }
 }
 
 function getPointColor(point) {
