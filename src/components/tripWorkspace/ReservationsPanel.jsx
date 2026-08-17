@@ -222,6 +222,15 @@ export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focus
     onUpdate({ reservations: trip.reservations.map((reservation) => reservation.id === reservationId ? { ...reservation, status } : reservation) });
   }
 
+  function getLinkedActivityAmount(reservation) {
+    const activities = (trip.itinerary || []).flatMap((day) => day.items || []);
+    const linked = reservation.sourceActivityId ? activities.find((activity) => activity.id === reservation.sourceActivityId) : reservation.sourceActivitySeriesId ? activities.find((activity) => activity.seriesId === reservation.sourceActivitySeriesId && Number(activity.seriesIndex || 0) === 0) : null;
+    if (!linked) return null;
+    const amount = Math.max(0, Number(linked.estimatedCost) || 0);
+    return amount > 0 ? amount : null;
+  }
+  function syncReservationAmount(reservation, amount) { onUpdate({ reservations: trip.reservations.map((item) => item.id === reservation.id ? { ...item, amount } : item) }); }
+
   function removeReservation(reservation) {
     if (!window.confirm(t('reservations.deleteConfirm', { name: reservation.title }))) return;
     onUpdate({ reservations: trip.reservations.filter((item) => item.id !== reservation.id) });
@@ -353,7 +362,7 @@ export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focus
                   <div className="reservation-card__content">
                     <div className="reservation-card__headline">
                       <div><small>{getCategoryLabel(RESERVATION_TYPES, reservation.type, t)}</small><h3>{reservation.title}</h3></div>
-                      <Badge tone={getStatusTone(reservation.status)}>{getCategoryLabel(RESERVATION_STATUSES, reservation.status, t)}</Badge>
+                      <div className="reservation-card__headline-actions"><Badge tone={getStatusTone(reservation.status)}>{getCategoryLabel(RESERVATION_STATUSES, reservation.status, t)}</Badge><button className="icon-button icon-button--small" type="button" aria-label={`${t('common.edit')} ${reservation.title}`} onClick={() => openEditForm(reservation)}><Icon name="edit" size={16} /></button><button className="icon-button icon-button--small" type="button" aria-label={`${t('common.delete')} ${reservation.title}`} onClick={() => removeReservation(reservation)}><Icon name="trash" size={16} /></button></div>
                     </div>
                     <div className="reservation-card__meta">
                       {(reservation.startDate || reservation.startTime) && <span><Icon name="calendarDays" size={15} /> {formatReservationDate(reservation, locale, t)}</span>}
@@ -364,14 +373,13 @@ export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focus
                     </div>
                     {reservation.confirmationNumber && <p className="reservation-card__reference">{t('reservations.confirmation')} <strong>{reservation.confirmationNumber}</strong></p>}
                     {reservation.notes && <p className="reservation-card__notes">{reservation.notes}</p>}
-                    <DiscussionThread comments={reservation.comments} currentUserName={getCurrentActorName(trip)} onAdd={(message) => addReservationComment(reservation, message)} onRemove={(commentId) => removeReservationComment(reservation.id, commentId)} />
                     <div className="reservation-card__actions">
                       <label><span className="sr-only">{t('reservations.status')}</span><select value={reservation.status} onChange={(event) => updateStatus(reservation.id, event.target.value)}>{RESERVATION_STATUSES.map((status) => <option key={status.id} value={status.id}>{t(status.labelKey)}</option>)}</select></label>
                       {safeUrl && <a className="text-link" href={safeUrl} target="_blank" rel="noreferrer">{t('reservations.openBooking')} <Icon name="externalLink" size={15} /></a>}
                       {linkedDocuments.length > 0 && <button className="text-link" type="button" onClick={() => onOpenDocument?.(linkedDocuments[0].id)}><Icon name="folder" size={15} /> {t('reservations.openDocuments', { count: linkedDocuments.length })}</button>}
-                      <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.edit')} ${reservation.title}`} onClick={() => openEditForm(reservation)}><Icon name="edit" size={16} /></button>
-                      <button className="icon-button icon-button--small" type="button" aria-label={`${t('common.delete')} ${reservation.title}`} onClick={() => removeReservation(reservation)}><Icon name="trash" size={16} /></button>
+                      {(() => { const linkedAmount = getLinkedActivityAmount(reservation); return linkedAmount !== null && Math.abs(linkedAmount - Number(reservation.amount || 0)) > 0.009 ? <button className="text-link reservation-card__amount-sync" type="button" onClick={() => syncReservationAmount(reservation, linkedAmount)}><Icon name="refresh" size={15} /> {t('reservations.updateAmountFromItinerary', { amount: formatCurrency(linkedAmount, trip.currency, locale) })}</button> : null; })()}
                     </div>
+                    <DiscussionThread comments={reservation.comments} currentUserName={getCurrentActorName(trip)} onAdd={(message) => addReservationComment(reservation, message)} onRemove={(commentId) => removeReservationComment(reservation.id, commentId)} />
                   </div>
                 </Card>
                 {editingId === reservation.id && renderEditor('reservation-editor--inline')}

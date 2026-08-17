@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const itinerary=fs.readFileSync(new URL('../src/components/tripWorkspace/ItineraryPanel.jsx',import.meta.url),'utf8');
+const weather=fs.readFileSync(new URL('../src/components/tripWorkspace/tools/WeatherCard.jsx',import.meta.url),'utf8');
+const collaboration=fs.readFileSync(new URL('../src/components/tripWorkspace/CollaborationPanel.jsx',import.meta.url),'utf8');
+const reservations=fs.readFileSync(new URL('../src/components/tripWorkspace/ReservationsPanel.jsx',import.meta.url),'utf8');
+const overview=fs.readFileSync(new URL('../src/components/tripWorkspace/OverviewPanel.jsx',import.meta.url),'utf8');
+test('return to activity',()=>{assert.match(itinerary,/focusActivityId/);assert.match(itinerary,/itinerary-activity-/);});
+test('weather place search',()=>{assert.match(weather,/LocationAutocomplete/);assert.match(weather,/onLocationSelect/);});
+test('known traveller suggestions',()=>{assert.match(collaboration,/knownTravellerSuggestions/);});
+test('reservation sync and actions above comments',()=>{assert.match(reservations,/updateAmountFromItinerary/);assert.ok(reservations.indexOf('reservation-card__headline-actions')<reservations.indexOf('<DiscussionThread'));});
+test('no forced any time for accommodation',()=>{assert.match(overview,/item\.type === 'hotel'/);});

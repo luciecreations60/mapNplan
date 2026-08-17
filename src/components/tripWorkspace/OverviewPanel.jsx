@@ -59,7 +59,7 @@ export function OverviewPanel({ trip, onOpenTab }) {
             <div className="overview-timeline">
               {upcomingItems.map((item) => (
                 <article key={item.id} className="overview-timeline__item">
-                  <span className="overview-timeline__time"><strong>{formatLocalizedDate(item.date, locale, 'numeric')}</strong><small>{formatLocalizedTime(item.time, t('overview.anyTime'))}</small></span>
+                  <span className="overview-timeline__time"><strong>{formatLocalizedDate(item.date, locale, 'numeric')}</strong>{getOverviewTime(item, t) && <small>{getOverviewTime(item, t)}</small>}</span>
                   <span className="overview-timeline__marker"><Icon name={item.type} size={17} /></span>
                   <div>
                     <strong>{item.title}</strong>
@@ -176,6 +176,11 @@ function WorkspaceEmptyState({ icon, title, copy, action, onAction }) {
       <button className="text-link" type="button" onClick={onAction}>{action} <Icon name="arrowRight" size={16} /></button>
     </div>
   );
+}
+
+function getOverviewTime(item, t) {
+  if (item.type === 'hotel') return item.checkInTime || item.checkOutTime || item.time || '';
+  return formatLocalizedTime(item.time, t('overview.anyTime'));
 }
 
 function getReservationIcon(type) {

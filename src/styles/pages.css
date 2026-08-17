@@ -5959,3 +5959,19 @@
   justify-content: flex-end;
   gap: 8px;
 }
+
+
+/* Part 33 — contextual actions, weather search and focus restoration */
+.itinerary-cost-field__control { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; }
+.transport-cost-calculator { margin-top:-4px; }
+.itinerary-item:focus { outline:0; box-shadow:0 0 0 3px color-mix(in srgb,var(--color-primary) 16%,transparent); }
+.weather-location-search { display:grid; gap:4px; margin:12px 0 14px; }
+.weather-location-search__reset { justify-self:start; font-size:.72rem; }
+.known-traveller-suggestions { display:grid; gap:8px; padding:12px; border:1px solid var(--color-border); border-radius:14px; background:var(--brand-gradient-soft); }
+.known-traveller-suggestions > span { font-size:.72rem; font-weight:800; }
+.known-traveller-suggestions > div { display:flex; flex-wrap:wrap; gap:8px; }
+.known-traveller-suggestions button { display:inline-flex; align-items:center; gap:7px; padding:6px 9px; border:1px solid var(--color-border); border-radius:999px; color:var(--color-text); background:var(--color-surface); cursor:pointer; }
+.known-traveller-suggestions button .member-avatar { width:26px; height:26px; font-size:.62rem; }
+.reservation-card__headline-actions { display:flex; flex:0 0 auto; align-items:center; gap:6px; }
+.reservation-card__actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin-top:10px; }
+.reservation-card__amount-sync { font-weight:750; }

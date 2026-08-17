@@ -27,6 +27,14 @@ export function CollaborationPanel({ trip, onUpdate }) {
   const [notice, setNotice] = useState(null);
   const collaboration = trip.collaboration;
   const actorName = getCurrentActorName(trip);
+  const knownTravellerSuggestions = useMemo(() => {
+    const memberKeys = new Set(collaboration.members.flatMap((member) => [member.email?.toLowerCase(), member.name?.trim().toLowerCase()].filter(Boolean)));
+    return (trip.travelParty || []).filter((traveller) => {
+      const email = traveller.email?.toLowerCase();
+      const name = traveller.name?.trim().toLowerCase();
+      return traveller.name && !memberKeys.has(email) && !memberKeys.has(name);
+    });
+  }, [collaboration.members, trip.travelParty]);
   const sortedActivity = useMemo(
     () => [...collaboration.activityLog].sort((left, right) => right.createdAt.localeCompare(left.createdAt)),
     [collaboration.activityLog],
@@ -37,34 +45,17 @@ export function CollaborationPanel({ trip, onUpdate }) {
     setMemberForm((current) => ({ ...current, [name]: value }));
   }
 
-  function addMember(event) {
-    event.preventDefault();
-    if (!memberForm.name.trim()) return;
-
-    const member = {
-      id: createId('member'),
-      name: memberForm.name.trim(),
-      email: memberForm.email.trim().toLowerCase(),
-      role: memberForm.role,
-      addedAt: new Date().toISOString(),
-    };
-    const entry = createActivityEntry({
-      action: 'memberAdded',
-      actorName,
-      entityType: 'member',
-      entityId: member.id,
-      targetTitle: member.name,
-    });
-
-    onUpdate({
-      collaboration: appendActivityEntry({
-        ...collaboration,
-        members: [...collaboration.members, member],
-      }, entry),
-    });
+  function persistMember({ name, email = '', role = 'editor' }) {
+    if (!String(name || '').trim()) return;
+    const member = { id: createId('member'), name: String(name).trim(), email: String(email || '').trim().toLowerCase(), role, addedAt: new Date().toISOString() };
+    const entry = createActivityEntry({ action: 'memberAdded', actorName, entityType: 'member', entityId: member.id, targetTitle: member.name });
+    onUpdate({ collaboration: appendActivityEntry({ ...collaboration, members: [...collaboration.members, member] }, entry) });
     setMemberForm(EMPTY_MEMBER);
     setNotice({ tone: 'success', title: t('collaboration.memberAdded'), message: t('collaboration.memberAddedText', { name: member.name }) });
   }
+
+  function addMember(event) { event.preventDefault(); persistMember(memberForm); }
+  function addKnownTraveller(traveller) { persistMember({ name: traveller.name, email: traveller.email || '', role: 'editor' }); }
 
   function updateMemberRole(memberId, role) {
     const member = collaboration.members.find((item) => item.id === memberId);
@@ -248,6 +239,12 @@ export function CollaborationPanel({ trip, onUpdate }) {
             ))}
           </div>
 
+          {knownTravellerSuggestions.length > 0 && (
+            <div className="known-traveller-suggestions">
+              <span>{t('collaboration.knownTravellers')}</span>
+              <div>{knownTravellerSuggestions.map((traveller) => <button key={traveller.id || traveller.email || traveller.name} type="button" onClick={() => addKnownTraveller(traveller)}><span className="member-avatar">{getInitials(traveller.name)}</span><strong>{traveller.name}</strong><Icon name="plus" size={14} /></button>)}</div>
+            </div>
+          )}
           <form className="member-form" onSubmit={addMember}>
             <h4>{t('collaboration.addPerson')}</h4>
             <div className="member-form__grid">

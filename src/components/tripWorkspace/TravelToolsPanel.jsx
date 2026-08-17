@@ -10,7 +10,9 @@ import { WeatherCard } from './tools/WeatherCard.jsx';
 
 export function TravelToolsPanel({ trip, onOpenTab }) {
   const { t } = useI18n();
-  const location = getPrimaryTripLocation(trip);
+  const defaultLocation = getPrimaryTripLocation(trip);
+  const [customLocation, setCustomLocation] = useState(null);
+  const location = customLocation || defaultLocation;
   const [forecast, setForecast] = useState(null);
   const [status, setStatus] = useState(location ? 'loading' : 'idle');
   const [error, setError] = useState('');
@@ -34,6 +36,7 @@ export function TravelToolsPanel({ trip, onOpenTab }) {
   }, [location?.latitude, location?.longitude, t]);
 
   useEffect(() => {
+    setForecast(null);
     loadForecast(false);
   }, [loadForecast]);
 
@@ -64,7 +67,7 @@ export function TravelToolsPanel({ trip, onOpenTab }) {
       </section>
 
       <div className="travel-tools-grid">
-        <WeatherCard forecast={forecast} location={location} status={status} error={error} tripStartDate={trip.startDate} tripEndDate={trip.endDate} onRefresh={() => loadForecast(true)} />
+        <WeatherCard forecast={forecast} location={location} status={status} error={error} tripStartDate={trip.startDate} tripEndDate={trip.endDate} onRefresh={() => loadForecast(true)} onLocationSelect={setCustomLocation} onResetLocation={() => setCustomLocation(null)} isCustomLocation={Boolean(customLocation)} />
         <div className="travel-tools-grid__side">
           <LocalTimeCard timezone={forecast?.timezone} timezoneAbbreviation={forecast?.timezoneAbbreviation} locationLabel={location.label} />
           <CurrencyConverter baseCurrency={trip.currency} destinationCurrency={trip.destinationCurrency} />

@@ -42,6 +42,7 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null, onOpe
   const [editingDayId, setEditingDayId] = useState(null);
   const [dayTitleDraft, setDayTitleDraft] = useState('');
   const [showTransportCost, setShowTransportCost] = useState(false);
+  const [focusActivityId, setFocusActivityId] = useState(null);
   const formAnchorRef = useRef(null);
   const handledCreateRequestRef = useRef(null);
   const itinerary = useMemo(() => buildVisibleItineraryDays(trip), [trip]);
@@ -51,6 +52,17 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null, onOpe
     handledCreateRequestRef.current = createRequest.id;
     openCreateForm(createRequest.date || getLastUsedItineraryDate(trip), 'day');
   }, [createRequest]);
+
+  useEffect(() => {
+    if (!focusActivityId || isFormOpen) return;
+    const frame = window.requestAnimationFrame(() => {
+      const block = document.getElementById(`itinerary-activity-${focusActivityId}`);
+      block?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      block?.focus({ preventScroll: true });
+      setFocusActivityId(null);
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [focusActivityId, isFormOpen, itinerary]);
 
   function updateField(event) {
     const { name, value } = event.target;
@@ -281,6 +293,8 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null, onOpe
       ?.filter((item) => item.type === activity.type && item.title === activity.title && item.location === activity.location)
       ?.at(-1) || activity;
 
+    setFocusActivityId(savedActivity.id);
+
     if (openBooking) {
       onOpenBooking?.({
         source: 'itinerary',
@@ -490,7 +504,7 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null, onOpe
                 </div>
               </fieldset>
             )}
-            <div className="workspace-field itinerary-cost-field">
+            <div className="workspace-field itinerary-cost-field workspace-form__wide">
               <span>{t('itinerary.estimatedCost')} ({trip.currency})</span>
               <div className="itinerary-cost-field__control">
                 <input name="estimatedCost" type="number" min="0" step="0.01" value={form.estimatedCost} onChange={updateField} />
@@ -499,7 +513,6 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null, onOpe
                 )}
               </div>
             </div>
-            <Field label={t('itinerary.notes')} className="workspace-form__full"><textarea name="notes" rows="3" value={form.notes} onChange={updateField} placeholder={t('itinerary.notesPlaceholder')} /></Field>
             {showTransportCost && form.type === 'car' && form.transportMode === 'driving' && (
               <fieldset className="transport-cost-calculator workspace-form__full">
                 <legend>{t('itinerary.costCalculatorTitle')}</legend>
@@ -514,6 +527,7 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null, onOpe
                 <div className="transport-cost-calculator__actions"><Button type="button" size="small" icon="calculator" disabled={!form.routeDistanceKm || !form.fuelPricePerLiter} onClick={calculateTransportCost}>{t('itinerary.applyCostEstimate')}</Button></div>
               </fieldset>
             )}
+            <Field label={t('itinerary.notes')} className="workspace-form__full"><textarea name="notes" rows="3" value={form.notes} onChange={updateField} placeholder={t('itinerary.notesPlaceholder')} /></Field>
           </div>
           <div className="workspace-form__actions">
             <Button variant="ghost" onClick={closeForm}>{t('common.cancel')}</Button>
@@ -542,7 +556,7 @@ export function ItineraryPanel({ trip, onUpdate, onOpenReservation = null, onOpe
       : `${getCategoryLabel(ACTIVITY_TYPES, item.type, t)}${item.type === 'car' && item.transportMode ? ` · ${t(`itinerary.transportModes.${item.transportMode}`)}` : ''}`;
 
     return (
-      <article className={`itinerary-item${isHotel ? ' itinerary-item--hotel' : ''}${isStayMiddle ? ' itinerary-item--stay-continuation' : ''}${isStayCheckout ? ' itinerary-item--stay-checkout' : ''}`}>
+      <article id={`itinerary-activity-${item.id}`} tabIndex="-1" className={`itinerary-item${isHotel ? ' itinerary-item--hotel' : ''}${isStayMiddle ? ' itinerary-item--stay-continuation' : ''}${isStayCheckout ? ' itinerary-item--stay-checkout' : ''}`}>
         <time>{isStayMiddle ? '' : (item.time || '—')}</time>
         <span className={`itinerary-item__icon itinerary-item__icon--${item.type}`}><Icon name={item.type} size={18} /></span>
         <div className="itinerary-item__content">
