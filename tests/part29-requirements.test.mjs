@@ -46,9 +46,12 @@ test('map points keep stable focus, visible numbering and type colours without o
   assert.doesNotMatch(mapPanel, /onClick=\{\(\) => selectMapPoint\(point/);
   assert.match(tripMap, /pointToFeature\(point, index \+ 1, point\.id === focusedPointId\)/);
   assert.match(tripMap, /number: String\(number\)/);
+  assert.match(tripMap, /const PIN_LAYER_ID = 'mapnplan-point-pins'/);
   assert.match(tripMap, /const NUMBER_LAYER_ID = 'mapnplan-point-numbers'/);
+  assert.match(tripMap, /'icon-image': \['get', 'icon'\]/);
+  assert.match(tripMap, /'icon-anchor': 'bottom'/);
   assert.match(tripMap, /'text-field': \['get', 'number'\]/);
-  assert.match(tripMap, /'circle-color': \['get', 'color'\]/);
+  assert.match(tripMap, /createPinImage/);
   assert.match(tripMap, /TYPE_COLORS/);
   assert.match(styles, /map-marker-legend__dot--hotel/);
   assert.doesNotMatch(tripMap, /new maplibregl\.Marker/);

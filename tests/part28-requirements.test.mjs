@@ -64,6 +64,8 @@ test('map points are anchored to the exact GeoJSON coordinate', async () => {
   assert.match(map, /const SOURCE_ID = 'mapnplan-points'/);
   assert.match(map, /geometry:\s*\{ type: 'Point', coordinates: \[longitude, latitude\] \}/);
   assert.match(map, /type: 'geojson'/);
+  assert.match(map, /const PIN_LAYER_ID = 'mapnplan-point-pins'/);
+  assert.match(map, /'icon-anchor': 'bottom'/);
   assert.match(map, /source\.setData\(\{ type: 'FeatureCollection', features \}\)/);
   assert.doesNotMatch(map, /new maplibregl\.Marker/);
 });

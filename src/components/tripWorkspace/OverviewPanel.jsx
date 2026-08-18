@@ -23,9 +23,7 @@ export function OverviewPanel({ trip, onOpenTab }) {
   const itineraryCount = getItineraryItemCount(trip.itinerary);
   const confirmedReservations = getConfirmedReservationCount(trip.reservations);
   const mapPointCount = getTripMapPoints(trip).length;
-  const upcomingItems = trip.itinerary
-    .flatMap((day) => day.items.map((item) => ({ ...item, date: day.date })))
-    .slice(0, 4);
+  const upcomingItems = getMeaningfulOverviewItems(trip.itinerary).slice(0, 6);
   const upcomingReservations = [...trip.reservations]
     .filter((reservation) => reservation.status !== 'cancelled')
     .sort((left, right) => `${left.startDate}${left.startTime}`.localeCompare(`${right.startDate}${right.startTime}`))
@@ -178,8 +176,29 @@ function WorkspaceEmptyState({ icon, title, copy, action, onAction }) {
   );
 }
 
+function getMeaningfulOverviewItems(itinerary) {
+  const seenAccommodationSeries = new Set();
+  const seenAccommodationFallbacks = new Set();
+
+  return (itinerary || []).flatMap((day) => (day.items || [])
+    .filter((item) => {
+      if (item.type !== 'hotel') return true;
+      if (item.stayRole && !['checkin', 'single'].includes(item.stayRole)) return false;
+      if (item.seriesId) {
+        if (seenAccommodationSeries.has(item.seriesId)) return false;
+        seenAccommodationSeries.add(item.seriesId);
+        return true;
+      }
+      const fallbackKey = [item.title, item.location, item.stayStartDate, item.stayEndDate].join('|');
+      if (seenAccommodationFallbacks.has(fallbackKey)) return false;
+      seenAccommodationFallbacks.add(fallbackKey);
+      return true;
+    })
+    .map((item) => ({ ...item, date: item.stayStartDate || day.date })));
+}
+
 function getOverviewTime(item, t) {
-  if (item.type === 'hotel') return item.checkInTime || item.checkOutTime || item.time || '';
+  if (item.type === 'hotel') return item.checkInTime || item.time || '';
   return formatLocalizedTime(item.time, t('overview.anyTime'));
 }
 

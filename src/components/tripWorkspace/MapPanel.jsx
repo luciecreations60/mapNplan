@@ -34,8 +34,10 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
   const { language, locale, t } = useI18n();
   const points = useMemo(() => getTripMapPoints(trip), [trip]);
   const dates = useMemo(() => buildTripDateRange(trip.startDate, trip.endDate), [trip.startDate, trip.endDate]);
+  const movablePoints = useMemo(() => points.filter((point) => point.source !== 'destination'), [points]);
   const [selection, setSelection] = useState(null);
   const [focusedPointId, setFocusedPointId] = useState(null);
+  const [editingPoint, setEditingPoint] = useState(null);
   const [status, setStatus] = useState('idle');
   const [searchValue, setSearchValue] = useState('');
   const [notice, setNotice] = useState(null);
@@ -43,6 +45,7 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
 
   const closeEditor = useCallback(() => {
     setSelection(null);
+    setEditingPoint(null);
     setStatus('idle');
   }, []);
 
@@ -50,6 +53,7 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
     const normalizedSelection = { latitude: Number(latitude), longitude: Number(longitude) };
     if (!Number.isFinite(normalizedSelection.latitude) || !Number.isFinite(normalizedSelection.longitude)) return;
 
+    setEditingPoint(null);
     setSelection(normalizedSelection);
     setNotice(null);
     setForm((current) => ({
@@ -90,12 +94,52 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
     });
   }
 
-  function addSelectedPlace(event) {
+  function findSourceActivity(point) {
+    if (point?.source !== 'itinerary') return null;
+    for (const day of trip.itinerary || []) {
+      const item = (day.items || []).find((candidate) => (
+        point.seriesId ? candidate.seriesId === point.seriesId : candidate.id === point.activityId
+      ));
+      if (item) return { day, item };
+    }
+    return null;
+  }
+
+  function openPointEditor(point) {
+    if (!point) return;
+    const sourceActivity = findSourceActivity(point);
+    const item = sourceActivity?.item;
+    setFocusedPointId(point.id);
+    setEditingPoint(point);
+    setSelection({ latitude: Number(point.latitude), longitude: Number(point.longitude) });
+    setStatus('ready');
+    setNotice(null);
+    setForm({
+      ...createInitialForm(trip),
+      date: item?.stayStartDate || point.date || getLastUsedItineraryDate(trip),
+      endDate: item?.stayEndDate || point.endDate || point.date || getLastUsedItineraryDate(trip),
+      time: item?.checkInTime || item?.time || point.time || '09:00',
+      endTime: item?.checkOutTime || item?.endTime || point.endTime || '10:00',
+      type: item?.type || point.type || 'map',
+      title: item?.title || point.title || '',
+      location: item?.location || point.subtitle || '',
+      durationMinutes: Math.max(0, Number(item?.durationMinutes ?? point.durationMinutes) || 0),
+      estimatedCost: Math.max(0, Number(item?.estimatedCost ?? point.estimatedCost) || 0),
+      notes: item?.notes || point.notes || '',
+    });
+  }
+
+  function persistSelectedPlace(event) {
     event.preventDefault();
     if (!selection || !form.date || !form.title.trim()) return;
+
+    const sourceActivity = findSourceActivity(editingPoint);
+    const previousItem = sourceActivity?.item || null;
     const activity = {
-      id: createId('activity'),
+      ...(previousItem || {}),
+      id: previousItem?.id || createId('activity'),
       time: form.time,
+      endTime: form.type === 'hotel' ? '' : (previousItem?.endTime || ''),
       checkInTime: form.type === 'hotel' ? form.time : '',
       checkOutTime: form.type === 'hotel' ? form.endTime : '',
       type: form.type,
@@ -103,22 +147,40 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
       location: form.location.trim(),
       latitude: selection.latitude,
       longitude: selection.longitude,
-      departureLocation: '',
-      departureLatitude: null,
-      departureLongitude: null,
-      transportMode: '',
-      durationMinutes: Math.max(0, Number(form.durationMinutes) || 0),
+      departureLocation: previousItem?.departureLocation || '',
+      departureLatitude: previousItem?.departureLatitude ?? null,
+      departureLongitude: previousItem?.departureLongitude ?? null,
+      transportMode: previousItem?.transportMode || '',
+      durationMinutes: form.type === 'hotel' ? 0 : Math.max(0, Number(form.durationMinutes) || 0),
       estimatedCost: Math.max(0, Number(form.estimatedCost) || 0),
       notes: form.notes.trim(),
-      reminderMinutes: null,
-      externalCalendarUid: '',
-      completedAt: null,
-      comments: [],
-      linkedReservationId: null,
+      reminderMinutes: previousItem?.reminderMinutes ?? null,
+      externalCalendarUid: previousItem?.externalCalendarUid || '',
+      completedAt: previousItem?.completedAt || null,
+      comments: previousItem?.comments || [],
+      linkedReservationId: previousItem?.linkedReservationId || null,
+      seriesId: previousItem?.seriesId || null,
     };
+
+    const previous = sourceActivity ? { dayId: sourceActivity.day.id, activityId: sourceActivity.item.id } : null;
+    const endDate = form.type === 'hotel' && form.endDate && form.endDate >= form.date ? form.endDate : form.date;
+    let baseItinerary = trip.itinerary;
+    let effectivePrevious = previous;
+
+    if (previousItem?.seriesId && form.type !== 'hotel') {
+      baseItinerary = trip.itinerary.map((day) => ({
+        ...day,
+        items: (day.items || []).filter((item) => item.seriesId !== previousItem.seriesId),
+        routePlan: null,
+      }));
+      effectivePrevious = null;
+      activity.seriesId = null;
+    }
+
     const nextItinerary = form.type === 'hotel'
-      ? upsertActivityAcrossDates(trip.itinerary, form.date, form.endDate && form.endDate >= form.date ? form.endDate : form.date, activity)
-      : upsertActivityInItinerary(trip.itinerary, form.date, activity);
+      ? upsertActivityAcrossDates(baseItinerary, form.date, endDate, activity, effectivePrevious)
+      : upsertActivityInItinerary(baseItinerary, form.date, activity, effectivePrevious);
+
     onUpdate({ itinerary: nextItinerary });
     setNotice({ tone: 'success', title: t('map.activityAddedTitle'), text: t('map.activityAddedText', { name: activity.title }) });
     setSearchValue('');
@@ -159,6 +221,42 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
     closeEditor();
   }
 
+  function deleteMappedPoint(point) {
+    if (!point || point.source === 'destination') return;
+
+    if (point.source === 'itinerary') {
+      const confirmationKey = point.seriesId ? 'itinerary.deleteStaySeriesConfirm' : 'itinerary.deleteConfirm';
+      if (!window.confirm(t(confirmationKey, { name: point.title }))) return;
+      const itinerary = (trip.itinerary || []).map((day) => ({
+        ...day,
+        items: (day.items || []).filter((item) => (
+          point.seriesId ? item.seriesId !== point.seriesId : item.id !== point.activityId
+        )),
+        routePlan: null,
+      }));
+      onUpdate({ itinerary, mapPointOrder: removePointFromOrder(trip.mapPointOrder, point.id) });
+    } else if (point.source === 'savedPlace') {
+      if (!window.confirm(t('places.deleteText', { name: point.title }))) return;
+      onUpdate({
+        savedPlaces: (trip.savedPlaces || []).filter((place) => place.id !== point.savedPlaceId),
+        mapPointOrder: removePointFromOrder(trip.mapPointOrder, point.id),
+      });
+    }
+
+    if (focusedPointId === point.id) setFocusedPointId(null);
+  }
+
+  function moveMappedPoint(point, direction) {
+    if (!point || point.source === 'destination') return;
+    const ids = movablePoints.map((item) => item.id);
+    const configured = (Array.isArray(trip.mapPointOrder) ? trip.mapPointOrder : []).filter((id) => ids.includes(id));
+    ids.forEach((id) => { if (!configured.includes(id)) configured.push(id); });
+    const index = configured.indexOf(point.id);
+    const target = direction === 'up' ? index - 1 : index + 1;
+    if (index < 0 || target < 0 || target >= configured.length) return;
+    [configured[index], configured[target]] = [configured[target], configured[index]];
+    onUpdate({ mapPointOrder: configured });
+  }
 
   function openComparison() {
     if (!form.location.trim() || !onOpenBooking) return;
@@ -189,33 +287,22 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
           placeholder={t('map.searchPlaceholder')}
           hint={t('map.searchHint')}
           variant="workspace"
-         
           onValueChange={setSearchValue}
-onPlaceSelect={(place) => {
-  if (!place) {
-    setNotice({
-      tone: 'warning',
-      title: t('map.searchNoResultTitle'),
-      text: t('map.searchNoResultText'),
-    });
-    return;
-  }
-
-  const latitude = Number(place.latitude);
-  const longitude = Number(place.longitude);
-  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-    setNotice({
-      tone: 'warning',
-      title: t('map.searchInvalidResultTitle'),
-      text: t('map.searchInvalidResultText'),
-    });
-    return;
-  }
-
-  setNotice(null);
-  setSearchValue(place.label || '');
-  selectMapPoint({ latitude, longitude }, place);
-}}
+          onPlaceSelect={(place) => {
+            if (!place) {
+              setNotice({ tone: 'warning', title: t('map.searchNoResultTitle'), text: t('map.searchNoResultText') });
+              return;
+            }
+            const latitude = Number(place.latitude);
+            const longitude = Number(place.longitude);
+            if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+              setNotice({ tone: 'warning', title: t('map.searchInvalidResultTitle'), text: t('map.searchInvalidResultText') });
+              return;
+            }
+            setNotice(null);
+            setSearchValue(place.label || '');
+            selectMapPoint({ latitude, longitude }, place);
+          }}
         />
         <p className="map-language-note"><Icon name="globe" size={15} /> {t('map.languageNote')}</p>
       </div>
@@ -232,13 +319,7 @@ onPlaceSelect={(place) => {
 
       <div className="map-workspace-grid map-workspace-grid--planner">
         <Card className="map-card map-card--interactive">
-          <TripMap
-            points={points}
-            onMapClick={selectMapPoint}
-            onPointSelect={focusExistingPoint}
-            selection={selection}
-            focusedPointId={focusedPointId}
-          />
+          <TripMap points={points} onMapClick={selectMapPoint} onPointSelect={focusExistingPoint} selection={selection} focusedPointId={focusedPointId} />
           <div className="map-card__instruction"><Icon name="pin" size={16} /> {t('map.clickToAddText')}</div>
         </Card>
 
@@ -248,22 +329,28 @@ onPlaceSelect={(place) => {
           </header>
           {points.length > 0 ? (
             <div className="map-place-list__items">
-              {points.map((point, index) => (
-                <button
-                  key={point.id}
-                  type="button"
-                  className={`map-place-row map-place-row--button${focusedPointId === point.id ? ' map-place-row--active' : ''}`}
-                  onClick={() => focusExistingPoint(point)}
-                >
-                  <span className="map-place-row__number">{index + 1}</span>
-                  <div>
-                    <small>{point.source === 'destination' ? t('map.destination') : point.source === 'savedPlace' ? t('map.savedPlace') : t('map.itinerary')}</small>
-                    <strong>{point.title}</strong>
-                    <p><Icon name="pin" size={13} /> {point.subtitle || t('map.savedCoordinates')}</p>
-                  </div>
-                  <Icon name="search" size={16} />
-                </button>
-              ))}
+              {points.map((point, index) => {
+                const movableIndex = movablePoints.findIndex((item) => item.id === point.id);
+                const canMove = point.source !== 'destination';
+                return (
+                  <article key={point.id} className={`map-place-row${focusedPointId === point.id ? ' map-place-row--active' : ''}`}>
+                    <button type="button" className="map-place-row__main" onClick={() => focusExistingPoint(point)}>
+                      <span className="map-place-row__number">{index + 1}</span>
+                      <div className="map-place-row__copy">
+                        <small>{point.source === 'destination' ? t('map.destination') : point.source === 'savedPlace' ? t('map.savedPlace') : t('map.itinerary')}</small>
+                        <strong>{point.title}</strong>
+                        <p><Icon name="pin" size={13} /> {point.subtitle || t('map.savedCoordinates')}</p>
+                      </div>
+                    </button>
+                    <div className="map-place-row__actions">
+                      <button className="icon-button icon-button--small" type="button" aria-label={t('common.edit')} title={t('common.edit')} onClick={() => openPointEditor(point)}><Icon name="edit" size={15} /></button>
+                      {canMove && <button className="icon-button icon-button--small" type="button" disabled={movableIndex <= 0} aria-label={t('itinerary.moveUp', { name: point.title })} onClick={() => moveMappedPoint(point, 'up')}><Icon name="chevronUp" size={15} /></button>}
+                      {canMove && <button className="icon-button icon-button--small" type="button" disabled={movableIndex < 0 || movableIndex >= movablePoints.length - 1} aria-label={t('itinerary.moveDown', { name: point.title })} onClick={() => moveMappedPoint(point, 'down')}><Icon name="chevronDown" size={15} /></button>}
+                      {canMove && <button className="icon-button icon-button--small" type="button" aria-label={t('common.delete')} title={t('common.delete')} onClick={() => deleteMappedPoint(point)}><Icon name="trash" size={15} /></button>}
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           ) : (
             <section className="workspace-large-empty workspace-large-empty--compact">
@@ -276,14 +363,8 @@ onPlaceSelect={(place) => {
         </Card>
       </div>
 
-      <Modal
-        isOpen={Boolean(selection)}
-        title={status === 'loading' ? t('map.searchingPlace') : t('map.configureActivity')}
-        description={t('map.configureActivityDescription')}
-        onClose={closeEditor}
-        size="large"
-      >
-        <form className="workspace-form map-activity-editor" onSubmit={addSelectedPlace}>
+      <Modal isOpen={Boolean(selection)} title={status === 'loading' ? t('map.searchingPlace') : t('map.configureActivity')} description={t('map.configureActivityDescription')} onClose={closeEditor} size="large">
+        <form className="workspace-form map-activity-editor" onSubmit={persistSelectedPlace}>
           <div className="map-selected-place-summary">
             <span><Icon name="pin" size={20} /></span>
             <div className="map-selected-place-summary__copy"><strong>{form.title || t('map.selectedPlaceFallback')}</strong><small>{form.location}</small></div>
@@ -292,7 +373,7 @@ onPlaceSelect={(place) => {
             <label className="workspace-field workspace-form__wide"><span>{t('itinerary.titleLabel')}</span><input name="title" value={form.title} onChange={updateField} required /></label>
             <label className="workspace-field workspace-form__wide"><span>{t('common.location')}</span><textarea name="location" rows="2" value={form.location} onChange={updateField} /></label>
             <label className="workspace-field"><span>{t(form.type === 'hotel' ? 'itinerary.startDate' : 'itinerary.date')}</span><select name="date" value={form.date} onChange={updateField} required>{dates.map((date, index) => <option key={date} value={date}>{t('itinerary.day', { count: index + 1 })} · {formatLocalizedDate(date, locale, 'compact')}</option>)}</select></label>
-            {form.type === 'hotel' && <label className="workspace-field"><span>{t('itinerary.endDate')}</span><select name="endDate" value={form.endDate || form.date} onChange={updateField} required>{dates.filter((date) => date >= form.date).map((date, index) => <option key={date} value={date}>{formatLocalizedDate(date, locale, 'compact')}</option>)}</select></label>}
+            {form.type === 'hotel' && <label className="workspace-field"><span>{t('itinerary.endDate')}</span><select name="endDate" value={form.endDate || form.date} onChange={updateField} required>{dates.filter((date) => date >= form.date).map((date) => <option key={date} value={date}>{formatLocalizedDate(date, locale, 'compact')}</option>)}</select></label>}
             <label className="workspace-field"><span>{t(form.type === 'hotel' ? 'itinerary.checkInTime' : 'itinerary.time')}</span><input name="time" type="time" value={form.time} onChange={updateField} /></label>
             {form.type === 'hotel' && <label className="workspace-field"><span>{t('itinerary.checkOutTime')}</span><input name="endTime" type="time" value={form.endTime} onChange={updateField} /></label>}
             <label className="workspace-field"><span>{t('itinerary.type')}</span><select name="type" value={form.type} onChange={updateField}>{ACTIVITY_TYPES.map((type) => <option key={type.id} value={type.id}>{t(type.labelKey)}</option>)}</select></label>
@@ -303,12 +384,16 @@ onPlaceSelect={(place) => {
           {selection && <small className="map-add-form__coordinates">{selection.latitude.toFixed(5)}, {selection.longitude.toFixed(5)}</small>}
           <div className="workspace-form__actions map-add-form__actions">
             <Button variant="ghost" onClick={closeEditor}>{t('common.cancel')}</Button>
-            <Button type="button" variant="secondary" icon="pin" disabled={status === 'loading'} onClick={saveSelectionToPlaces}>{t('map.saveToPlaces')}</Button>
+            {!editingPoint && <Button type="button" variant="secondary" icon="pin" disabled={status === 'loading'} onClick={saveSelectionToPlaces}>{t('map.saveToPlaces')}</Button>}
             {form.location.trim() && onOpenBooking && <Button type="button" variant="secondary" icon="search" disabled={status === 'loading'} onClick={openComparison}>{t('affiliate.compareAll')}</Button>}
-            <Button type="submit" icon="plus" disabled={status === 'loading'}>{t('map.addToItinerary')}</Button>
+            <Button type="submit" icon={editingPoint?.source === 'itinerary' ? 'save' : 'plus'} disabled={status === 'loading'}>{t(editingPoint?.source === 'itinerary' ? 'itinerary.saveChanges' : 'map.addToItinerary')}</Button>
           </div>
         </form>
       </Modal>
     </div>
   );
+}
+
+function removePointFromOrder(order, pointId) {
+  return (Array.isArray(order) ? order : []).filter((id) => id !== pointId);
 }

@@ -5,8 +5,9 @@ import { MAP_CONFIG } from '../../config/map.config.js';
 import { applyMapLanguage } from '../../utils/mapLanguage.js';
 
 const SOURCE_ID = 'mapnplan-points';
-const CIRCLE_LAYER_ID = 'mapnplan-point-circles';
+const PIN_LAYER_ID = 'mapnplan-point-pins';
 const NUMBER_LAYER_ID = 'mapnplan-point-numbers';
+const PIN_IMAGE_PREFIX = 'mapnplan-pin-';
 
 const TYPE_COLORS = Object.freeze({
   destination: '#c96574',
@@ -83,7 +84,7 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
 
     const handleMapClick = (event) => {
-      const renderedPoints = map.queryRenderedFeatures(event.point, { layers: [CIRCLE_LAYER_ID] });
+      const renderedPoints = map.queryRenderedFeatures(event.point, { layers: [PIN_LAYER_ID] });
       const feature = renderedPoints[0];
       if (feature && feature.properties?.pointId && feature.properties.pointId !== '__selection__') {
         const point = pointsRef.current.find((candidate) => candidate.id === feature.properties.pointId);
@@ -105,7 +106,7 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
     };
 
     const handleMouseMove = (event) => {
-      const overPoint = map.queryRenderedFeatures(event.point, { layers: [CIRCLE_LAYER_ID] }).length > 0;
+      const overPoint = map.queryRenderedFeatures(event.point, { layers: [PIN_LAYER_ID] }).length > 0;
       map.getCanvas().style.cursor = overPoint ? 'pointer' : (clickHandlerRef.current ? 'crosshair' : '');
     };
 
@@ -200,6 +201,8 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
 }
 
 function ensurePointLayers(map) {
+  ensurePinImages(map);
+
   if (!map.getSource(SOURCE_ID)) {
     map.addSource(SOURCE_ID, {
       type: 'geojson',
@@ -207,28 +210,22 @@ function ensurePointLayers(map) {
     });
   }
 
-  if (!map.getLayer(CIRCLE_LAYER_ID)) {
+  if (!map.getLayer(PIN_LAYER_ID)) {
     map.addLayer({
-      id: CIRCLE_LAYER_ID,
-      type: 'circle',
+      id: PIN_LAYER_ID,
+      type: 'symbol',
       source: SOURCE_ID,
-      paint: {
-        'circle-radius': [
+      layout: {
+        'icon-image': ['get', 'icon'],
+        'icon-anchor': 'bottom',
+        'icon-size': [
           'case',
-          ['==', ['get', 'selected'], true], 13,
-          ['==', ['get', 'focused'], true], 12,
-          ['==', ['get', 'source'], 'destination'], 11,
-          10,
+          ['==', ['get', 'selected'], true], 1.12,
+          ['==', ['get', 'focused'], true], 1.1,
+          1,
         ],
-        'circle-color': ['get', 'color'],
-        'circle-stroke-color': '#ffffff',
-        'circle-stroke-width': [
-          'case',
-          ['==', ['get', 'focused'], true], 4,
-          3,
-        ],
-        'circle-opacity': 1,
-        'circle-stroke-opacity': 1,
+        'icon-allow-overlap': true,
+        'icon-ignore-placement': true,
       },
     });
   }
@@ -242,16 +239,51 @@ function ensurePointLayers(map) {
         'text-field': ['get', 'number'],
         'text-size': 10,
         'text-font': ['Noto Sans Regular'],
+        'text-offset': [0, -2.25],
+        'text-anchor': 'center',
         'text-allow-overlap': true,
         'text-ignore-placement': true,
       },
       paint: {
         'text-color': '#ffffff',
-        'text-halo-color': 'rgba(0,0,0,0.18)',
-        'text-halo-width': 0.5,
+        'text-halo-color': 'rgba(0,0,0,0.16)',
+        'text-halo-width': 0.45,
       },
     });
   }
+}
+
+function ensurePinImages(map) {
+  Object.entries(TYPE_COLORS).forEach(([key, color]) => {
+    const imageId = `${PIN_IMAGE_PREFIX}${key}`;
+    if (map.hasImage(imageId)) return;
+    map.addImage(imageId, createPinImage(color), { pixelRatio: 2 });
+  });
+}
+
+function createPinImage(color) {
+  const width = 64;
+  const height = 80;
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext('2d');
+
+  context.clearRect(0, 0, width, height);
+  context.beginPath();
+  context.moveTo(32, 76);
+  context.bezierCurveTo(27, 67, 8, 48, 8, 28);
+  context.bezierCurveTo(8, 14, 18, 5, 32, 5);
+  context.bezierCurveTo(46, 5, 56, 14, 56, 28);
+  context.bezierCurveTo(56, 48, 37, 67, 32, 76);
+  context.closePath();
+  context.fillStyle = color;
+  context.fill();
+  context.lineWidth = 5;
+  context.strokeStyle = '#ffffff';
+  context.stroke();
+
+  return context.getImageData(0, 0, width, height);
 }
 
 function syncPointData(map, points, selection, focusedPointId) {
@@ -272,7 +304,7 @@ function syncPointData(map, points, selection, focusedPointId) {
       properties: {
         pointId: '__selection__',
         source: 'selection',
-        color: TYPE_COLORS.selection,
+        icon: `${PIN_IMAGE_PREFIX}selection`,
         number: '+',
         focused: false,
         selected: true,
@@ -295,7 +327,7 @@ function pointToFeature(point, number, focused) {
       title: point.title || '',
       subtitle: point.subtitle || '',
       source: point.source || 'itinerary',
-      color: getPointColor(point),
+      icon: `${PIN_IMAGE_PREFIX}${getPointIconKey(point)}`,
       number: String(number),
       focused: Boolean(focused),
       selected: false,
@@ -327,10 +359,10 @@ function applyInitialViewport(map, points, signature, lastViewportSignatureRef) 
   map.fitBounds(bounds, { padding: 54, maxZoom: MAP_CONFIG.tripOverviewZoom, duration: 0 });
 }
 
-function getPointColor(point) {
-  if (point.source === 'destination') return TYPE_COLORS.destination;
-  if (point.type === 'car' && point.transportMode === 'ferry') return TYPE_COLORS.ferry;
-  if (TYPE_COLORS[point.type]) return TYPE_COLORS[point.type];
-  if (point.source === 'savedPlace') return TYPE_COLORS.savedPlace;
-  return TYPE_COLORS.map;
+function getPointIconKey(point) {
+  if (point.source === 'destination') return 'destination';
+  if (point.type === 'car' && point.transportMode === 'ferry') return 'ferry';
+  if (Object.hasOwn(TYPE_COLORS, point.type)) return point.type;
+  if (point.source === 'savedPlace') return 'savedPlace';
+  return 'map';
 }

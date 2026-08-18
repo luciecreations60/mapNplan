@@ -6212,3 +6212,92 @@
   .map-selected-place-summary > span { width: 32px; height: 32px; }
   .map-add-form__actions .button { width: 100%; justify-content: center; }
 }
+
+
+/* ========================================================================== */
+/* Part 36 — pointed map pins, manageable map list and useful overview        */
+/* ========================================================================== */
+
+/* Give the mapped-place list enough room to display real place names. */
+.map-workspace-grid--planner {
+  grid-template-columns: minmax(0, 1fr) minmax(390px, 460px);
+  align-items: start;
+}
+.map-place-list__items {
+  max-height: 620px;
+  gap: 9px;
+}
+.map-place-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  padding: 10px;
+}
+.map-place-row__main {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: start;
+  gap: 11px;
+  padding: 2px;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.map-place-row__main:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-primary) 45%, transparent);
+  outline-offset: 3px;
+  border-radius: 9px;
+}
+.map-place-row__copy { min-width: 0; }
+.map-place-row__copy strong {
+  display: block;
+  overflow: visible;
+  max-width: none;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
+.map-place-row__copy p {
+  display: flex;
+  overflow: visible;
+  max-width: none;
+  align-items: flex-start;
+  gap: 5px;
+  -webkit-line-clamp: unset;
+  -webkit-box-orient: initial;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.map-place-row__copy p svg { flex: 0 0 auto; margin-top: 2px; }
+.map-place-row__actions {
+  display: grid;
+  grid-template-columns: repeat(2, 30px);
+  gap: 5px;
+  align-self: start;
+}
+.map-place-row__actions .icon-button {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+}
+.map-place-row__actions .icon-button:disabled { opacity: .32; cursor: default; }
+
+@media (max-width: 1250px) {
+  .map-workspace-grid--planner { grid-template-columns: minmax(0, 1fr) minmax(350px, 400px); }
+}
+@media (max-width: 1100px) {
+  .map-workspace-grid--planner { grid-template-columns: 1fr; }
+  .map-place-list__items { max-height: 430px; }
+}
+@media (max-width: 520px) {
+  .map-place-row { grid-template-columns: minmax(0, 1fr); }
+  .map-place-row__actions { grid-template-columns: repeat(4, 34px); justify-content: end; }
+  .map-place-row__actions .icon-button { width: 34px; min-width: 34px; height: 34px; }
+}

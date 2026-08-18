@@ -59,6 +59,7 @@ class TripService {
       documents: [],
       savedPlaces: [],
       savedPlaceLists: [],
+      mapPointOrder: [],
       bookingOptions: [],
       notes: '',
       collaboration: null,
@@ -166,6 +167,7 @@ class TripService {
         createdAt: now,
         updatedAt: now,
       })),
+      mapPointOrder: [],
       bookingOptions: sourceTrip.bookingOptions.map((option) => ({
         ...option,
         id: createId('booking-option'),
@@ -308,6 +310,9 @@ class TripService {
       documents,
       savedPlaces,
       savedPlaceLists,
+      mapPointOrder: Array.isArray(trip.mapPointOrder)
+        ? [...new Set(trip.mapPointOrder.map(String).filter(Boolean))]
+        : [],
       bookingOptions,
       companion,
       collaboration,

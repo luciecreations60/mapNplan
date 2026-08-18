@@ -23,6 +23,9 @@ export function hasValidCoordinates(latitude, longitude) {
  * an itinerary activity (for example an accommodation), showing both creates
  * duplicate pins and duplicate rows. The planning map represents the places
  * and itinerary; reservation management stays in the Reservations view.
+ *
+ * `mapPointOrder` is presentation-only. Reordering a pin in the map sidebar
+ * never changes the chronological order of the itinerary itself.
  */
 export function getTripMapPoints(trip) {
   const destinationPoints = hasValidCoordinates(
@@ -55,14 +58,21 @@ export function getTripMapPoints(trip) {
         id: `itinerary-${item.seriesId || item.id}`,
         source: 'itinerary',
         order: dayIndex * 100 + itemIndex,
+        activityId: item.id,
+        dayId: day.id,
         title: item.title,
         subtitle: item.location || day.date,
         latitude: Number(item.latitude),
         longitude: Number(item.longitude),
         type: item.type || 'map',
         transportMode: item.transportMode || '',
-        date: day.date,
-        time: item.time,
+        date: item.stayStartDate || day.date,
+        endDate: item.stayEndDate || day.date,
+        time: item.checkInTime || item.time || '',
+        endTime: item.checkOutTime || item.endTime || '',
+        durationMinutes: Math.max(0, Number(item.durationMinutes) || 0),
+        estimatedCost: Math.max(0, Number(item.estimatedCost) || 0),
+        notes: item.notes || '',
         seriesId: item.seriesId || null,
       }))
   ));
@@ -71,6 +81,7 @@ export function getTripMapPoints(trip) {
     .filter((place) => hasValidCoordinates(place.latitude, place.longitude))
     .map((place, index) => ({
       id: `saved-place-${place.id}`,
+      savedPlaceId: place.id,
       source: 'savedPlace',
       order: 20000 + index,
       title: place.name,
@@ -81,8 +92,23 @@ export function getTripMapPoints(trip) {
       category: place.category || 'other',
       date: '',
       time: '',
+      notes: place.notes || '',
     }));
 
-  return [...destinationPoints, ...itineraryPoints, ...savedPlacePoints]
-    .sort((left, right) => left.order - right.order);
+  const points = [...destinationPoints, ...itineraryPoints, ...savedPlacePoints];
+  const customOrder = new Map(
+    (Array.isArray(trip.mapPointOrder) ? trip.mapPointOrder : [])
+      .map((id, index) => [String(id), index]),
+  );
+
+  return points.sort((left, right) => {
+    if (left.source === 'destination') return right.source === 'destination' ? 0 : -1;
+    if (right.source === 'destination') return 1;
+    const leftCustom = customOrder.get(left.id);
+    const rightCustom = customOrder.get(right.id);
+    if (leftCustom !== undefined && rightCustom !== undefined) return leftCustom - rightCustom;
+    if (leftCustom !== undefined) return -1;
+    if (rightCustom !== undefined) return 1;
+    return left.order - right.order;
+  });
 }
