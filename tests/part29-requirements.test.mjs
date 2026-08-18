@@ -35,7 +35,7 @@ test('accommodation occurrences use check-in only on the first day and check-out
   assert.equal(items.reduce((sum, item) => sum + item.estimatedCost, 0), 420);
 });
 
-test('map markers keep stable focus, visible numbering and type colours without opening the editor', async () => {
+test('map points keep stable focus, visible numbering and type colours without opening the editor', async () => {
   const [mapPanel, tripMap, styles] = await Promise.all([
     read('src/components/tripWorkspace/MapPanel.jsx'),
     read('src/components/tripWorkspace/TripMap.jsx'),
@@ -44,11 +44,14 @@ test('map markers keep stable focus, visible numbering and type colours without 
   assert.match(mapPanel, /onPointSelect=\{focusExistingPoint\}/);
   assert.match(mapPanel, /focusedPointId=\{focusedPointId\}/);
   assert.doesNotMatch(mapPanel, /onClick=\{\(\) => selectMapPoint\(point/);
-  assert.match(tripMap, /number: index \+ 1/);
-  assert.match(tripMap, /anchor: 'bottom'/);
+  assert.match(tripMap, /pointToFeature\(point, index \+ 1, point\.id === focusedPointId\)/);
+  assert.match(tripMap, /number: String\(number\)/);
+  assert.match(tripMap, /const NUMBER_LAYER_ID = 'mapnplan-point-numbers'/);
+  assert.match(tripMap, /'text-field': \['get', 'number'\]/);
+  assert.match(tripMap, /'circle-color': \['get', 'color'\]/);
   assert.match(tripMap, /TYPE_COLORS/);
-  assert.match(styles, /maplibre-point-marker__number/);
   assert.match(styles, /map-marker-legend__dot--hotel/);
+  assert.doesNotMatch(tripMap, /new maplibregl\.Marker/);
 });
 
 test('saved-place editor starts with location, keeps custom lists and uses the large desktop modal', async () => {

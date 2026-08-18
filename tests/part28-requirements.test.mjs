@@ -59,15 +59,13 @@ test('linked reservation button navigates to the reservations tab and focuses th
   assert.match(reservations, /scrollIntoView/);
 });
 
-test('map marker tip is anchored to the exact coordinate', async () => {
-  const [map, language, styles] = await Promise.all([
-    read('src/components/tripWorkspace/TripMap.jsx'),
-    read('src/utils/mapLanguage.js'),
-    read('src/styles/pages.css'),
-  ]);
-  assert.match(map, /new maplibregl\.Marker\(\{ element, anchor: 'bottom' \}\)/);
-  assert.match(language, /maplibre-point-marker__visual/);
-  assert.match(styles, /\.maplibre-point-marker__visual::after/);
+test('map points are anchored to the exact GeoJSON coordinate', async () => {
+  const map = await read('src/components/tripWorkspace/TripMap.jsx');
+  assert.match(map, /const SOURCE_ID = 'mapnplan-points'/);
+  assert.match(map, /geometry:\s*\{ type: 'Point', coordinates: \[longitude, latitude\] \}/);
+  assert.match(map, /type: 'geojson'/);
+  assert.match(map, /source\.setData\(\{ type: 'FeatureCollection', features \}\)/);
+  assert.doesNotMatch(map, /new maplibregl\.Marker/);
 });
 
 test('multi-day accommodation appears on every requested day with one shared budget', () => {
