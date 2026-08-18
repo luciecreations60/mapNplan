@@ -17,7 +17,12 @@ export function hasValidCoordinates(latitude, longitude) {
 }
 
 /**
- * Builds a stable, presentation-neutral list of map points from trip data.
+ * Builds the points that belong to the planning map.
+ *
+ * Reservations are intentionally excluded: when a reservation is linked to
+ * an itinerary activity (for example an accommodation), showing both creates
+ * duplicate pins and duplicate rows. The planning map represents the places
+ * and itinerary; reservation management stays in the Reservations view.
  */
 export function getTripMapPoints(trip) {
   const destinationPoints = hasValidCoordinates(
@@ -62,22 +67,6 @@ export function getTripMapPoints(trip) {
       }))
   ));
 
-  const reservationPoints = (trip.reservations || [])
-    .filter((reservation) => hasValidCoordinates(reservation.latitude, reservation.longitude))
-    .map((reservation, index) => ({
-      id: `reservation-${reservation.id}`,
-      source: 'reservation',
-      order: 10000 + index,
-      title: reservation.title,
-      subtitle: reservation.location || reservation.provider,
-      latitude: Number(reservation.latitude),
-      longitude: Number(reservation.longitude),
-      type: reservation.type || 'ticket',
-      transportMode: reservation.type === 'transport' ? 'transit' : '',
-      date: reservation.startDate,
-      time: reservation.startTime,
-    }));
-
   const savedPlacePoints = (trip.savedPlaces || [])
     .filter((place) => hasValidCoordinates(place.latitude, place.longitude))
     .map((place, index) => ({
@@ -94,6 +83,6 @@ export function getTripMapPoints(trip) {
       time: '',
     }));
 
-  return [...destinationPoints, ...itineraryPoints, ...reservationPoints, ...savedPlacePoints]
+  return [...destinationPoints, ...itineraryPoints, ...savedPlacePoints]
     .sort((left, right) => left.order - right.order);
 }

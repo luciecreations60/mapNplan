@@ -14,7 +14,6 @@ import { InlineNotice } from '../feedback/InlineNotice.jsx';
 import { LocationAutocomplete } from '../common/LocationAutocomplete.jsx';
 import { Modal } from '../common/Modal.jsx';
 import { TripMap } from './TripMap.jsx';
-import { BookingContextCard } from './BookingContextCard.jsx';
 
 function createInitialForm(trip) {
   return {
@@ -31,7 +30,7 @@ function createInitialForm(trip) {
   };
 }
 
-export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null, onRememberBookingSearch = null }) {
+export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
   const { language, locale, t } = useI18n();
   const points = useMemo(() => getTripMapPoints(trip), [trip]);
   const dates = useMemo(() => buildTripDateRange(trip.startDate, trip.endDate), [trip.startDate, trip.endDate]);
@@ -160,6 +159,22 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null, onRe
     closeEditor();
   }
 
+
+  function openComparison() {
+    if (!form.location.trim() || !onOpenBooking) return;
+    onOpenBooking({
+      source: 'map',
+      activityType: form.type,
+      title: form.title.trim(),
+      location: form.location.trim(),
+      arrivalLocation: form.location.trim(),
+      startDate: form.date,
+      endDate: form.type === 'hotel' ? (form.endDate || form.date) : form.date,
+      travelers: trip.travelers,
+      currency: trip.currency,
+    });
+  }
+
   return (
     <div className="workspace-section map-planner">
       <section className="workspace-section__heading map-planner__heading">
@@ -242,7 +257,7 @@ onPlaceSelect={(place) => {
                 >
                   <span className="map-place-row__number">{index + 1}</span>
                   <div>
-                    <small>{point.source === 'reservation' ? t('map.reservation') : point.source === 'destination' ? t('map.destination') : point.source === 'savedPlace' ? t('map.savedPlace') : t('map.itinerary')}</small>
+                    <small>{point.source === 'destination' ? t('map.destination') : point.source === 'savedPlace' ? t('map.savedPlace') : t('map.itinerary')}</small>
                     <strong>{point.title}</strong>
                     <p><Icon name="pin" size={13} /> {point.subtitle || t('map.savedCoordinates')}</p>
                   </div>
@@ -266,13 +281,14 @@ onPlaceSelect={(place) => {
         title={status === 'loading' ? t('map.searchingPlace') : t('map.configureActivity')}
         description={t('map.configureActivityDescription')}
         onClose={closeEditor}
+        size="large"
       >
         <form className="workspace-form map-activity-editor" onSubmit={addSelectedPlace}>
           <div className="map-selected-place-summary">
             <span><Icon name="pin" size={20} /></span>
-            <div><strong>{form.title || t('map.selectedPlaceFallback')}</strong><small>{form.location}</small></div>
+            <div className="map-selected-place-summary__copy"><strong>{form.title || t('map.selectedPlaceFallback')}</strong><small>{form.location}</small></div>
           </div>
-          <div className="workspace-form__grid">
+          <div className="workspace-form__grid map-activity-editor__grid">
             <label className="workspace-field workspace-form__wide"><span>{t('itinerary.titleLabel')}</span><input name="title" value={form.title} onChange={updateField} required /></label>
             <label className="workspace-field workspace-form__wide"><span>{t('common.location')}</span><textarea name="location" rows="2" value={form.location} onChange={updateField} /></label>
             <label className="workspace-field"><span>{t(form.type === 'hotel' ? 'itinerary.startDate' : 'itinerary.date')}</span><select name="date" value={form.date} onChange={updateField} required>{dates.map((date, index) => <option key={date} value={date}>{t('itinerary.day', { count: index + 1 })} · {formatLocalizedDate(date, locale, 'compact')}</option>)}</select></label>
@@ -285,29 +301,10 @@ onPlaceSelect={(place) => {
             <label className="workspace-field workspace-form__wide"><span>{t('itinerary.notes')}</span><textarea name="notes" rows="3" value={form.notes} onChange={updateField} /></label>
           </div>
           {selection && <small className="map-add-form__coordinates">{selection.latitude.toFixed(5)}, {selection.longitude.toFixed(5)}</small>}
-          {form.location.trim() && (
-            <BookingContextCard
-              trip={trip}
-              context={{
-                source: 'map',
-                activityType: form.type,
-                title: form.title,
-                location: form.location,
-                arrivalLocation: form.location,
-                startDate: form.date,
-                endDate: form.type === 'hotel' ? form.endDate : form.date,
-                travelers: trip.travelers,
-                currency: trip.currency,
-              }}
-              categories={form.type === 'map' ? ['hotels', 'activities', 'cars'] : null}
-              compact
-              onOpenBooking={onOpenBooking}
-              onRememberSearch={onRememberBookingSearch}
-            />
-          )}
           <div className="workspace-form__actions map-add-form__actions">
             <Button variant="ghost" onClick={closeEditor}>{t('common.cancel')}</Button>
             <Button type="button" variant="secondary" icon="pin" disabled={status === 'loading'} onClick={saveSelectionToPlaces}>{t('map.saveToPlaces')}</Button>
+            {form.location.trim() && onOpenBooking && <Button type="button" variant="secondary" icon="search" disabled={status === 'loading'} onClick={openComparison}>{t('affiliate.compareAll')}</Button>}
             <Button type="submit" icon="plus" disabled={status === 'loading'}>{t('map.addToItinerary')}</Button>
           </div>
         </form>

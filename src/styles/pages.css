@@ -6024,3 +6024,191 @@
 @media (max-width: 520px) {
   .map-card--interactive .trip-map--stable { height: 390px; }
 }
+
+
+/* ========================================================================== */
+/* Part 35 — visible MapLibre layers, clean map list and dialog spacing        */
+/* ========================================================================== */
+
+/* The point source is rendered by MapLibre itself; keep the canvas interaction
+   predictable and do not rely on DOM marker stacking above the WebGL canvas. */
+.trip-map--stable .maplibregl-canvas { outline: 0; }
+
+/* Right column: three real columns (number, content, action) with breathing
+   room around the internal scrollbar. Browser button defaults are reset. */
+.map-place-list {
+  min-width: 0;
+  padding: 20px;
+}
+.map-place-list .workspace-panel__header {
+  padding: 0 0 14px;
+}
+.map-place-list__items {
+  gap: 8px;
+  max-height: 520px;
+  padding: 0 7px 2px 0;
+  scrollbar-gutter: stable;
+}
+.map-place-row,
+.map-place-row--button {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: 32px minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 11px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  color: var(--color-text);
+  background: var(--color-surface);
+  font: inherit;
+  text-align: left;
+}
+.map-place-row:not(:last-child) { border-bottom: 1px solid var(--color-border); }
+.map-place-row--button:hover,
+.map-place-row--button:focus-visible {
+  border-color: color-mix(in srgb, var(--color-primary) 42%, var(--color-border));
+  outline: 0;
+  background: var(--brand-gradient-soft);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 10%, transparent);
+}
+.map-place-row--active {
+  border-color: color-mix(in srgb, var(--color-primary) 56%, var(--color-border));
+  background: var(--brand-gradient-soft);
+  box-shadow: inset 3px 0 0 var(--color-primary);
+}
+.map-place-row > div { min-width: 0; }
+.map-place-row strong {
+  display: block;
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.map-place-row p {
+  display: -webkit-box;
+  overflow: hidden;
+  max-width: 100%;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.4;
+}
+.map-place-row > svg:last-child {
+  justify-self: center;
+  color: var(--color-text-muted);
+}
+
+/* Map activity dialog: the selected place summary now has its own layout and
+   the form uses the available desktop width instead of squeezing four columns
+   into the old 720px dialog. */
+.map-activity-editor {
+  width: 100%;
+  min-width: 0;
+  gap: 18px;
+}
+.map-selected-place-summary {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  padding: 13px 14px;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 18%, var(--color-border));
+  border-radius: 14px;
+  background: var(--brand-gradient-soft);
+}
+.map-selected-place-summary > span {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 11px;
+  color: var(--color-primary);
+  background: var(--color-surface);
+}
+.map-selected-place-summary__copy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+.map-selected-place-summary__copy strong,
+.map-selected-place-summary__copy small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.map-selected-place-summary__copy small {
+  color: var(--color-text-muted);
+  line-height: 1.45;
+}
+.modal--large .map-activity-editor__grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+.modal--large .map-activity-editor__grid .workspace-form__wide {
+  grid-column: span 2;
+}
+.map-add-form__coordinates {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  padding: 5px 8px;
+  border-radius: 8px;
+  color: var(--color-text-muted);
+  background: var(--color-surface-muted);
+  overflow-wrap: anywhere;
+}
+.map-add-form__actions {
+  padding-top: 4px;
+  border-top: 1px solid var(--color-border);
+  flex-wrap: wrap;
+}
+
+/* General modal guards: useful for the remaining dialogs as well. */
+.modal,
+.modal__header,
+.modal__header > div,
+.modal__body,
+.modal__body > *,
+.modal form,
+.modal fieldset,
+.modal label,
+.modal input,
+.modal select,
+.modal textarea {
+  min-width: 0;
+  max-width: 100%;
+}
+.modal { overflow-x: hidden; }
+.modal__header > div { flex: 1 1 auto; }
+.modal__header h2,
+.modal__header p,
+.modal__body p,
+.modal__body small,
+.modal__body strong,
+.modal__body span {
+  overflow-wrap: anywhere;
+}
+.modal .workspace-form__actions,
+.modal .modal__footer {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .modal--large .map-activity-editor__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .modal--large .map-activity-editor__grid .workspace-form__wide {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 620px) {
+  .map-place-list { padding: 14px; }
+  .map-place-row,
+  .map-place-row--button { padding: 10px; }
+  .modal--large .map-activity-editor__grid { grid-template-columns: 1fr; }
+  .modal--large .map-activity-editor__grid .workspace-form__wide { grid-column: 1; }
+  .map-selected-place-summary { grid-template-columns: 34px minmax(0, 1fr); padding: 11px; }
+  .map-selected-place-summary > span { width: 32px; height: 32px; }
+  .map-add-form__actions .button { width: 100%; justify-content: center; }
+}
