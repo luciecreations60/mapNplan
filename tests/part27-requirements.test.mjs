@@ -9,8 +9,20 @@ const read = (relativePath) => fs.readFile(path.join(root, relativePath), 'utf8'
 
 test('overview tab uses the URL as its single source of truth', async () => {
   const source = await read('src/pages/TripWorkspacePage.jsx');
-  assert.match(source, /const activeTab = TRIP_TABS\.some/);
-  assert.match(source, /if \(tab === 'overview'\) nextParams\.delete\('tab'\)/);
+
+  // Current workspace navigation is grouped into a main product area (tab)
+  // plus a contextual view. The URL remains the single source of truth.
+  assert.match(source, /const requestedTab = searchParams\.get\('tab'\)/);
+  assert.match(source, /const requestedView = searchParams\.get\('view'\)/);
+  assert.match(source, /function resolveWorkspaceLocation\(requestedTab, requestedView\)/);
+  assert.match(source, /const requestedGroup = TRIP_TABS\.some/);
+  assert.match(source, /const activeGroup = requestedGroup \|\| 'overview'/);
+  assert.match(source, /const activeView = viewIds\.includes\(requestedView\)/);
+  assert.match(
+    source,
+    /if \(targetGroup === 'overview'\)\s*\{\s*nextParams\.delete\('tab'\);\s*nextParams\.delete\('view'\);\s*\}/s,
+  );
+  assert.match(source, /setSearchParams\(nextParams, \{ replace: true \}\)/);
   assert.doesNotMatch(source, /setActiveTab/);
 });
 
