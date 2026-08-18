@@ -7,11 +7,10 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relativePath) => fs.readFile(path.join(root, relativePath), 'utf8');
 
-test('workspace navigation uses the URL as its single source of truth', async () => {
+test('overview tab uses the URL as its single source of truth', async () => {
   const source = await read('src/pages/TripWorkspacePage.jsx');
-  assert.match(source, /resolveWorkspaceLocation\(requestedTab, requestedView\)/);
-  assert.match(source, /targetGroup === 'overview'/);
-  assert.match(source, /nextParams\.delete\('tab'\)/);
+  assert.match(source, /const activeTab = TRIP_TABS\.some/);
+  assert.match(source, /if \(tab === 'overview'\) nextParams\.delete\('tab'\)/);
   assert.doesNotMatch(source, /setActiveTab/);
 });
 
@@ -35,7 +34,7 @@ test('map search, vector language switching and marker zoom are connected', asyn
     read('package.json'),
   ]);
   assert.match(panel, /LocationAutocomplete/);
-  assert.match(panel, /addSelectedPlace/);
+  assert.match(panel, /persistSelectedPlace/);
   assert.match(panel, /saveSelectionToPlaces/);
   assert.match(map, /map\.flyTo/);
   assert.match(map, /applyMapLanguage/);
