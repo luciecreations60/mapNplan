@@ -3,7 +3,7 @@ import { useI18n } from '../../hooks/useI18n.js';
 import { geocodingService } from '../../services/geocoding/GeocodingService.js';
 import { formatLocalizedDate } from '../../utils/date.js';
 import { createId } from '../../utils/id.js';
-import { buildTripDateRange, getLastUsedItineraryDate, upsertActivityAcrossDates, upsertActivityInItinerary } from '../../utils/itinerary.js';
+import { buildTripDateRange, combineDuration, getLastUsedItineraryDate, splitDuration, upsertActivityAcrossDates, upsertActivityInItinerary } from '../../utils/itinerary.js';
 import { getTripMapPoints } from '../../utils/map.js';
 import { createSavedPlace } from '../../utils/savedPlaces.js';
 import { ACTIVITY_TYPES } from '../../utils/tripWorkspace.js';
@@ -24,7 +24,8 @@ function createInitialForm(trip) {
     type: 'map',
     title: '',
     location: '',
-    durationMinutes: 60,
+    durationHours: 1,
+    durationRemainderMinutes: 0,
     estimatedCost: 0,
     notes: '',
   };
@@ -109,6 +110,7 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
     if (!point) return;
     const sourceActivity = findSourceActivity(point);
     const item = sourceActivity?.item;
+    const duration = splitDuration(item?.durationMinutes ?? point.durationMinutes ?? 0);
     setFocusedPointId(point.id);
     setEditingPoint(point);
     setSelection({ latitude: Number(point.latitude), longitude: Number(point.longitude) });
@@ -123,14 +125,15 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
       type: item?.type || point.type || 'map',
       title: item?.title || point.title || '',
       location: item?.location || point.subtitle || '',
-      durationMinutes: Math.max(0, Number(item?.durationMinutes ?? point.durationMinutes) || 0),
+      durationHours: duration.hours,
+      durationRemainderMinutes: duration.minutes,
       estimatedCost: Math.max(0, Number(item?.estimatedCost ?? point.estimatedCost) || 0),
       notes: item?.notes || point.notes || '',
     });
   }
 
-  function persistSelectedPlace(event) {
-    event.preventDefault();
+  function persistSelectedPlace(event = null) {
+    event?.preventDefault?.();
     if (!selection || !form.date || !form.title.trim()) return;
 
     const sourceActivity = findSourceActivity(editingPoint);
@@ -151,7 +154,7 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
       departureLatitude: previousItem?.departureLatitude ?? null,
       departureLongitude: previousItem?.departureLongitude ?? null,
       transportMode: previousItem?.transportMode || '',
-      durationMinutes: form.type === 'hotel' ? 0 : Math.max(0, Number(form.durationMinutes) || 0),
+      durationMinutes: form.type === 'hotel' ? 0 : combineDuration(form.durationHours, form.durationRemainderMinutes),
       estimatedCost: Math.max(0, Number(form.estimatedCost) || 0),
       notes: form.notes.trim(),
       reminderMinutes: previousItem?.reminderMinutes ?? null,
@@ -195,6 +198,32 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
 
   function saveSelectionToPlaces() {
     if (!selection || !form.title.trim()) return;
+
+    if (editingPoint?.source === 'savedPlace') {
+      const existingPlace = (trip.savedPlaces || []).find((place) => place.id === editingPoint.savedPlaceId);
+      if (!existingPlace) return;
+
+      const updatedPlace = {
+        ...existingPlace,
+        name: form.title.trim(),
+        label: form.location.trim(),
+        latitude: selection.latitude,
+        longitude: selection.longitude,
+        category: activityTypeToSavedPlaceCategory(form.type, existingPlace.category),
+        notes: form.notes.trim(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      onUpdate({
+        savedPlaces: (trip.savedPlaces || []).map((place) => (
+          place.id === existingPlace.id ? updatedPlace : place
+        )),
+      });
+      setNotice({ tone: 'success', title: t('map.placeSavedTitle'), text: t('map.placeSavedText', { name: updatedPlace.name }) });
+      closeEditor();
+      return;
+    }
+
     const existing = (trip.savedPlaces || []).some((place) => (
       Math.abs(Number(place.latitude) - selection.latitude) < 0.00001
       && Math.abs(Number(place.longitude) - selection.longitude) < 0.00001
@@ -208,7 +237,7 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
       label: form.location.trim(),
       latitude: selection.latitude,
       longitude: selection.longitude,
-      category: 'other',
+      category: activityTypeToSavedPlaceCategory(form.type, 'other'),
       list: 'ideas',
       priority: 'medium',
       status: 'idea',
@@ -364,7 +393,14 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
       </div>
 
       <Modal isOpen={Boolean(selection)} title={status === 'loading' ? t('map.searchingPlace') : t('map.configureActivity')} description={t('map.configureActivityDescription')} onClose={closeEditor} size="large">
-        <form className="workspace-form map-activity-editor" onSubmit={persistSelectedPlace}>
+        <form
+          className="workspace-form map-activity-editor"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (editingPoint?.source === 'savedPlace') saveSelectionToPlaces();
+            else persistSelectedPlace(event);
+          }}
+        >
           <div className="map-selected-place-summary">
             <span><Icon name="pin" size={20} /></span>
             <div className="map-selected-place-summary__copy"><strong>{form.title || t('map.selectedPlaceFallback')}</strong><small>{form.location}</small></div>
@@ -377,7 +413,21 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
             <label className="workspace-field"><span>{t(form.type === 'hotel' ? 'itinerary.checkInTime' : 'itinerary.time')}</span><input name="time" type="time" value={form.time} onChange={updateField} /></label>
             {form.type === 'hotel' && <label className="workspace-field"><span>{t('itinerary.checkOutTime')}</span><input name="endTime" type="time" value={form.endTime} onChange={updateField} /></label>}
             <label className="workspace-field"><span>{t('itinerary.type')}</span><select name="type" value={form.type} onChange={updateField}>{ACTIVITY_TYPES.map((type) => <option key={type.id} value={type.id}>{t(type.labelKey)}</option>)}</select></label>
-            <label className="workspace-field"><span>{t('itinerary.duration')}</span><input name="durationMinutes" type="number" min="0" step="15" value={form.durationMinutes} onChange={updateField} /></label>
+            {form.type !== 'hotel' && (
+              <fieldset className="workspace-field duration-field workspace-form__wide">
+                <legend>{t('itinerary.duration')}</legend>
+                <div className="duration-field__controls">
+                  <label>
+                    <span>{t('itinerary.hours')}</span>
+                    <input name="durationHours" type="number" min="0" max="72" step="1" value={form.durationHours} onChange={updateField} />
+                  </label>
+                  <label>
+                    <span>{t('itinerary.minutePart')}</span>
+                    <input name="durationRemainderMinutes" type="number" min="0" max="59" step="1" value={form.durationRemainderMinutes} onChange={updateField} />
+                  </label>
+                </div>
+              </fieldset>
+            )}
             <label className="workspace-field"><span>{t('itinerary.estimatedCost')} ({trip.currency})</span><input name="estimatedCost" type="number" min="0" step="0.01" value={form.estimatedCost} onChange={updateField} /></label>
             <label className="workspace-field workspace-form__wide"><span>{t('itinerary.notes')}</span><textarea name="notes" rows="3" value={form.notes} onChange={updateField} /></label>
           </div>
@@ -386,7 +436,14 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
             <Button variant="ghost" onClick={closeEditor}>{t('common.cancel')}</Button>
             {!editingPoint && <Button type="button" variant="secondary" icon="pin" disabled={status === 'loading'} onClick={saveSelectionToPlaces}>{t('map.saveToPlaces')}</Button>}
             {form.location.trim() && onOpenBooking && <Button type="button" variant="secondary" icon="search" disabled={status === 'loading'} onClick={openComparison}>{t('affiliate.compareAll')}</Button>}
-            <Button type="submit" icon={editingPoint?.source === 'itinerary' ? 'save' : 'plus'} disabled={status === 'loading'}>{t(editingPoint?.source === 'itinerary' ? 'itinerary.saveChanges' : 'map.addToItinerary')}</Button>
+            {editingPoint?.source === 'savedPlace' ? (
+              <>
+                <Button type="button" variant="secondary" icon="plus" disabled={status === 'loading'} onClick={persistSelectedPlace}>{t('map.addToItinerary')}</Button>
+                <Button type="submit" icon="save" disabled={status === 'loading'}>{t('itinerary.saveChanges')}</Button>
+              </>
+            ) : (
+              <Button type="submit" icon={editingPoint?.source === 'itinerary' ? 'save' : 'plus'} disabled={status === 'loading'}>{t(editingPoint?.source === 'itinerary' ? 'itinerary.saveChanges' : 'map.addToItinerary')}</Button>
+            )}
           </div>
         </form>
       </Modal>
@@ -396,4 +453,12 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
 
 function removePointFromOrder(order, pointId) {
   return (Array.isArray(order) ? order : []).filter((id) => id !== pointId);
+}
+
+function activityTypeToSavedPlaceCategory(type, fallback = 'other') {
+  if (type === 'food') return 'food';
+  if (type === 'hotel') return 'accommodation';
+  if (type === 'car' || type === 'plane') return 'transport';
+  if (type === 'ticket') return 'sight';
+  return fallback || 'other';
 }
