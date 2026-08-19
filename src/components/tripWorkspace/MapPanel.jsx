@@ -14,6 +14,7 @@ import { InlineNotice } from '../feedback/InlineNotice.jsx';
 import { LocationAutocomplete } from '../common/LocationAutocomplete.jsx';
 import { Modal } from '../common/Modal.jsx';
 import { TripMap } from './TripMap.jsx';
+import { PlaceDiscoveryPanel } from './PlaceDiscoveryPanel.jsx';
 
 function createInitialForm(trip) {
   return {
@@ -42,6 +43,7 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
   const [status, setStatus] = useState('idle');
   const [searchValue, setSearchValue] = useState('');
   const [notice, setNotice] = useState(null);
+  const [discoveryPreview, setDiscoveryPreview] = useState(null);
   const [form, setForm] = useState(() => createInitialForm(trip));
 
   const closeEditor = useCallback(() => {
@@ -302,6 +304,44 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
     });
   }
 
+  function saveDiscoveredPlace(place) {
+    if (!place) return;
+    const duplicate = (trip.savedPlaces || []).some((savedPlace) => (
+      Math.abs(Number(savedPlace.latitude) - Number(place.latitude)) < 0.0008
+      && Math.abs(Number(savedPlace.longitude) - Number(place.longitude)) < 0.0008
+    ));
+    if (duplicate) {
+      setNotice({ tone: 'warning', title: t('map.placeAlreadySavedTitle'), text: t('map.placeAlreadySavedText') });
+      return;
+    }
+    const savedPlace = createSavedPlace({
+      name: place.name,
+      label: place.label,
+      latitude: place.latitude,
+      longitude: place.longitude,
+      category: place.savedCategory || 'other',
+      list: 'ideas',
+      priority: 'medium',
+      status: 'idea',
+      notes: '',
+      tags: [],
+      source: 'discovery',
+    });
+    onUpdate({ savedPlaces: [...(trip.savedPlaces || []), savedPlace] });
+    setNotice({ tone: 'success', title: t('map.placeSavedTitle'), text: t('map.placeSavedText', { name: savedPlace.name }) });
+    setFocusedPointId(`saved-place-${savedPlace.id}`);
+    setDiscoveryPreview(null);
+  }
+
+  function planDiscoveredPlace(place) {
+    if (!place) return;
+    setDiscoveryPreview(null);
+    selectMapPoint(
+      { latitude: place.latitude, longitude: place.longitude },
+      { name: place.name, label: place.label },
+    );
+  }
+
   return (
     <div className="workspace-section map-planner">
       <section className="workspace-section__heading map-planner__heading">
@@ -338,6 +378,15 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
 
       {notice && <InlineNotice tone={notice.tone} title={notice.title}>{notice.text}</InlineNotice>}
 
+      <PlaceDiscoveryPanel
+        trip={trip}
+        points={points}
+        focusedPointId={focusedPointId}
+        onPreview={setDiscoveryPreview}
+        onSave={saveDiscoveredPlace}
+        onPlan={planDiscoveredPlace}
+      />
+
       <div className="map-marker-legend" aria-label={t('map.legend')}>
         <span><i className="map-marker-legend__dot map-marker-legend__dot--place" />{t('map.legendPlace')}</span>
         <span><i className="map-marker-legend__dot map-marker-legend__dot--hotel" />{t('map.legendAccommodation')}</span>
@@ -348,7 +397,7 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
 
       <div className="map-workspace-grid map-workspace-grid--planner">
         <Card className="map-card map-card--interactive">
-          <TripMap points={points} onMapClick={selectMapPoint} onPointSelect={focusExistingPoint} selection={selection} focusedPointId={focusedPointId} />
+          <TripMap points={points} onMapClick={selectMapPoint} onPointSelect={focusExistingPoint} selection={selection} preview={discoveryPreview} focusedPointId={focusedPointId} />
           <div className="map-card__instruction"><Icon name="pin" size={16} /> {t('map.clickToAddText')}</div>
         </Card>
 

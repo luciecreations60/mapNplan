@@ -20,9 +20,10 @@ const TYPE_COLORS = Object.freeze({
   ticket: '#2cbb6b',
   savedPlace: '#d89422',
   selection: '#f4a62a',
+  discovery: '#2cbb6b',
 });
 
-export function TripMap({ points, onMapClick = null, onPointSelect = null, selection = null, focusedPointId = null }) {
+export function TripMap({ points, onMapClick = null, onPointSelect = null, selection = null, preview = null, focusedPointId = null }) {
   const { language, t } = useI18n();
   const containerRef = useRef(null);
   const mapRef = useRef(null);
@@ -31,6 +32,7 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
   const pointSelectHandlerRef = useRef(onPointSelect);
   const pointsRef = useRef(points || []);
   const selectionRef = useRef(selection);
+  const previewRef = useRef(preview);
   const focusedPointIdRef = useRef(focusedPointId);
   const languageRef = useRef(language);
   const lastViewportSignatureRef = useRef('');
@@ -38,6 +40,7 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
 
   pointsRef.current = points || [];
   selectionRef.current = selection;
+  previewRef.current = preview;
   focusedPointIdRef.current = focusedPointId;
   languageRef.current = language;
 
@@ -61,8 +64,11 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
     const selectionPart = selection && Number.isFinite(Number(selection.latitude)) && Number.isFinite(Number(selection.longitude))
       ? `${selection.latitude}|${selection.longitude}`
       : '';
-    return `${pointPart}##${selectionPart}##${focusedPointId || ''}`;
-  }, [points, selection, focusedPointId]);
+    const previewPart = preview && Number.isFinite(Number(preview.latitude)) && Number.isFinite(Number(preview.longitude))
+      ? `${preview.id || ''}|${preview.latitude}|${preview.longitude}|${preview.name || ''}`
+      : '';
+    return `${pointPart}##${selectionPart}##${previewPart}##${focusedPointId || ''}`;
+  }, [points, selection, preview, focusedPointId]);
 
   useEffect(() => { clickHandlerRef.current = onMapClick; }, [onMapClick]);
   useEffect(() => { pointSelectHandlerRef.current = onPointSelect; }, [onPointSelect]);
@@ -86,6 +92,7 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
     const handleMapClick = (event) => {
       const renderedPoints = map.queryRenderedFeatures(event.point, { layers: [PIN_LAYER_ID] });
       const feature = renderedPoints[0];
+      if (feature?.properties?.pointId === '__preview__') return;
       if (feature && feature.properties?.pointId && feature.properties.pointId !== '__selection__') {
         const point = pointsRef.current.find((candidate) => candidate.id === feature.properties.pointId);
         if (point) {
@@ -114,7 +121,7 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
       mapReadyRef.current = true;
       applyMapLanguage(map, languageRef.current);
       ensurePointLayers(map);
-      syncPointData(map, pointsRef.current, selectionRef.current, focusedPointIdRef.current);
+      syncPointData(map, pointsRef.current, selectionRef.current, previewRef.current, focusedPointIdRef.current);
       applyInitialViewport(map, pointsRef.current, viewportSignature, lastViewportSignatureRef);
       window.requestAnimationFrame(() => map.resize());
     };
@@ -158,7 +165,7 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
     const map = mapRef.current;
     if (!map || !mapReadyRef.current) return;
     ensurePointLayers(map);
-    syncPointData(map, pointsRef.current, selectionRef.current, focusedPointIdRef.current);
+    syncPointData(map, pointsRef.current, selectionRef.current, previewRef.current, focusedPointIdRef.current);
   }, [dataSignature]);
 
   useEffect(() => {
@@ -196,6 +203,21 @@ export function TripMap({ points, onMapClick = null, onPointSelect = null, selec
       essential: true,
     });
   }, [selection?.latitude, selection?.longitude]);
+
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReadyRef.current || !preview) return;
+    const latitude = Number(preview.latitude);
+    const longitude = Number(preview.longitude);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
+    map.flyTo({
+      center: [longitude, latitude],
+      zoom: Math.max(map.getZoom(), MAP_CONFIG.focusedZoom),
+      speed: 1.2,
+      essential: true,
+    });
+  }, [preview?.id, preview?.latitude, preview?.longitude]);
 
   return <div ref={containerRef} className="trip-map trip-map--stable" aria-label={t('map.aria')} />;
 }
@@ -286,13 +308,31 @@ function createPinImage(color) {
   return context.getImageData(0, 0, width, height);
 }
 
-function syncPointData(map, points, selection, focusedPointId) {
+function syncPointData(map, points, selection, preview, focusedPointId) {
   const source = map.getSource(SOURCE_ID);
   if (!source?.setData) return;
 
   const features = (points || [])
     .map((point, index) => pointToFeature(point, index + 1, point.id === focusedPointId))
     .filter(Boolean);
+
+  if (preview && Number.isFinite(Number(preview.latitude)) && Number.isFinite(Number(preview.longitude))) {
+    features.push({
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [Number(preview.longitude), Number(preview.latitude)],
+      },
+      properties: {
+        pointId: '__preview__',
+        source: 'discovery',
+        icon: `${PIN_IMAGE_PREFIX}discovery`,
+        number: '★',
+        focused: true,
+        selected: false,
+      },
+    });
+  }
 
   if (selection && Number.isFinite(Number(selection.latitude)) && Number.isFinite(Number(selection.longitude))) {
     features.push({
