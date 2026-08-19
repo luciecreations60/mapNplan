@@ -3,6 +3,8 @@ import { useI18n } from '../../hooks/useI18n.js';
 import { attachmentStorageService } from '../../services/storage/AttachmentStorageService.js';
 import { formatCurrency } from '../../utils/currency.js';
 import { formatLocalizedDate, formatLocalizedTime } from '../../utils/date.js';
+import { upsertActivityAcrossDates, upsertActivityInItinerary } from '../../utils/itinerary.js';
+import { mapReservationTypeToActivityType, mapReservationTypeToExpenseCategory } from '../../utils/reservationImport.js';
 import { createId } from '../../utils/id.js';
 import { RESERVATION_STATUSES, RESERVATION_TYPES, getCategoryLabel } from '../../utils/tripWorkspace.js';
 import { appendActivityEntry, createActivityEntry, getCurrentActorName } from '../../utils/collaboration.js';
@@ -14,6 +16,7 @@ import { Card } from '../common/Card.jsx';
 import { Icon } from '../common/Icon.jsx';
 import { LocationAutocomplete } from '../common/LocationAutocomplete.jsx';
 import { InlineNotice } from '../feedback/InlineNotice.jsx';
+import { ReservationImportDialog } from './ReservationImportDialog.jsx';
 
 const EMPTY_FORM = Object.freeze({
   type: 'flight', title: '', provider: '', confirmationNumber: '', startDate: '', startTime: '',
@@ -25,6 +28,7 @@ export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focus
   const { locale, t } = useI18n();
   const [form, setForm] = useState(() => ({ ...EMPTY_FORM, startDate: trip.startDate || '' }));
   const [isCreateOpen, setCreateOpen] = useState(false);
+  const [isImportOpen, setImportOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [feedback, setFeedback] = useState(null);
@@ -218,6 +222,141 @@ export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focus
     }
   }
 
+  async function confirmImportedReservation({ file, draft, targets }) {
+    const reservationId = createId('reservation');
+    const amount = Math.max(0, Number(draft.amount) || 0);
+    const activityType = mapReservationTypeToActivityType(draft.type);
+    let sourceActivityId = null;
+    let sourceActivitySeriesId = null;
+    let nextItinerary = [...(trip.itinerary || [])];
+
+    if (targets.itinerary && draft.startDate) {
+      const activity = {
+        id: createId('activity'),
+        time: draft.startTime || '',
+        endTime: activityType === 'hotel' ? '' : (draft.endTime || ''),
+        checkInTime: activityType === 'hotel' ? (draft.startTime || '') : '',
+        checkOutTime: activityType === 'hotel' ? (draft.endTime || '') : '',
+        type: activityType,
+        title: draft.title,
+        location: draft.location,
+        latitude: draft.latitude,
+        longitude: draft.longitude,
+        departureLocation: '',
+        departureLatitude: null,
+        departureLongitude: null,
+        transportMode: '',
+        durationMinutes: activityType === 'hotel' ? 0 : 60,
+        estimatedCost: amount,
+        notes: draft.notes,
+        reminderMinutes: null,
+        externalCalendarUid: '',
+        completedAt: null,
+        comments: [],
+        linkedReservationId: reservationId,
+        seriesId: null,
+      };
+
+      if (activityType === 'hotel') {
+        sourceActivitySeriesId = createId('activity-series');
+        activity.seriesId = sourceActivitySeriesId;
+        const endDate = draft.endDate && draft.endDate >= draft.startDate ? draft.endDate : draft.startDate;
+        nextItinerary = upsertActivityAcrossDates(nextItinerary, draft.startDate, endDate, activity);
+      } else {
+        sourceActivityId = activity.id;
+        nextItinerary = upsertActivityInItinerary(nextItinerary, draft.startDate, activity);
+      }
+    }
+
+    const reservation = {
+      id: reservationId,
+      type: draft.type,
+      title: draft.title,
+      provider: draft.provider,
+      confirmationNumber: draft.confirmationNumber,
+      startDate: draft.startDate,
+      startTime: draft.startTime,
+      endDate: draft.endDate,
+      endTime: draft.endTime,
+      location: draft.location,
+      status: draft.status,
+      amount,
+      url: normalizeExternalUrl(draft.url),
+      latitude: draft.latitude,
+      longitude: draft.longitude,
+      notes: draft.notes,
+      reminderMinutes: null,
+      externalCalendarUid: '',
+      comments: [],
+      sourceActivityId,
+      sourceActivitySeriesId,
+      sourceBookingOptionId: null,
+      createdAt: new Date().toISOString(),
+    };
+
+    let nextDocuments = [...(trip.documents || [])];
+    let savedAttachment = null;
+    if (targets.document) {
+      const documentId = createId('document');
+      savedAttachment = await attachmentStorageService.saveFile({
+        file,
+        tripId: trip.id,
+        documentId,
+        reservationId,
+      });
+      nextDocuments.push({
+        id: documentId,
+        type: 'booking',
+        title: t('reservations.generatedDocumentTitle', { name: draft.title }),
+        reference: draft.confirmationNumber,
+        url: normalizeExternalUrl(draft.url),
+        expiryDate: draft.endDate || draft.startDate || '',
+        notes: draft.notes,
+        linkedReservationId: reservationId,
+        attachments: [savedAttachment],
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    let nextExpenses = [...(trip.expenses || [])];
+    if (targets.expense && amount > 0) {
+      const participants = trip.travelParty || [];
+      const payer = participants.find((participant) => participant.isCurrentUser) || participants[0] || null;
+      nextExpenses.push({
+        id: createId('expense'),
+        label: draft.title,
+        category: mapReservationTypeToExpenseCategory(draft.type),
+        amount,
+        paidAmount: 0,
+        paid: false,
+        date: draft.startDate || '',
+        paidById: payer?.id || null,
+        splitBetweenIds: participants.map((participant) => participant.id),
+        splitShares: [],
+        notes: draft.notes,
+        sourceActivityId,
+        sourceActivitySeriesId,
+      });
+    }
+
+    try {
+      onUpdate({
+        reservations: [...trip.reservations, reservation],
+        documents: nextDocuments,
+        itinerary: nextItinerary,
+        expenses: nextExpenses,
+      });
+      setFeedback({
+        tone: 'success',
+        title: t('reservations.importSuccessTitle'),
+        message: t('reservations.importSuccessText', { name: reservation.title }),
+      });
+    } catch (error) {
+      if (savedAttachment) await attachmentStorageService.delete(savedAttachment.id).catch(() => {});
+      throw error;
+    }
+  }
+
   function updateStatus(reservationId, status) {
     onUpdate({ reservations: trip.reservations.map((reservation) => reservation.id === reservationId ? { ...reservation, status } : reservation) });
   }
@@ -332,9 +471,12 @@ export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focus
           <h2>{t('reservations.title')}</h2>
           <p>{t('reservations.intro')}</p>
         </div>
-        <Button icon={isCreateOpen ? 'close' : 'plus'} onClick={() => (isCreateOpen ? resetEditor() : openCreateForm())}>
-          {isCreateOpen ? t('common.close') : t('reservations.add')}
-        </Button>
+        <div className="workspace-section__actions reservations-heading-actions">
+          <Button variant="secondary" icon="upload" onClick={() => setImportOpen(true)}>{t('reservations.importAction')}</Button>
+          <Button icon={isCreateOpen ? 'close' : 'plus'} onClick={() => (isCreateOpen ? resetEditor() : openCreateForm())}>
+            {isCreateOpen ? t('common.close') : t('reservations.add')}
+          </Button>
+        </div>
       </section>
 
       {feedback && <InlineNotice tone={feedback.tone} title={feedback.title}>{feedback.message}</InlineNotice>}
@@ -401,6 +543,13 @@ export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focus
           <Button icon="plus" onClick={openCreateForm}>{t('reservations.addFirst')}</Button>
         </section>
       )}
+
+      <ReservationImportDialog
+        isOpen={isImportOpen}
+        trip={trip}
+        onClose={() => setImportOpen(false)}
+        onConfirm={confirmImportedReservation}
+      />
     </div>
   );
 }
