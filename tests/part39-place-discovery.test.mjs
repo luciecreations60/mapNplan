@@ -72,7 +72,7 @@ test('map discovery stays opt-in and reuses existing saved-place and itinerary f
 
 test('discovery copy explicitly describes road time and user-controlled planning', () => {
   const translations = read('src/i18n/translations.js');
-  assert.match(translations, /Les 5 \/ 10 \/ 20 min sont vérifiées par la route en voiture/);
+  assert.match(translations, /Le temps choisi est vérifié par la route en voiture/);
   assert.match(translations, /sans modifier votre programme tant que vous n’avez rien validé/);
   assert.match(translations, /5 \/ 10 \/ 20 min are checked by road by car/);
 });
