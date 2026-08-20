@@ -74,5 +74,5 @@ test('discovery copy explicitly describes road time and user-controlled planning
   const translations = read('src/i18n/translations.js');
   assert.match(translations, /Le temps choisi est vérifié par la route en voiture/);
   assert.match(translations, /sans modifier votre programme tant que vous n’avez rien validé/);
-  assert.match(translations, /5 \/ 10 \/ 20 min are checked by road by car/);
+  assert.match(translations, /The selected time is checked by road by car/);
 });
