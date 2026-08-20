@@ -10,6 +10,8 @@ export const DISCOVERY_CATEGORIES = Object.freeze([
 ]);
 
 export const DISCOVERY_MINUTES = Object.freeze([5, 10, 20]);
+export const DISCOVERY_MINUTES_MIN = 1;
+export const DISCOVERY_MINUTES_MAX = 120;
 
 const CATEGORY_SELECTORS = Object.freeze({
   sights: Object.freeze([
@@ -46,11 +48,17 @@ export function getDiscoveryCategory(category) {
   return DISCOVERY_CATEGORIES.find((item) => item.id === category) || DISCOVERY_CATEGORIES[0];
 }
 
+export function normalizeDiscoveryMinutes(value, fallback = 10) {
+  const parsed = Math.round(Number(value));
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(DISCOVERY_MINUTES_MAX, Math.max(DISCOVERY_MINUTES_MIN, parsed));
+}
+
 export function getDiscoveryRadiusMeters(minutes, category, mode = 'around') {
-  const safeMinutes = DISCOVERY_MINUTES.includes(Number(minutes)) ? Number(minutes) : 10;
-  const general = safeMinutes === 5 ? 3500 : safeMinutes === 10 ? 7000 : 12000;
-  const dense = safeMinutes === 5 ? 2200 : safeMinutes === 10 ? 3800 : 6000;
-  const route = safeMinutes === 5 ? 2200 : safeMinutes === 10 ? 4200 : 7000;
+  const safeMinutes = normalizeDiscoveryMinutes(minutes);
+  const general = Math.min(50000, Math.max(1800, safeMinutes * 700));
+  const dense = Math.min(30000, Math.max(1400, safeMinutes * 380));
+  const route = Math.min(30000, Math.max(1600, safeMinutes * 420));
   if (mode === 'route') return route;
   if (['food', 'shopping', 'practical'].includes(category)) return dense;
   return general;
@@ -89,9 +97,21 @@ export function normalizeOverpassElement(element, { language = 'fr', category = 
     savedCategory: getDiscoveryCategory(category).savedCategory,
     openingHours: String(tags.opening_hours || ''),
     website: String(tags.website || tags['contact:website'] || ''),
+    googleMapsUrl: buildGoogleMapsSearchUrl({ name, label: address || tags['addr:full'] || tags.description || name, latitude, longitude }),
     source: 'openstreetmap',
   };
 }
+
+export function buildGoogleMapsSearchUrl(place) {
+  const name = String(place?.name || '').trim();
+  const label = String(place?.label || '').trim();
+  const latitude = Number(place?.latitude);
+  const longitude = Number(place?.longitude);
+  const query = [name, label && label !== name ? label : ''].filter(Boolean).join(', ')
+    || (Number.isFinite(latitude) && Number.isFinite(longitude) ? `${latitude},${longitude}` : '');
+  return query ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}` : '';
+}
+
 
 export function dedupeDiscoveryPlaces(places = []) {
   const seen = new Set();

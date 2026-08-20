@@ -138,6 +138,21 @@ export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focus
     setSaving(true);
     setFeedback(null);
     const previousReservation = trip.reservations.find((reservation) => reservation.id === editingId);
+    const linkedSource = previousReservation ? findLinkedItinerarySource(trip.itinerary, previousReservation) : null;
+    const nextActivityType = mapReservationTypeToActivityType(form.type);
+    let sourceActivityId = previousReservation?.sourceActivityId || form.sourceActivityId || null;
+    let sourceActivitySeriesId = previousReservation?.sourceActivitySeriesId || form.sourceActivitySeriesId || null;
+
+    if (linkedSource) {
+      if (nextActivityType === 'hotel') {
+        sourceActivitySeriesId = linkedSource.item.seriesId || sourceActivitySeriesId || createId('activity-series');
+        sourceActivityId = null;
+      } else {
+        sourceActivityId = linkedSource.item.id || sourceActivityId || createId('activity');
+        sourceActivitySeriesId = null;
+      }
+    }
+
     const reservation = {
       id: editingId || createId('reservation'),
       ...form,
@@ -153,8 +168,8 @@ export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focus
       reminderMinutes: previousReservation?.reminderMinutes ?? null,
       externalCalendarUid: previousReservation?.externalCalendarUid || '',
       comments: previousReservation?.comments || [],
-      sourceActivityId: previousReservation?.sourceActivityId || form.sourceActivityId || null,
-      sourceActivitySeriesId: previousReservation?.sourceActivitySeriesId || form.sourceActivitySeriesId || null,
+      sourceActivityId,
+      sourceActivitySeriesId,
       sourceBookingOptionId: previousReservation?.sourceBookingOptionId || null,
       createdAt: previousReservation?.createdAt || new Date().toISOString(),
     };
@@ -164,6 +179,24 @@ export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focus
       : [...trip.reservations, reservation];
 
     let nextDocuments = [...(trip.documents || [])];
+    let nextItinerary = [...(trip.itinerary || [])];
+    let nextExpenses = [...(trip.expenses || [])];
+    let linkedUpdateCount = 0;
+
+    if (editingId && previousReservation) {
+      const synced = synchronizeReservationLinks({
+        trip,
+        previousReservation,
+        reservation,
+        oldGeneratedDocumentTitle: t('reservations.generatedDocumentTitle', { name: previousReservation.title }),
+        newGeneratedDocumentTitle: t('reservations.generatedDocumentTitle', { name: reservation.title }),
+      });
+      nextDocuments = synced.documents;
+      nextItinerary = synced.itinerary;
+      nextExpenses = synced.expenses;
+      linkedUpdateCount = synced.updatedCount;
+    }
+
     const savedAttachments = [];
 
     try {
@@ -205,13 +238,15 @@ export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focus
           : [...nextDocuments, updatedDocument];
       }
 
-      onUpdate({ reservations: nextReservations, documents: nextDocuments });
+      onUpdate({ reservations: nextReservations, documents: nextDocuments, itinerary: nextItinerary, expenses: nextExpenses });
       setFeedback({
         tone: 'success',
         title: t('reservations.savedTitle'),
         message: selectedFiles.length > 0
           ? t('reservations.savedWithFiles', { count: selectedFiles.length })
-          : t('reservations.savedText'),
+          : linkedUpdateCount > 0
+            ? t('reservations.savedSyncedText', { count: linkedUpdateCount })
+            : t('reservations.savedText'),
       });
       resetEditor();
     } catch (error) {
@@ -334,6 +369,7 @@ export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focus
         splitBetweenIds: participants.map((participant) => participant.id),
         splitShares: [],
         notes: draft.notes,
+        linkedReservationId: reservationId,
         sourceActivityId,
         sourceActivitySeriesId,
       });
@@ -562,6 +598,114 @@ function normalizeMoney(value) {
   if (value === '') return '';
   const number = Number(value);
   return Number.isFinite(number) ? Math.max(0, number).toFixed(2) : '';
+}
+
+
+function findLinkedItinerarySource(itinerary, reservation) {
+  for (const day of itinerary || []) {
+    const item = (day.items || []).find((candidate) => isActivityLinkedToReservation(candidate, reservation));
+    if (item) return { day, item };
+  }
+  return null;
+}
+
+function isActivityLinkedToReservation(activity, reservation) {
+  if (!activity || !reservation) return false;
+  if (activity.linkedReservationId && activity.linkedReservationId === reservation.id) return true;
+  if (reservation.sourceActivityId && activity.id === reservation.sourceActivityId) return true;
+  if (reservation.sourceActivitySeriesId && activity.seriesId === reservation.sourceActivitySeriesId) return true;
+  return false;
+}
+
+function synchronizeReservationLinks({ trip, previousReservation, reservation, oldGeneratedDocumentTitle, newGeneratedDocumentTitle }) {
+  const linkedSource = findLinkedItinerarySource(trip.itinerary, previousReservation);
+  const changed = (field) => reservation[field] !== previousReservation[field];
+  const activityRelevantChange = ['type', 'title', 'startDate', 'startTime', 'endDate', 'endTime', 'location', 'latitude', 'longitude', 'amount', 'notes'].some(changed);
+  const expenseRelevantChange = ['type', 'title', 'startDate', 'amount', 'notes'].some(changed);
+  const documentRelevantChange = ['title', 'confirmationNumber', 'startDate', 'endDate', 'url', 'notes'].some(changed);
+  let itinerary = [...(trip.itinerary || [])];
+  let updatedCount = 0;
+
+  if (linkedSource && activityRelevantChange) {
+    const baseItinerary = itinerary.map((day) => {
+      const filtered = (day.items || []).filter((item) => !isActivityLinkedToReservation(item, previousReservation));
+      return filtered.length === (day.items || []).length ? day : { ...day, items: filtered, routePlan: null };
+    });
+
+    if (reservation.startDate) {
+      const activityType = mapReservationTypeToActivityType(reservation.type);
+      const root = linkedSource.item;
+      const activity = {
+        ...root,
+        id: reservation.sourceActivityId || root.id,
+        type: changed('type') ? activityType : root.type,
+        title: changed('title') ? reservation.title : root.title,
+        location: changed('location') ? reservation.location : root.location,
+        latitude: changed('latitude') ? reservation.latitude : root.latitude,
+        longitude: changed('longitude') ? reservation.longitude : root.longitude,
+        time: changed('startTime') ? (reservation.startTime || '') : (root.checkInTime || root.time || ''),
+        endTime: activityType === 'hotel' ? '' : (changed('endTime') ? (reservation.endTime || '') : (root.endTime || '')),
+        checkInTime: activityType === 'hotel' ? (changed('startTime') ? (reservation.startTime || '') : (root.checkInTime || root.time || '')) : '',
+        checkOutTime: activityType === 'hotel' ? (changed('endTime') ? (reservation.endTime || '') : (root.checkOutTime || '')) : '',
+        durationMinutes: activityType === 'hotel' ? 0 : Math.max(0, Number(root.durationMinutes) || 60),
+        estimatedCost: changed('amount') ? Math.max(0, Number(reservation.amount) || 0) : Math.max(0, Number(root.estimatedCost) || 0),
+        notes: changed('notes') ? (reservation.notes || '') : (root.notes || ''),
+        linkedReservationId: reservation.id,
+        seriesId: activityType === 'hotel' ? (reservation.sourceActivitySeriesId || root.seriesId || null) : null,
+      };
+
+      if (activityType === 'hotel') {
+        const oldStart = root.stayStartDate || previousReservation.startDate || reservation.startDate;
+        const oldEnd = root.stayEndDate || previousReservation.endDate || oldStart;
+        const startDate = changed('startDate') ? reservation.startDate : oldStart;
+        const requestedEnd = changed('endDate') ? reservation.endDate : oldEnd;
+        const endDate = requestedEnd && requestedEnd >= startDate ? requestedEnd : startDate;
+        itinerary = upsertActivityAcrossDates(baseItinerary, startDate, endDate, activity);
+      } else {
+        const date = changed('startDate') ? reservation.startDate : (linkedSource.day.date || reservation.startDate);
+        itinerary = upsertActivityInItinerary(baseItinerary, date, activity);
+      }
+    } else {
+      itinerary = baseItinerary;
+    }
+    updatedCount += 1;
+  }
+
+  const expenses = (trip.expenses || []).map((expense) => {
+    const linked = expense.linkedReservationId === previousReservation.id
+      || (previousReservation.sourceActivityId && expense.sourceActivityId === previousReservation.sourceActivityId)
+      || (previousReservation.sourceActivitySeriesId && expense.sourceActivitySeriesId === previousReservation.sourceActivitySeriesId);
+    if (!linked || !expenseRelevantChange) return expense;
+    updatedCount += 1;
+    return {
+      ...expense,
+      label: changed('title') ? reservation.title : expense.label,
+      category: changed('type') ? mapReservationTypeToExpenseCategory(reservation.type) : expense.category,
+      amount: changed('amount') ? Math.max(0, Number(reservation.amount) || 0) : expense.amount,
+      date: changed('startDate') ? (reservation.startDate || '') : expense.date,
+      notes: changed('notes') ? (reservation.notes || '') : expense.notes,
+      linkedReservationId: reservation.id,
+      sourceActivityId: reservation.sourceActivityId || null,
+      sourceActivitySeriesId: reservation.sourceActivitySeriesId || null,
+    };
+  });
+
+  const documents = (trip.documents || []).map((document) => {
+    if (document.linkedReservationId !== previousReservation.id || !documentRelevantChange) return document;
+    updatedCount += 1;
+    const generatedTitle = !document.title || document.title === oldGeneratedDocumentTitle;
+    return {
+      ...document,
+      title: changed('title') && generatedTitle ? newGeneratedDocumentTitle : document.title,
+      reference: changed('confirmationNumber') ? (reservation.confirmationNumber || '') : document.reference,
+      url: changed('url') ? (reservation.url || '') : document.url,
+      expiryDate: changed('endDate') || changed('startDate') ? (reservation.endDate || reservation.startDate || '') : document.expiryDate,
+      notes: changed('notes') ? (reservation.notes || '') : document.notes,
+      linkedReservationId: reservation.id,
+    };
+  });
+
+  return { itinerary, expenses, documents, updatedCount };
 }
 
 function compareReservations(left, right) {

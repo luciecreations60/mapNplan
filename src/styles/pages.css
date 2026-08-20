@@ -6719,3 +6719,79 @@
   .place-discovery-result__actions .button { flex: 1 1 105px; }
   .place-discovery__provider { justify-self: start; }
 }
+
+/* Part 40 — custom discovery time, result photos and external info actions. */
+.place-discovery__minute-presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 7px;
+}
+
+.place-discovery__custom-minutes {
+  display: grid;
+  gap: 4px;
+  min-width: 118px;
+  color: var(--color-text-muted);
+  font-size: .68rem;
+  font-weight: 700;
+}
+
+.place-discovery__custom-minutes-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 34px;
+  padding: 4px 9px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.place-discovery__custom-minutes-input:focus-within {
+  border-color: rgba(31, 144, 173, .52);
+  box-shadow: 0 0 0 3px rgba(31, 144, 173, .1);
+}
+
+.place-discovery__custom-minutes-input input {
+  width: 54px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  color: var(--color-text);
+  background: transparent;
+  font: inherit;
+  font-size: .76rem;
+  font-weight: 750;
+  text-align: center;
+}
+
+.place-discovery__custom-minutes-input b,
+.place-discovery__custom-minutes-input > span:last-child {
+  color: var(--color-text-muted);
+  font-size: .72rem;
+}
+
+.place-discovery-result__google {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+@media (max-width: 760px) {
+  .place-discovery__minutes > .place-discovery__minute-presets {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .place-discovery__custom-minutes {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+  .place-discovery__custom-minutes-input {
+    justify-content: center;
+    width: 100%;
+  }
+}

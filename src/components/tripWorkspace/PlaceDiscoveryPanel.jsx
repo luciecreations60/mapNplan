@@ -3,7 +3,7 @@ import { useI18n } from '../../hooks/useI18n.js';
 import { placeDiscoveryService } from '../../services/discovery/PlaceDiscoveryService.js';
 import { formatLocalizedDate } from '../../utils/date.js';
 import { hasValidCoordinates } from '../../utils/map.js';
-import { DISCOVERY_CATEGORIES, DISCOVERY_MINUTES } from '../../utils/placeDiscovery.js';
+import { DISCOVERY_CATEGORIES, DISCOVERY_MINUTES, DISCOVERY_MINUTES_MAX, DISCOVERY_MINUTES_MIN, normalizeDiscoveryMinutes } from '../../utils/placeDiscovery.js';
 import { Button } from '../common/Button.jsx';
 import { Card } from '../common/Card.jsx';
 import { Icon } from '../common/Icon.jsx';
@@ -47,7 +47,8 @@ export function PlaceDiscoveryPanel({
 
   const selectedAnchor = points.find((point) => point.id === anchorId) || null;
   const selectedRouteDay = routeDays.find((day) => day.id === routeDayId) || null;
-  const canSearch = mode === 'around' ? Boolean(selectedAnchor) : Boolean(selectedRouteDay);
+  const validMinutes = Number.isFinite(Number(maxMinutes)) && Number(maxMinutes) >= DISCOVERY_MINUTES_MIN && Number(maxMinutes) <= DISCOVERY_MINUTES_MAX;
+  const canSearch = (mode === 'around' ? Boolean(selectedAnchor) : Boolean(selectedRouteDay)) && validMinutes;
 
   async function runDiscovery() {
     if (!canSearch || status === 'loading') return;
@@ -64,14 +65,14 @@ export function PlaceDiscoveryPanel({
         ? await placeDiscoveryService.discoverAround({
           anchor: selectedAnchor,
           category,
-          maxMinutes,
+          maxMinutes: normalizeDiscoveryMinutes(maxMinutes),
           language,
           signal: controller.signal,
         })
         : await placeDiscoveryService.discoverAlongRoute({
           routePoints: selectedRouteDay.points,
           category,
-          maxMinutes,
+          maxMinutes: normalizeDiscoveryMinutes(maxMinutes),
           language,
           signal: controller.signal,
         });
@@ -129,12 +130,30 @@ export function PlaceDiscoveryPanel({
 
         <fieldset className="place-discovery__minutes">
           <legend>{t(mode === 'around' ? 'discovery.maxDriveTime' : 'discovery.maxDetour')}</legend>
-          <div>
+          <div className="place-discovery__minute-presets">
             {DISCOVERY_MINUTES.map((minutes) => (
-              <button key={minutes} type="button" className={maxMinutes === minutes ? 'is-active' : ''} onClick={() => setMaxMinutes(minutes)}>
+              <button key={minutes} type="button" className={Number(maxMinutes) === minutes ? 'is-active' : ''} onClick={() => setMaxMinutes(minutes)}>
                 {mode === 'route' ? '+' : ''}{minutes} min
               </button>
             ))}
+            <label className="place-discovery__custom-minutes">
+              <span>{t('discovery.customMinutes')}</span>
+              <span className="place-discovery__custom-minutes-input">
+                {mode === 'route' && <b aria-hidden="true">+</b>}
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={DISCOVERY_MINUTES_MIN}
+                  max={DISCOVERY_MINUTES_MAX}
+                  step="1"
+                  value={maxMinutes}
+                  aria-label={t('discovery.customMinutesAria')}
+                  onChange={(event) => setMaxMinutes(event.target.value)}
+                  onBlur={() => setMaxMinutes(normalizeDiscoveryMinutes(maxMinutes))}
+                />
+                <span>min</span>
+              </span>
+            </label>
           </div>
         </fieldset>
       </div>
@@ -197,6 +216,7 @@ export function PlaceDiscoveryPanel({
                   </div>
                   <div className="place-discovery-result__actions">
                     <Button variant="ghost" size="small" icon="eye" onClick={() => onPreview?.(place)}>{t('discovery.view')}</Button>
+                    {place.googleMapsUrl && <a className="button button--ghost button--small place-discovery-result__google" href={place.googleMapsUrl} target="_blank" rel="noreferrer"><Icon name="externalLink" size={14} /> {t('discovery.google')}</a>}
                     <Button variant="secondary" size="small" icon={alreadySaved ? 'check' : 'pin'} disabled={alreadySaved} onClick={() => onSave?.(place)}>
                       {alreadySaved ? t('discovery.saved') : t('discovery.save')}
                     </Button>

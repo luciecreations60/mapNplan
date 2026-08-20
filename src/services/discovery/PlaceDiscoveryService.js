@@ -9,6 +9,7 @@ import {
   dedupeDiscoveryPlaces,
   getDiscoveryRadiusMeters,
   getDiscoverySelectors,
+  normalizeDiscoveryMinutes,
   normalizeOverpassElement,
 } from '../../utils/placeDiscovery.js';
 
@@ -18,11 +19,12 @@ class PlaceDiscoveryService {
   async discoverAround({ anchor, category = 'sights', maxMinutes = 10, language = 'fr', signal = null }) {
     const normalizedAnchor = normalizeCoordinatePoint(anchor);
     if (!normalizedAnchor) throw new Error('A valid mapped point is required.');
-    const cacheKey = `around|${signaturePoint(normalizedAnchor)}|${category}|${maxMinutes}|${language}`;
+    const safeMinutes = normalizeDiscoveryMinutes(maxMinutes);
+    const cacheKey = `around|${signaturePoint(normalizedAnchor)}|${category}|${safeMinutes}|${language}`;
     const cached = readCache(cacheKey);
     if (cached) return cached;
 
-    const radiusMeters = getDiscoveryRadiusMeters(maxMinutes, category, 'around');
+    const radiusMeters = getDiscoveryRadiusMeters(safeMinutes, category, 'around');
     const candidates = await this.#fetchCandidates({
       centers: [normalizedAnchor],
       radiusMeters,
@@ -38,10 +40,10 @@ class PlaceDiscoveryService {
 
     try {
       const matrix = await this.#fetchRoadMatrix([normalizedAnchor, ...routedCandidates], signal);
-      results = attachAroundRoadTimes(routedCandidates, matrix, Number(maxMinutes));
+      results = attachAroundRoadTimes(routedCandidates, matrix, safeMinutes);
     } catch {
       timingSource = 'estimate';
-      results = attachAroundEstimatedTimes(normalizedAnchor, routedCandidates, Number(maxMinutes));
+      results = attachAroundEstimatedTimes(normalizedAnchor, routedCandidates, safeMinutes);
     }
 
     const response = {
@@ -56,13 +58,14 @@ class PlaceDiscoveryService {
   async discoverAlongRoute({ routePoints, category = 'sights', maxMinutes = 10, language = 'fr', signal = null }) {
     const normalizedRoute = (routePoints || []).map(normalizeCoordinatePoint).filter(Boolean);
     if (normalizedRoute.length < 2) throw new Error('At least two mapped route points are required.');
+    const safeMinutes = normalizeDiscoveryMinutes(maxMinutes);
     const routeSignature = normalizedRoute.map(signaturePoint).join(';');
-    const cacheKey = `route|${routeSignature}|${category}|${maxMinutes}|${language}`;
+    const cacheKey = `route|${routeSignature}|${category}|${safeMinutes}|${language}`;
     const cached = readCache(cacheKey);
     if (cached) return cached;
 
     const centers = buildRouteSearchCenters(normalizedRoute, DISCOVERY_CONFIG.routeSampleLimit);
-    const radiusMeters = getDiscoveryRadiusMeters(maxMinutes, category, 'route');
+    const radiusMeters = getDiscoveryRadiusMeters(safeMinutes, category, 'route');
     const candidates = await this.#fetchCandidates({ centers, radiusMeters, category, language, signal });
     const routedCandidates = [...candidates]
       .sort((left, right) => minimumDistanceToCenters(left, centers) - minimumDistanceToCenters(right, centers))
@@ -72,10 +75,10 @@ class PlaceDiscoveryService {
 
     try {
       const matrix = await this.#fetchRoadMatrix([...normalizedRoute, ...routedCandidates], signal);
-      results = attachRouteDetours(routedCandidates, matrix, normalizedRoute.length, Number(maxMinutes));
+      results = attachRouteDetours(routedCandidates, matrix, normalizedRoute.length, safeMinutes);
     } catch {
       timingSource = 'estimate';
-      results = attachRouteEstimatedDetours(normalizedRoute, routedCandidates, Number(maxMinutes));
+      results = attachRouteEstimatedDetours(normalizedRoute, routedCandidates, safeMinutes);
     }
 
     const response = {
