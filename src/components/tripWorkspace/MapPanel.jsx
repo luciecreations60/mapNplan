@@ -45,6 +45,8 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
   const [notice, setNotice] = useState(null);
   const [discoveryPreview, setDiscoveryPreview] = useState(null);
   const [form, setForm] = useState(() => createInitialForm(trip));
+  const [draggedPointId, setDraggedPointId] = useState(null);
+  const [dragOverPointId, setDragOverPointId] = useState(null);
 
   const closeEditor = useCallback(() => {
     setSelection(null);
@@ -279,13 +281,22 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
 
   function moveMappedPoint(point, direction) {
     if (!point || point.source === 'destination') return;
-    const ids = movablePoints.map((item) => item.id);
-    const configured = (Array.isArray(trip.mapPointOrder) ? trip.mapPointOrder : []).filter((id) => ids.includes(id));
-    ids.forEach((id) => { if (!configured.includes(id)) configured.push(id); });
+    const configured = computeConfiguredOrder(trip, movablePoints);
     const index = configured.indexOf(point.id);
     const target = direction === 'up' ? index - 1 : index + 1;
     if (index < 0 || target < 0 || target >= configured.length) return;
     [configured[index], configured[target]] = [configured[target], configured[index]];
+    onUpdate({ mapPointOrder: configured });
+  }
+
+  function reorderMappedPointByDrag(draggedId, targetId) {
+    if (!draggedId || !targetId || draggedId === targetId) return;
+    const configured = computeConfiguredOrder(trip, movablePoints);
+    const fromIndex = configured.indexOf(draggedId);
+    const toIndex = configured.indexOf(targetId);
+    if (fromIndex < 0 || toIndex < 0) return;
+    const [moved] = configured.splice(fromIndex, 1);
+    configured.splice(toIndex, 0, moved);
     onUpdate({ mapPointOrder: configured });
   }
 
@@ -411,7 +422,42 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
                 const movableIndex = movablePoints.findIndex((item) => item.id === point.id);
                 const canMove = point.source !== 'destination';
                 return (
-                  <article key={point.id} className={`map-place-row${focusedPointId === point.id ? ' map-place-row--active' : ''}`}>
+                  <article
+                    key={point.id}
+                    className={`map-place-row${focusedPointId === point.id ? ' map-place-row--active' : ''}${dragOverPointId === point.id ? ' map-place-row--drag-over' : ''}`}
+                    onDragOver={(event) => {
+                      if (!canMove || !draggedPointId || draggedPointId === point.id) return;
+                      event.preventDefault();
+                      setDragOverPointId(point.id);
+                    }}
+                    onDragLeave={() => setDragOverPointId((current) => (current === point.id ? null : current))}
+                    onDrop={(event) => {
+                      if (!canMove) return;
+                      event.preventDefault();
+                      reorderMappedPointByDrag(draggedPointId, point.id);
+                      setDraggedPointId(null);
+                      setDragOverPointId(null);
+                    }}
+                  >
+                    {canMove && (
+                      <span
+                        className="map-place-row__handle"
+                        draggable
+                        role="button"
+                        tabIndex={-1}
+                        aria-label={t('map.dragToReorder', { name: point.title })}
+                        onDragStart={(event) => {
+                          setDraggedPointId(point.id);
+                          event.dataTransfer.effectAllowed = 'move';
+                        }}
+                        onDragEnd={() => {
+                          setDraggedPointId(null);
+                          setDragOverPointId(null);
+                        }}
+                      >
+                        <Icon name="gripVertical" size={15} />
+                      </span>
+                    )}
                     <button type="button" className="map-place-row__main" onClick={() => focusExistingPoint(point)}>
                       <span className="map-place-row__number">{index + 1}</span>
                       <div className="map-place-row__copy">
@@ -502,6 +548,13 @@ export function MapPanel({ trip, onOpenTab, onUpdate, onOpenBooking = null }) {
 
 function removePointFromOrder(order, pointId) {
   return (Array.isArray(order) ? order : []).filter((id) => id !== pointId);
+}
+
+function computeConfiguredOrder(trip, movablePoints) {
+  const ids = movablePoints.map((item) => item.id);
+  const configured = (Array.isArray(trip.mapPointOrder) ? trip.mapPointOrder : []).filter((id) => ids.includes(id));
+  ids.forEach((id) => { if (!configured.includes(id)) configured.push(id); });
+  return configured;
 }
 
 function activityTypeToSavedPlaceCategory(type, fallback = 'other') {

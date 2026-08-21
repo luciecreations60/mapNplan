@@ -43,6 +43,7 @@ import {
   Folder,
   HardDrive,
   Globe,
+  GripVertical,
   Info,
   HeartPulse,
   LayoutDashboard,
@@ -190,6 +191,7 @@ const ICONS = {
   eye: Eye,
   close: X,
   logOut: LogOut,
+  gripVertical: GripVertical,
 };
 
 export function Icon({ name, size = 20, strokeWidth = 1.9, ...props }) {

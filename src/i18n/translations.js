@@ -513,7 +513,7 @@ export const TRANSLATIONS = Object.freeze({
 map: {
   eyebrow: 'Visual planning', title: 'Trip map', intro: 'See itinerary stops and saved places in one clear map.',
   emptyTitle: 'No mapped places yet', emptyText: 'Select a destination, add a geolocated activity or save a place to start your map.',
-  addCoordinates: 'Add itinerary coordinates', mappedPlaces: 'Mapped places', mappedEmpty: 'Mapped locations will appear here.', location: '{{count}} location', locations: '{{count}} locations', reservation: 'Reservation', itinerary: 'Itinerary', destination: 'Destination', savedPlace: 'Saved place', savedCoordinates: 'Saved coordinates',
+  addCoordinates: 'Add itinerary coordinates', mappedPlaces: 'Mapped places', mappedEmpty: 'Mapped locations will appear here.', location: '{{count}} location', locations: '{{count}} locations', reservation: 'Reservation', itinerary: 'Itinerary', destination: 'Destination', savedPlace: 'Saved place', savedCoordinates: 'Saved coordinates', dragToReorder: 'Drag to reorder {{name}}',
   selectedPoint: 'Selected point', selectedPlaceFallback: 'Selected place', reverseUnavailableTitle: 'Place name unavailable', reverseUnavailableText: 'The coordinates are ready; enter a name manually if needed.',
   activityAddedTitle: 'Activity added', activityAddedText: '“{{name}}” was added to the itinerary.',
   clickToAddTitle: 'Click anywhere on the map', clickToAddText: 'Select a point, verify the detected place, then choose the date, time and activity type.',
@@ -1303,7 +1303,7 @@ map: {
 map: {
   eyebrow: 'Planification visuelle', title: 'Carte du voyage', intro: 'Visualisez les étapes de l’itinéraire et les lieux enregistrés sur une carte claire.',
   emptyTitle: 'Aucun lieu cartographié', emptyText: 'Sélectionnez une destination, ajoutez une activité géolocalisée ou enregistrez un lieu pour démarrer la carte.',
-  addCoordinates: 'Ajouter des coordonnées à l’itinéraire', mappedPlaces: 'Lieux cartographiés', mappedEmpty: 'Les lieux cartographiés apparaîtront ici.', location: '{{count}} lieu', locations: '{{count}} lieux', reservation: 'Réservation', itinerary: 'Itinéraire', destination: 'Destination', savedPlace: 'Lieu enregistré', savedCoordinates: 'Coordonnées enregistrées',
+  addCoordinates: 'Ajouter des coordonnées à l’itinéraire', mappedPlaces: 'Lieux cartographiés', mappedEmpty: 'Les lieux cartographiés apparaîtront ici.', location: '{{count}} lieu', locations: '{{count}} lieux', reservation: 'Réservation', itinerary: 'Itinéraire', destination: 'Destination', savedPlace: 'Lieu enregistré', savedCoordinates: 'Coordonnées enregistrées', dragToReorder: 'Glisser pour réordonner {{name}}',
   selectedPoint: 'Point sélectionné', selectedPlaceFallback: 'Lieu sélectionné', reverseUnavailableTitle: 'Nom du lieu indisponible', reverseUnavailableText: 'Les coordonnées sont prêtes ; saisissez le nom manuellement si nécessaire.',
   activityAddedTitle: 'Activité ajoutée', activityAddedText: '« {{name}} » a été ajouté à l’itinéraire.',
   clickToAddTitle: 'Cliquez n’importe où sur la carte', clickToAddText: 'Sélectionnez un point, vérifiez le lieu détecté puis choisissez la date, l’heure et le type d’activité.',
