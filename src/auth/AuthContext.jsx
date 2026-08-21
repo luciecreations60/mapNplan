@@ -1,48 +1,60 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { supabase } from '../config/supabase.config.js';
 
 const AuthContext = createContext(undefined);
-const STORAGE_KEY = "mapnplan_session";
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Restore session on app start
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
+    let isMounted = true;
 
-      const parsed = JSON.parse(raw);
-      if (parsed && parsed.email) {
-        setUser(parsed);
-      } else {
-        localStorage.removeItem(STORAGE_KEY);
-      }
-    } catch (e) {
-      localStorage.removeItem(STORAGE_KEY);
-      setUser(null);
-    }
+    supabase.auth.getSession().then(({ data }) => {
+      if (!isMounted) return;
+      setSession(data.session ?? null);
+      setIsLoading(false);
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession);
+      setIsLoading(false);
+    });
+
+    return () => {
+      isMounted = false;
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
-  const login = (email) => {
-    const nextUser = { email };
-    setUser(nextUser);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser));
-  };
+  async function signUp(email, password) {
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) throw error;
+    return data;
+  }
 
-  const logout = () => {
-    localStorage.removeItem(STORAGE_KEY);
-    setUser(null);
-  };
+  async function signIn(email, password) {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return data;
+  }
+
+  async function signOut() {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+  }
 
   const value = useMemo(
     () => ({
-      user,
-      isAuthenticated: !!user,
-      login,
-      logout,
+      user: session?.user ?? null,
+      session,
+      isAuthenticated: !!session?.user,
+      isLoading,
+      signUp,
+      signIn,
+      signOut,
     }),
-    [user]
+    [session, isLoading],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -50,6 +62,6 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
   return ctx;
 }

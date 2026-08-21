@@ -3,6 +3,7 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ErrorBoundary } from './components/feedback/ErrorBoundary.jsx';
 import { RouteLoading } from './components/feedback/RouteLoading.jsx';
 import { AppLayout } from './layouts/AppLayout.jsx';
+import { RequireAuth } from './auth/RequireAuth.jsx';
 
 function lazyNamed(importer, exportName) {
   return lazy(() => importer().then((module) => ({ default: module[exportName] })));
@@ -18,6 +19,7 @@ const SettingsPage = lazyNamed(() => import('./pages/SettingsPage.jsx'), 'Settin
 const TemplatesPage = lazyNamed(() => import('./pages/TemplatesPage.jsx'), 'TemplatesPage');
 const TripWorkspacePage = lazyNamed(() => import('./pages/TripWorkspacePage.jsx'), 'TripWorkspacePage');
 const TripsPage = lazyNamed(() => import('./pages/TripsPage.jsx'), 'TripsPage');
+const LoginPage = lazyNamed(() => import('./pages/LoginPage.jsx'), 'LoginPage');
 
 export default function App() {
   return (
@@ -28,7 +30,14 @@ export default function App() {
             <Route path="/trips/:tripId/print" element={<PrintTripPage />} />
             <Route path="/shared" element={<SharedTripPage />} />
             <Route path="/guides/:slug" element={<PublicDestinationPage />} />
-            <Route element={<AppLayout />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route
+              element={(
+                <RequireAuth>
+                  <AppLayout />
+                </RequireAuth>
+              )}
+            >
               <Route index element={<Navigate replace to="/dashboard" />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/trips" element={<TripsPage />} />

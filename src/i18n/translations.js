@@ -7,6 +7,23 @@
 export const TRANSLATIONS = Object.freeze({
   en: Object.freeze({
     brand: { tagline: 'Plan. Explore. Enjoy.', welcome: 'Every journey starts here.' },
+    auth: {
+      signInTitle: 'Sign in to mapNplan',
+      signUpTitle: 'Create your mapNplan account',
+      email: 'Email',
+      password: 'Password',
+      signIn: 'Sign in',
+      signUp: 'Create account',
+      signingIn: 'Signing in…',
+      signingUp: 'Creating account…',
+      switchToSignUp: "Don't have an account? Sign up",
+      switchToSignIn: 'Already have an account? Sign in',
+      signOut: 'Sign out',
+      confirmEmailSent: 'Check your inbox to confirm your email before signing in.',
+      errorInvalidCredentials: 'Incorrect email or password.',
+      errorGeneric: 'Something went wrong. Please try again.',
+      errorWeakPassword: 'Password must be at least 6 characters.',
+    },
     common: {
       add: 'Add', cancel: 'Cancel', close: 'Close', delete: 'Delete', edit: 'Edit', save: 'Save', saving: 'Saving…',
       manage: 'Manage', details: 'Details', refresh: 'Refresh', loading: 'Loading…',
@@ -781,6 +798,23 @@ map: {
   }),
   fr: Object.freeze({
     brand: { tagline: 'Planifiez. Explorez. Profitez.', welcome: 'Chaque voyage commence ici.' },
+    auth: {
+      signInTitle: 'Connexion à mapNplan',
+      signUpTitle: 'Créer votre compte mapNplan',
+      email: 'Email',
+      password: 'Mot de passe',
+      signIn: 'Se connecter',
+      signUp: 'Créer un compte',
+      signingIn: 'Connexion…',
+      signingUp: 'Création du compte…',
+      switchToSignUp: "Pas encore de compte ? S'inscrire",
+      switchToSignIn: 'Déjà un compte ? Se connecter',
+      signOut: 'Se déconnecter',
+      confirmEmailSent: 'Vérifiez votre boîte mail pour confirmer votre adresse avant de vous connecter.',
+      errorInvalidCredentials: 'Email ou mot de passe incorrect.',
+      errorGeneric: "Une erreur est survenue. Réessayez.",
+      errorWeakPassword: 'Le mot de passe doit contenir au moins 6 caractères.',
+    },
     common: {
       add: 'Ajouter', cancel: 'Annuler', close: 'Fermer', delete: 'Supprimer', edit: 'Modifier', save: 'Enregistrer', saving: 'Enregistrement…',
       manage: 'Gérer', details: 'Détails', refresh: 'Actualiser', loading: 'Chargement…',

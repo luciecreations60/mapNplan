@@ -47,6 +47,7 @@ import {
   HeartPulse,
   LayoutDashboard,
   ListChecks,
+  LogOut,
   Map,
   MapPin,
   Menu,
@@ -188,6 +189,7 @@ const ICONS = {
   wifi: Wifi,
   eye: Eye,
   close: X,
+  logOut: LogOut,
 };
 
 export function Icon({ name, size = 20, strokeWidth = 1.9, ...props }) {
