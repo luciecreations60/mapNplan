@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
 import { useI18n } from '../hooks/useI18n.js';
 import { Brand } from '../components/common/Brand.jsx';
@@ -99,6 +99,8 @@ export function LoginPage() {
         >
           {mode === 'signIn' ? t('auth.switchToSignUp') : t('auth.switchToSignIn')}
         </button>
+
+        <Link className="auth-page__legal" to="/confidentialite">{t('gdpr.privacyLink')}</Link>
       </div>
     </div>
   );

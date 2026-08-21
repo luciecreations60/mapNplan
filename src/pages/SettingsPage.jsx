@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '../components/common/Button.jsx';
 import { Card } from '../components/common/Card.jsx';
 import { Icon } from '../components/common/Icon.jsx';
@@ -10,16 +11,20 @@ import { useTheme } from '../hooks/useTheme.js';
 import { useTrips } from '../hooks/useTrips.js';
 import { attachmentStorageService } from '../services/storage/AttachmentStorageService.js';
 import { storageHealthService } from '../services/storage/StorageHealthService.js';
+import { deleteAccount } from '../services/account/AccountService.js';
+import { useAuth } from '../auth/AuthContext.jsx';
 
 export function SettingsPage() {
   const { language, locale, setLanguage, supportedLanguages, t } = useI18n();
   const { theme, setTheme } = useTheme();
   const { clearLocalTripData, exportBackup, importBackup, trips } = useTrips();
+  const { user } = useAuth();
   const fileInputRef = useRef(null);
   const [feedback, setFeedback] = useState(null);
   const [isImporting, setIsImporting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [storageUsage, setStorageUsage] = useState(null);
   const [storageHealth, setStorageHealth] = useState(null);
   const [isCheckingStorage, setIsCheckingStorage] = useState(false);
@@ -56,6 +61,29 @@ export function SettingsPage() {
     refreshStorageUsage();
     refreshStorageHealth();
   }, [refreshStorageHealth, refreshStorageUsage, trips]);
+
+  /**
+   * Permanent account deletion. The remote account and its trips are removed
+   * first: if that call fails, local data is deliberately left untouched so the
+   * user is not left with an unusable local copy and a live remote account.
+   */
+  async function handleDeleteAccount() {
+    if (!window.confirm(t('gdpr.deleteConfirmFirst'))) return;
+    if (!window.confirm(t('gdpr.deleteConfirmSecond'))) return;
+
+    setIsDeletingAccount(true);
+    try {
+      await deleteAccount();
+      await clearLocalTripData();
+      // A hash route keeps the deployment path intact, so this works both on
+      // the GitHub Pages sub-path and on a future custom domain.
+      window.location.hash = '#/login';
+      window.location.reload();
+    } catch (error) {
+      showFeedback('danger', t('gdpr.deleteFailedTitle'), t('gdpr.deleteFailedText'));
+      setIsDeletingAccount(false);
+    }
+  }
 
   function showFeedback(tone, title, message) {
     setFeedback({ tone, title, message });
@@ -364,6 +392,39 @@ export function SettingsPage() {
       </Card>
 
       <AffiliateSettingsCard />
+
+      <Card className="settings-card" id="privacy">
+        <header>
+          <span className="settings-card__icon"><Icon name="shield" /></span>
+          <div>
+            <h2>{t('gdpr.title')}</h2>
+            <p>{t('gdpr.intro')}</p>
+          </div>
+        </header>
+
+        <dl className="configuration-list">
+          <div><dt>{t('gdpr.account')}</dt><dd>{user?.email || '—'}</dd></div>
+          <div><dt>{t('gdpr.hosting')}</dt><dd>{t('gdpr.hostingValue')}</dd></div>
+        </dl>
+
+        <div className="settings-actions">
+          <div>
+            <strong>{t('gdpr.policyTitle')}</strong>
+            <p>{t('gdpr.policyText')}</p>
+          </div>
+          <Link className="button button--secondary" to="/confidentialite">{t('gdpr.policyButton')}</Link>
+        </div>
+
+        <div className="settings-actions">
+          <div>
+            <strong>{t('gdpr.deleteTitle')}</strong>
+            <p>{t('gdpr.deleteText')}</p>
+          </div>
+          <Button variant="danger" icon="trash" disabled={isDeletingAccount} onClick={handleDeleteAccount}>
+            {isDeletingAccount ? t('gdpr.deleting') : t('gdpr.deleteButton')}
+          </Button>
+        </div>
+      </Card>
 
       <Card className="settings-card settings-card--danger" id="clear-local-trip-data">
         <header>

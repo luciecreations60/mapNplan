@@ -20,6 +20,7 @@ const TemplatesPage = lazyNamed(() => import('./pages/TemplatesPage.jsx'), 'Temp
 const TripWorkspacePage = lazyNamed(() => import('./pages/TripWorkspacePage.jsx'), 'TripWorkspacePage');
 const TripsPage = lazyNamed(() => import('./pages/TripsPage.jsx'), 'TripsPage');
 const LoginPage = lazyNamed(() => import('./pages/LoginPage.jsx'), 'LoginPage');
+const PrivacyPolicyPage = lazyNamed(() => import('./pages/PrivacyPolicyPage.jsx'), 'PrivacyPolicyPage');
 
 export default function App() {
   return (
@@ -31,6 +32,8 @@ export default function App() {
             <Route path="/shared" element={<SharedTripPage />} />
             <Route path="/guides/:slug" element={<PublicDestinationPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/confidentialite" element={<PrivacyPolicyPage />} />
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route
               element={(
                 <RequireAuth>
