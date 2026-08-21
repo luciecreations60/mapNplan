@@ -30,6 +30,7 @@ export const WORKSPACE_VIEWS = Object.freeze({
     primary: Object.freeze([
       { id: 'booking', labelKey: 'workspace.compare', icon: 'search' },
       { id: 'reservations', labelKey: 'workspace.reservations', icon: 'ticket' },
+      { id: 'stays', labelKey: 'workspace.stays', icon: 'hotel' },
     ]),
     more: Object.freeze([]),
   }),

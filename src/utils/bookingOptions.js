@@ -34,6 +34,18 @@ export function normalizeBookingOption(option, fallbackCurrency = 'EUR') {
     departureLocation: String(option?.departureLocation || '').trim(),
     arrivalLocation: String(option?.arrivalLocation || '').trim(),
     travelers: Math.max(1, Number(option?.travelers) || 1),
+    // Accommodation comparison fields. Defaults keep every previously stored
+    // option valid: an option saved before this feature simply compares with
+    // no rating, no amenities and a flat price.
+    pricePerNight: Math.max(0, Number(option?.pricePerNight) || 0),
+    extraCosts: Math.max(0, Number(option?.extraCosts) || 0),
+    rating: Math.min(10, Math.max(0, Number(option?.rating) || 0)),
+    lodgingType: String(option?.lodgingType || '').trim(),
+    amenities: Array.isArray(option?.amenities)
+      ? [...new Set(option.amenities.map((amenity) => String(amenity).trim()).filter(Boolean))]
+      : [],
+    latitude: Number.isFinite(Number(option?.latitude)) ? Number(option.latitude) : null,
+    longitude: Number.isFinite(Number(option?.longitude)) ? Number(option.longitude) : null,
     searchContextKey: String(option?.searchContextKey || '').trim(),
     createdAt: option?.createdAt || new Date().toISOString(),
     updatedAt: option?.updatedAt || option?.createdAt || new Date().toISOString(),

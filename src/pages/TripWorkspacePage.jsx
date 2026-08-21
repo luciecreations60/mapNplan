@@ -17,6 +17,7 @@ import { StatisticsPanel } from '../components/tripWorkspace/StatisticsPanel.jsx
 import { TravelToolsPanel } from '../components/tripWorkspace/TravelToolsPanel.jsx';
 import { TripHero } from '../components/tripWorkspace/TripHero.jsx';
 import { TodayPanel } from '../components/tripWorkspace/TodayPanel.jsx';
+import { AccommodationComparisonPanel } from '../components/tripWorkspace/AccommodationComparisonPanel.jsx';
 import { EditTripDialog } from '../components/trips/EditTripDialog.jsx';
 import { InlineNotice } from '../components/feedback/InlineNotice.jsx';
 import {
@@ -203,6 +204,9 @@ export function TripWorkspacePage() {
 
         {activeGroup === 'booking' && activeView === 'booking' && (
           <BookingPanel trip={trip} onUpdate={handleUpdate} context={bookingContext} onClearContext={() => setBookingContext(null)} />
+        )}
+        {activeGroup === 'booking' && activeView === 'stays' && (
+          <AccommodationComparisonPanel trip={trip} onUpdate={handleUpdate} onOpenTab={handleTabChange} />
         )}
         {activeGroup === 'booking' && activeView === 'reservations' && (
           <ReservationsPanel

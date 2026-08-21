@@ -6895,3 +6895,100 @@
 .auth-page__switch:hover {
   text-decoration: underline;
 }
+
+/* --------------------------------------------------------------------------
+ * Accommodation comparison
+ * -------------------------------------------------------------------------- */
+.stay-group { padding: 18px; margin-bottom: 16px; }
+.stay-group__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.stay-group__header h3 { margin: 2px 0 4px; }
+.stay-group__meta { margin: 0; color: var(--color-text-muted); font-size: .78rem; }
+
+/* The table scrolls horizontally so a fourth or fifth candidate never squeezes
+   the criterion column into unreadable wrapping. */
+.stay-compare-scroll { overflow-x: auto; scrollbar-gutter: stable; }
+.stay-compare-table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  font-size: .82rem;
+}
+.stay-compare-table th,
+.stay-compare-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+}
+.stay-compare-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--color-surface);
+  border-bottom: 2px solid var(--color-border-strong);
+}
+.stay-compare-table tbody th {
+  width: 168px;
+  color: var(--color-text-muted);
+  font-size: .76rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.stay-compare-table__name { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; }
+.stay-cell--best {
+  background: color-mix(in srgb, var(--color-green) 11%, transparent);
+  border-radius: 8px;
+}
+.stay-cell--best small {
+  display: block;
+  margin-top: 2px;
+  color: var(--color-green-strong);
+  font-size: .68rem;
+  font-weight: 800;
+}
+.stay-cell--notes { max-width: 240px; color: var(--color-text-muted); font-size: .76rem; }
+.stay-amenity-list { display: grid; gap: 3px; margin: 0; padding: 0; list-style: none; }
+.stay-amenity-list li { display: flex; align-items: center; gap: 5px; font-size: .74rem; }
+.stay-amenity-list li.is-present { color: var(--color-green-strong); }
+.stay-amenity-list li.is-absent { color: var(--color-text-soft); text-decoration: line-through; }
+.stay-candidate-actions { display: grid; gap: 7px; }
+.stay-candidate-actions__row { display: flex; flex-wrap: wrap; gap: 4px; }
+.icon-button--active { color: var(--color-warning); background: var(--color-warning-soft); }
+.stays-amenities__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  margin-top: 6px;
+}
+.stays-amenity-toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: .8rem;
+  cursor: pointer;
+}
+.stays-amenity-toggle:hover { border-color: var(--color-border-strong); background: var(--color-surface-muted); }
+.stays-form__preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--color-primary-strong);
+  background: var(--color-primary-soft);
+  font-size: .82rem;
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .stay-group__header { flex-direction: column; }
+  .stay-compare-table tbody th { width: 130px; }
+}
