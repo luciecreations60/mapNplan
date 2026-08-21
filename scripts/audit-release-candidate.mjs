@@ -46,11 +46,11 @@ check('Robots keeps page-level noindex visible', /page-level noindex metadata/i.
 check('No provisional sitemap submission', !/^Sitemap:/im.test(robots), 'robots.txt must not advertise a sitemap before launch.');
 
 const requiredDocs = [
-  'RELEASE_CANDIDATE_TEST_PLAN.md',
-  'RELEASE_CHECKLIST.md',
-  'KNOWN_LIMITATIONS.md',
-  'V1_READINESS_REPORT.md',
-  'ROLLBACK.md',
+  'docs/RELEASE_CANDIDATE_TEST_PLAN.md',
+  'docs/RELEASE_CHECKLIST.md',
+  'docs/KNOWN_LIMITATIONS.md',
+  'docs/V1_READINESS_REPORT.md',
+  'docs/ROLLBACK.md',
 ];
 for (const file of requiredDocs) {
   check(`Documentation: ${file}`, await exists(file), `Missing release document: ${file}`);
