@@ -42,7 +42,8 @@ const TOTAL_KEYWORDS = [
 const REFERENCE_KEYWORDS = [
   'confirmation number', 'confirmation no', 'booking number', 'booking reference', 'reservation number',
   'reservation reference', 'référence de réservation', 'numero de réservation', 'numéro de réservation',
-  'numéro de confirmation', 'reference', 'référence', 'confirmation', 'booking id', 'reservation id', 'pnr', 'code de réservation',
+  'numéro de confirmation', 'code de confirmation', 'dossier', 'numéro de dossier', 'numero de dossier',
+  'reference', 'référence', 'confirmation', 'booking id', 'reservation id', 'pnr', 'code de réservation',
 ];
 
 export function analyzeReservationText(text, {
@@ -160,12 +161,25 @@ function detectConfirmationNumber(lines) {
     const value = line
       .replace(new RegExp(`.*(?:${REFERENCE_KEYWORDS.map(escapeRegExp).join('|')})\\s*(?:n[°o.]*)?\\s*[:#-]?\\s*`, 'i'), '')
       .trim();
-    const token = value.match(/[A-Z0-9][A-Z0-9-]{3,19}/i)?.[0];
+    const token = (value.match(/[A-Z0-9][A-Z0-9-]{3,19}/gi) || []).find(isPlausibleReference);
     if (token) return token;
   }
 
   const pnr = lines.join(' ').match(/\b(?:PNR|REF|BOOKING)\s*[:#-]?\s*([A-Z0-9][A-Z0-9-]{4,11})\b/i);
   return pnr?.[1] || '';
+}
+
+/**
+ * Heading lines such as "Confirmation de réservation" carry a keyword but no
+ * reference, and a naive token match happily returns a fragment of the French
+ * word itself. A real reference either contains a digit, or is an all-caps
+ * code such as a rail booking file number.
+ */
+function isPlausibleReference(token) {
+  const compact = String(token).replace(/-/g, '');
+  if (compact.length < 4) return false;
+  if (/\d/.test(compact)) return true;
+  return compact.length >= 5 && compact === compact.toLocaleUpperCase('fr');
 }
 
 function detectDates(text, { tripStartDate, tripEndDate }) {
@@ -180,7 +194,7 @@ function detectDates(text, { tripStartDate, tripEndDate }) {
     if (iso) candidates.push({ iso, index: match.index || 0 });
   }
 
-  const namedPattern = /\b(0?[1-9]|[12]\d|3[01])\s+(jan(?:uary|vier)?|janv\.?|feb(?:ruary)?|fév(?:rier)?|fev(?:rier)?|mars?|march|apr(?:il)?|avr(?:il)?|mai|may|juin|june|jun|juillet|july|jul|ao[uû]t|aug(?:ust)?|sept(?:ember|embre)?|sep|oct(?:ober|obre)?|nov(?:ember|embre)?|d[ée]c(?:ember|embre)?|dec(?:ember|embre)?|gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre|enero|febrero|abril|mayo|junio|julio|septiembre|octubre|noviembre|diciembre)\s+(20\d{2}|\d{2})\b/giu;
+  const namedPattern = /\b(0?[1-9]|[12]\d|3[01])\s+(jan(?:uary|vier)?|janv\.?|feb(?:ruary)?|fév(?:rier)?|fev(?:rier)?|mars?|march|apr(?:il)?|avr(?:il)?|mai|may|juin|june|jun|juillet|july|jul|ao[uû]t|aug(?:ust)?|sept(?:ember|embre)?|sep|oct(?:ober|obre)?|nov(?:ember|embre)?|d[ée]c(?:ember|embre)?|dec(?:ember|embre)?|gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre|enero|febrero|abril|mayo|junio|julio|septiembre|octubre|noviembre|diciembre)\.?\s+(20\d{2}|\d{2})\b/giu;
   for (const match of text.matchAll(namedPattern)) {
     const month = monthNumber(match[2]);
     const iso = safeIsoDate(normalizeYear(match[3]), month, Number(match[1]));
