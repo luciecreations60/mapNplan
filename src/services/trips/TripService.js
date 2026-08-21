@@ -603,6 +603,7 @@ class TripService {
         : 'pending',
       amount: Math.max(0, Number(reservation.amount) || 0),
       url: normalizeExternalUrl(reservation.url),
+      emailUrl: normalizeExternalUrl(reservation.emailUrl),
       latitude: this.#normalizeLatitude(reservation.latitude),
       longitude: this.#normalizeLongitude(reservation.longitude),
       notes: String(reservation.notes || '').trim(),

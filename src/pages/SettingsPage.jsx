@@ -13,12 +13,15 @@ import { attachmentStorageService } from '../services/storage/AttachmentStorageS
 import { storageHealthService } from '../services/storage/StorageHealthService.js';
 import { deleteAccount } from '../services/account/AccountService.js';
 import { useAuth } from '../auth/AuthContext.jsx';
+import { useMailProvider } from '../hooks/useMailProvider.js';
+import { MAIL_PROVIDERS } from '../utils/mailLink.js';
 
 export function SettingsPage() {
   const { language, locale, setLanguage, supportedLanguages, t } = useI18n();
   const { theme, setTheme } = useTheme();
   const { clearLocalTripData, exportBackup, importBackup, trips } = useTrips();
   const { user } = useAuth();
+  const { mailProvider, setMailProvider } = useMailProvider();
   const fileInputRef = useRef(null);
   const [feedback, setFeedback] = useState(null);
   const [isImporting, setIsImporting] = useState(false);
@@ -392,6 +395,25 @@ export function SettingsPage() {
       </Card>
 
       <AffiliateSettingsCard />
+
+      <Card className="settings-card" id="mail">
+        <header>
+          <span className="settings-card__icon"><Icon name="mail" /></span>
+          <div>
+            <h2>{t('mailLink.settingsTitle')}</h2>
+            <p>{t('mailLink.settingsText')}</p>
+          </div>
+        </header>
+        <label className="workspace-field">
+          <span>{t('mailLink.settingsLabel')}</span>
+          <select value={mailProvider} onChange={(event) => setMailProvider(event.target.value)}>
+            {MAIL_PROVIDERS.map((provider) => (
+              <option key={provider.id} value={provider.id}>{t(provider.labelKey)}</option>
+            ))}
+          </select>
+          <small className="workspace-field__hint">{t('mailLink.settingsHint')}</small>
+        </label>
+      </Card>
 
       <Card className="settings-card" id="privacy">
         <header>

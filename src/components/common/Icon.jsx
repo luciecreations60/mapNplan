@@ -49,6 +49,7 @@ import {
   LayoutDashboard,
   ListChecks,
   LogOut,
+  Mail,
   Map,
   MapPin,
   Menu,
@@ -191,6 +192,7 @@ const ICONS = {
   eye: Eye,
   close: X,
   logOut: LogOut,
+  mail: Mail,
   gripVertical: GripVertical,
 };
 

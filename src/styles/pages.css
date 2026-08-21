@@ -7044,3 +7044,11 @@
   .legal-page { padding: 20px 12px 40px; }
   .legal-page__inner { padding: 22px 18px 26px; }
 }
+
+.workspace-field__hint {
+  display: block;
+  margin-top: 4px;
+  color: var(--color-text-muted);
+  font-size: .72rem;
+  line-height: 1.45;
+}

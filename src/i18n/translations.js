@@ -541,6 +541,15 @@ export const TRANSLATIONS = Object.freeze({
       deleteFailedTitle: 'Deletion failed', deleteFailedText: 'Your account has not been deleted. Please check your connection and try again.',
       privacyLink: 'Privacy policy',
     },
+    mailLink: {
+      openEmail: 'See the email', openSearchHint: 'Opens your mailbox with this confirmation already searched',
+      openDirectHint: 'Opens the saved email link',
+      directLinkLabel: 'Direct link to the email', directLinkHint: 'Optional. If left empty, a search of your mailbox is built from the provider and confirmation number.',
+      directLinkPlaceholder: 'https://mail.google.com/...',
+      settingsTitle: 'Mailbox', settingsText: 'Confirmations usually arrive by email. mapNplan can take you straight back to them.',
+      settingsLabel: 'My mailbox', settingsHint: 'Used to build the "See the email" link on your reservations. Stored on this device only.',
+      providerGmail: 'Gmail', providerOutlook: 'Outlook / Hotmail', providerYahoo: 'Yahoo Mail', providerIcloud: 'iCloud Mail', providerOther: 'Other (direct link only)',
+    },
 map: {
   eyebrow: 'Visual planning', title: 'Trip map', intro: 'See itinerary stops and saved places in one clear map.',
   emptyTitle: 'No mapped places yet', emptyText: 'Select a destination, add a geolocated activity or save a place to start your map.',
@@ -1361,6 +1370,15 @@ map: {
       deleteConfirmSecond: 'Dernière confirmation : tout sera effacé, sur nos serveurs et sur cet appareil. Continuer ?',
       deleteFailedTitle: 'Échec de la suppression', deleteFailedText: 'Votre compte n’a pas été supprimé. Vérifiez votre connexion et réessayez.',
       privacyLink: 'Politique de confidentialité',
+    },
+    mailLink: {
+      openEmail: 'Voir le mail', openSearchHint: 'Ouvre votre messagerie avec cette confirmation déjà recherchée',
+      openDirectHint: 'Ouvre le lien du mail enregistré',
+      directLinkLabel: 'Lien direct vers le mail', directLinkHint: 'Facultatif. Si vide, une recherche dans votre messagerie est construite à partir du fournisseur et du numéro de confirmation.',
+      directLinkPlaceholder: 'https://mail.google.com/...',
+      settingsTitle: 'Messagerie', settingsText: 'Les confirmations arrivent le plus souvent par mail. mapNplan peut vous y ramener directement.',
+      settingsLabel: 'Ma messagerie', settingsHint: 'Sert à construire le lien « Voir le mail » sur vos réservations. Conservé uniquement sur cet appareil.',
+      providerGmail: 'Gmail', providerOutlook: 'Outlook / Hotmail', providerYahoo: 'Yahoo Mail', providerIcloud: 'iCloud Mail', providerOther: 'Autre (lien direct uniquement)',
     },
 map: {
   eyebrow: 'Planification visuelle', title: 'Carte du voyage', intro: 'Visualisez les étapes de l’itinéraire et les lieux enregistrés sur une carte claire.',

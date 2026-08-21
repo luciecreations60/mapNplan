@@ -1,5 +1,7 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { useI18n } from '../../hooks/useI18n.js';
+import { useMailProvider } from '../../hooks/useMailProvider.js';
+import { buildMailLink } from '../../utils/mailLink.js';
 import { attachmentStorageService } from '../../services/storage/AttachmentStorageService.js';
 import { formatCurrency } from '../../utils/currency.js';
 import { formatLocalizedDate, formatLocalizedTime } from '../../utils/date.js';
@@ -20,12 +22,13 @@ import { ReservationImportDialog } from './ReservationImportDialog.jsx';
 
 const EMPTY_FORM = Object.freeze({
   type: 'flight', title: '', provider: '', confirmationNumber: '', startDate: '', startTime: '',
-  endDate: '', endTime: '', location: '', status: 'confirmed', amount: '0.00', url: '',
+  endDate: '', endTime: '', location: '', status: 'confirmed', amount: '0.00', url: '', emailUrl: '',
   latitude: '', longitude: '', notes: '', sourceActivityId: null, sourceActivitySeriesId: null,
 });
 
 export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focusedReservationId = null }) {
   const { locale, t } = useI18n();
+  const { mailProvider } = useMailProvider();
   const [form, setForm] = useState(() => ({ ...EMPTY_FORM, startDate: trip.startDate || '' }));
   const [isCreateOpen, setCreateOpen] = useState(false);
   const [isImportOpen, setImportOpen] = useState(false);
@@ -108,6 +111,7 @@ export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focus
       status: reservation.status || 'pending',
       amount: Number(reservation.amount || 0).toFixed(2),
       url: reservation.url || '',
+      emailUrl: reservation.emailUrl || '',
       latitude: reservation.latitude ?? '',
       longitude: reservation.longitude ?? '',
       notes: reservation.notes || '',
@@ -452,6 +456,7 @@ export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focus
             <Field label={t('common.provider')}><input name="provider" value={form.provider} onChange={updateField} placeholder={t('reservations.providerPlaceholder')} /></Field>
             <Field label={t('reservations.confirmationNumber')}><input name="confirmationNumber" value={form.confirmationNumber} onChange={updateField} placeholder={t('reservations.optionalReference')} /></Field>
             <Field label={t('reservations.bookingLink')} className="workspace-form__wide"><input name="url" type="url" value={form.url} onChange={updateField} placeholder={t('reservations.linkPlaceholder')} /></Field>
+            <Field label={t('mailLink.directLinkLabel')} hint={t('mailLink.directLinkHint')} className="workspace-form__wide"><input name="emailUrl" type="url" value={form.emailUrl} onChange={updateField} placeholder={t('mailLink.directLinkPlaceholder')} /></Field>
             <LocationAutocomplete
               id={editingId ? `reservation-location-${editingId}` : 'reservation-location-new'}
               variant="workspace"
@@ -554,6 +559,7 @@ export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focus
                     <div className="reservation-card__actions">
                       <label><span className="sr-only">{t('reservations.status')}</span><select value={reservation.status} onChange={(event) => updateStatus(reservation.id, event.target.value)}>{RESERVATION_STATUSES.map((status) => <option key={status.id} value={status.id}>{t(status.labelKey)}</option>)}</select></label>
                       {safeUrl && <a className="text-link" href={safeUrl} target="_blank" rel="noreferrer">{t('reservations.openBooking')} <Icon name="externalLink" size={15} /></a>}
+                      {(() => { const mailLink = buildMailLink(reservation, mailProvider); return mailLink ? <a className="text-link" href={mailLink} target="_blank" rel="noreferrer" title={t(reservation.emailUrl ? 'mailLink.openDirectHint' : 'mailLink.openSearchHint')}><Icon name="mail" size={15} /> {t('mailLink.openEmail')}</a> : null; })()}
                       {linkedDocuments.length > 0 && <button className="text-link" type="button" onClick={() => onOpenDocument?.(linkedDocuments[0].id)}><Icon name="folder" size={15} /> {t('reservations.openDocuments', { count: linkedDocuments.length })}</button>}
                       {(() => { const linkedAmount = getLinkedActivityAmount(reservation); return linkedAmount !== null && Math.abs(linkedAmount - Number(reservation.amount || 0)) > 0.009 ? <button className="text-link reservation-card__amount-sync" type="button" onClick={() => syncReservationAmount(reservation, linkedAmount)}><Icon name="refresh" size={15} /> {t('reservations.updateAmountFromItinerary', { amount: formatCurrency(linkedAmount, trip.currency, locale) })}</button> : null; })()}
                     </div>
@@ -590,8 +596,14 @@ export function ReservationsPanel({ trip, onUpdate, onOpenDocument = null, focus
   );
 }
 
-function Field({ label, className = '', children }) {
-  return <label className={`workspace-field ${className}`.trim()}><span>{label}</span>{children}</label>;
+function Field({ label, hint = '', className = '', children }) {
+  return (
+    <label className={`workspace-field ${className}`.trim()}>
+      <span>{label}</span>
+      {children}
+      {hint && <small className="workspace-field__hint">{hint}</small>}
+    </label>
+  );
 }
 
 function normalizeMoney(value) {
