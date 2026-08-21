@@ -4,11 +4,16 @@ import { formatLocalizedDate, formatLocalizedDateTime } from '../../utils/date.j
 import { formatCurrency } from '../../utils/currency.js';
 import { createId } from '../../utils/id.js';
 import { normalizeExternalUrl } from '../../utils/url.js';
+import { buildDirectionsUrl } from '../../utils/navigation.js';
+import { weatherService } from '../../services/weather/WeatherService.js';
+import { formatTemperature, getWeatherPresentation } from '../../utils/weather.js';
 import {
   buildCompanionAlerts,
+  formatCountdown,
   getActivityTimelineState,
   getCompanionDay,
   getInitialCompanionDate,
+  getMinutesUntilActivity,
 } from '../../utils/travelCompanion.js';
 import { Badge } from '../common/Badge.jsx';
 import { Button } from '../common/Button.jsx';
@@ -31,9 +36,18 @@ export function TodayPanel({ trip, onUpdate, onOpenTab }) {
   }, [trip.id]);
 
   const day = useMemo(() => getCompanionDay(trip, selectedDate), [trip, selectedDate]);
+
+  // A ticking clock so the countdown and the "happening now" state stay
+  // accurate while the panel is left open during a travel day.
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
   const timeline = useMemo(
-    () => getActivityTimelineState(day.activities, selectedDate),
-    [day.activities, selectedDate],
+    () => getActivityTimelineState(day.activities, selectedDate, now),
+    [day.activities, selectedDate, now],
   );
   const alerts = useMemo(
     () => buildCompanionAlerts(trip, selectedDate, day),
@@ -42,6 +56,40 @@ export function TodayPanel({ trip, onUpdate, onOpenTab }) {
   const currentParticipant = trip.travelParty.find((participant) => participant.isCurrentUser)
     || trip.travelParty[0]
     || null;
+
+  // Weather is anchored on the first geolocated stop of the displayed day, so
+  // it reflects where the traveller actually is rather than the trip's main
+  // destination. Failures stay silent: the forecast is a bonus, never a
+  // blocker for the rest of the panel.
+  const weatherAnchor = useMemo(() => {
+    const located = day.activities.find((activity) => (
+      Number.isFinite(Number(activity.latitude)) && Number.isFinite(Number(activity.longitude))
+    ));
+    if (located) return { latitude: Number(located.latitude), longitude: Number(located.longitude) };
+    if (Number.isFinite(Number(trip.destinationLatitude)) && Number.isFinite(Number(trip.destinationLongitude))) {
+      return { latitude: Number(trip.destinationLatitude), longitude: Number(trip.destinationLongitude) };
+    }
+    return null;
+  }, [day.activities, trip.destinationLatitude, trip.destinationLongitude]);
+
+  const [dayWeather, setDayWeather] = useState(null);
+  useEffect(() => {
+    if (!weatherAnchor) {
+      setDayWeather(null);
+      return undefined;
+    }
+    let cancelled = false;
+    weatherService
+      .getForecast({ latitude: weatherAnchor.latitude, longitude: weatherAnchor.longitude })
+      .then((forecast) => {
+        if (cancelled) return;
+        setDayWeather((forecast.days || []).find((entry) => entry.date === selectedDate) || null);
+      })
+      .catch(() => {
+        if (!cancelled) setDayWeather(null);
+      });
+    return () => { cancelled = true; };
+  }, [weatherAnchor?.latitude, weatherAnchor?.longitude, selectedDate]);
 
   function toggleActivityCompleted(activityId) {
     const now = new Date().toISOString();
@@ -101,6 +149,11 @@ export function TodayPanel({ trip, onUpdate, onOpenTab }) {
   }
 
   const focusActivity = timeline.currentActivity || timeline.nextActivity;
+  const focusCountdown = focusActivity && !timeline.currentActivity
+    ? formatCountdown(getMinutesUntilActivity(focusActivity, selectedDate, now), t)
+    : '';
+  const focusDirectionsUrl = focusActivity ? buildDirectionsUrl(focusActivity) : '';
+  const weatherPresentation = dayWeather ? getWeatherPresentation(dayWeather.weatherCode) : null;
 
   return (
     <div className="workspace-section companion-panel">
@@ -134,6 +187,13 @@ export function TodayPanel({ trip, onUpdate, onOpenTab }) {
             <Badge tone={timeline.currentActivity ? 'success' : 'primary'}>
               {t(timeline.currentActivity ? 'companion.happeningNow' : 'companion.nextUp')}
             </Badge>
+            {focusCountdown && <span className="companion-countdown">{focusCountdown}</span>}
+            {weatherPresentation && (
+              <span className="companion-weather-chip" title={t(weatherPresentation.labelKey)}>
+                <Icon name={weatherPresentation.icon} size={16} />
+                {formatTemperature(dayWeather.temperatureMax)} / {formatTemperature(dayWeather.temperatureMin)}
+              </span>
+            )}
             <span>{formatLongDate(selectedDate, locale)}</span>
           </div>
           {focusActivity ? (
@@ -153,11 +213,23 @@ export function TodayPanel({ trip, onUpdate, onOpenTab }) {
             </div>
           )}
           <div className="companion-focus-card__actions">
+            {focusDirectionsUrl && (
+              <a
+                className="button button--primary button--small"
+                href={focusDirectionsUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Icon name="route" size={16} />
+                <span>{t('companion.navigateThere')}</span>
+              </a>
+            )}
             <Button variant="secondary" size="small" icon="calendarDays" onClick={() => onOpenTab('itinerary')}>
               {t('companion.openItinerary')}
             </Button>
             {focusActivity && (
               <Button
+                variant="secondary"
                 size="small"
                 icon={focusActivity.completedAt ? 'undo' : 'check'}
                 onClick={() => toggleActivityCompleted(focusActivity.id)}
@@ -204,6 +276,7 @@ export function TodayPanel({ trip, onUpdate, onOpenTab }) {
             <div className="companion-agenda-list">
               {day.activities.map((activity) => {
                 const state = timeline.states.get(activity.id) || 'upcoming';
+                const directionsUrl = buildDirectionsUrl(activity);
                 return (
                   <article key={activity.id} className={`companion-agenda-item companion-agenda-item--${state}`}>
                     <time>{activity.time || '—'}</time>
@@ -212,14 +285,28 @@ export function TodayPanel({ trip, onUpdate, onOpenTab }) {
                       <h4>{activity.title}</h4>
                       {activity.location && <p>{activity.location}</p>}
                     </div>
-                    <button
-                      className={`companion-complete-button ${activity.completedAt ? 'companion-complete-button--done' : ''}`}
-                      type="button"
-                      aria-label={t(activity.completedAt ? 'companion.markNotDoneFor' : 'companion.markDoneFor', { name: activity.title })}
-                      onClick={() => toggleActivityCompleted(activity.id)}
-                    >
-                      <Icon name={activity.completedAt ? 'checkCircle' : 'circle'} size={20} />
-                    </button>
+                    <div className="companion-agenda-item__actions">
+                      {directionsUrl && (
+                        <a
+                          className="icon-button icon-button--small"
+                          href={directionsUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={t('companion.navigateTo', { name: activity.title })}
+                          title={t('companion.navigateThere')}
+                        >
+                          <Icon name="route" size={17} />
+                        </a>
+                      )}
+                      <button
+                        className={`companion-complete-button ${activity.completedAt ? 'companion-complete-button--done' : ''}`}
+                        type="button"
+                        aria-label={t(activity.completedAt ? 'companion.markNotDoneFor' : 'companion.markDoneFor', { name: activity.title })}
+                        onClick={() => toggleActivityCompleted(activity.id)}
+                      >
+                        <Icon name={activity.completedAt ? 'checkCircle' : 'circle'} size={20} />
+                      </button>
+                    </div>
                   </article>
                 );
               })}

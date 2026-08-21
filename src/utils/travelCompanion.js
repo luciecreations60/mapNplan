@@ -151,3 +151,31 @@ function parseTimeToMinutes(value) {
   if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return Number.MAX_SAFE_INTEGER;
   return hours * 60 + minutes;
 }
+
+/**
+ * Minutes remaining before an activity starts, for the day currently shown.
+ *
+ * Returns null when the countdown would be meaningless: a different day than
+ * today, an activity with no recorded time, or a start time already passed.
+ */
+export function getMinutesUntilActivity(activity, date, now = new Date()) {
+  if (!activity?.time) return null;
+  if (date !== toDateKey(now)) return null;
+
+  const startMinutes = parseTimeToMinutes(activity.time);
+  if (startMinutes === Number.MAX_SAFE_INTEGER) return null;
+
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+  const remaining = startMinutes - nowMinutes;
+  return remaining > 0 ? remaining : null;
+}
+
+export function formatCountdown(minutes, t) {
+  if (!Number.isFinite(minutes) || minutes <= 0) return '';
+  if (minutes < 60) return t('companion.inMinutes', { count: minutes });
+
+  const hours = Math.floor(minutes / 60);
+  const remainder = minutes % 60;
+  if (remainder === 0) return t('companion.inHours', { count: hours });
+  return t('companion.inHoursMinutes', { hours, minutes: remainder });
+}
