@@ -35,11 +35,11 @@ test('continuous delivery requires the complete release-candidate gate', async (
 
 test('release documentation covers acceptance, limitations and rollback', async () => {
   const requiredFiles = [
-    'RELEASE_CANDIDATE_TEST_PLAN.md',
-    'RELEASE_CHECKLIST.md',
-    'KNOWN_LIMITATIONS.md',
-    'V1_READINESS_REPORT.md',
-    'ROLLBACK.md',
+    'docs/RELEASE_CANDIDATE_TEST_PLAN.md',
+    'docs/RELEASE_CHECKLIST.md',
+    'docs/KNOWN_LIMITATIONS.md',
+    'docs/V1_READINESS_REPORT.md',
+    'docs/ROLLBACK.md',
   ];
   for (const file of requiredFiles) {
     const content = await read(file);
