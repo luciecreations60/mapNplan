@@ -21,6 +21,25 @@ const PROVIDERS = Object.freeze([
   'GetYourGuide', 'Viator', 'Tiqets',
 ]);
 
+/**
+ * The provider is the most reliable signal a confirmation carries: a document
+ * from Air France is a flight whatever words it happens to contain. It is
+ * weighted rather than absolute, so a flight confirmation sent by a mostly
+ * accommodation provider is still classified on its own wording.
+ */
+const PROVIDER_TYPES = Object.freeze({
+  'Booking.com': 'accommodation', Airbnb: 'accommodation', Expedia: 'accommodation',
+  'Hotels.com': 'accommodation', Agoda: 'accommodation', Vrbo: 'accommodation',
+  'Air France': 'flight', easyJet: 'flight', Ryanair: 'flight', Transavia: 'flight',
+  Lufthansa: 'flight', KLM: 'flight', Vueling: 'flight',
+  'SNCF Connect': 'transport', SNCF: 'transport', Trenitalia: 'transport', Eurostar: 'transport',
+  FlixBus: 'transport', 'BlaBlaCar Bus': 'transport', 'Corsica Ferries': 'transport',
+  'La Méridionale': 'transport', 'Moby Lines': 'transport', 'Grimaldi Lines': 'transport',
+  GetYourGuide: 'activity', Viator: 'activity', Tiqets: 'activity',
+});
+
+const PROVIDER_TYPE_WEIGHT = 2;
+
 const TYPE_KEYWORDS = Object.freeze({
   accommodation: [
     'hotel', 'hôtel', 'hebergement', 'hébergement', 'accommodation', 'camping', 'campsite',
@@ -55,13 +74,17 @@ export function analyzeReservationText(text, {
   const normalizedText = normalizeWhitespace(text);
   const lines = getMeaningfulLines(text);
   const lower = normalizedText.toLocaleLowerCase('fr');
-  const type = detectReservationType(lower);
+
   const provider = detectProvider(lines, lower);
+  const type = detectReservationType(lower, provider);
   const confirmationNumber = detectConfirmationNumber(lines);
   const dates = detectDates(normalizedText, { tripStartDate, tripEndDate });
   const times = detectTimes(normalizedText);
   const amountInfo = detectAmount(lines, currency);
-  const location = detectLocation(lines, type, provider);
+  const route = detectRoute(lines, type);
+  const location = (route.origin && route.destination)
+    ? `${route.origin} → ${route.destination}`
+    : detectLocation(lines, type, provider);
   const title = detectTitle(lines, { provider, location, type, fileName });
   const status = detectStatus(lower);
 
@@ -75,6 +98,8 @@ export function analyzeReservationText(text, {
     type,
     status,
     title,
+    origin: route.origin,
+    destination: route.destination,
     provider,
     confirmationNumber,
     startDate: dates.startDate,
@@ -132,17 +157,23 @@ export function mapReservationTypeToExpenseCategory(type) {
   }[type] || 'other';
 }
 
-function detectReservationType(lower) {
-  let winner = 'activity';
-  let bestScore = -1;
+function detectReservationType(lower, provider = '') {
+  const providerType = PROVIDER_TYPES[provider] || '';
+  let winner = '';
+  let bestScore = 0;
+
   for (const [type, keywords] of Object.entries(TYPE_KEYWORDS)) {
-    const score = keywords.reduce((sum, keyword) => sum + countOccurrences(lower, keyword), 0);
+    let score = keywords.reduce((sum, keyword) => sum + countOccurrences(lower, keyword), 0);
+    if (type === providerType) score += PROVIDER_TYPE_WEIGHT;
     if (score > bestScore) {
       winner = type;
       bestScore = score;
     }
   }
-  return winner;
+
+  // No usable signal at all: stay on the neutral type rather than defaulting to
+  // whichever category happens to be declared first.
+  return winner || providerType || 'activity';
 }
 
 function detectProvider(lines, lower) {
@@ -249,6 +280,79 @@ function detectAmount(lines, fallbackCurrency) {
 
   candidates.sort((left, right) => right.score - left.score || right.amount - left.amount || left.lineIndex - right.lineIndex);
   return candidates[0] || { amount: 0, currency: fallbackCurrency };
+}
+
+
+const ORIGIN_LABELS = /(?:d[ée]part|departure|origine|origin|from|de)\s*[:\-]\s*(.+)$/i;
+const DESTINATION_LABELS = /(?:arriv[ée]e?|arrival|destination|to|vers|à destination de)\s*[:\-]\s*(.+)$/i;
+
+/**
+ * Removes the date and time that transport documents print next to each stop,
+ * leaving the station or airport name on its own.
+ */
+function stripDateAndTime(line) {
+  return String(line)
+    .replace(/\b\d{1,2}[/.\-]\d{1,2}[/.\-]\d{2,4}\b/g, ' ')
+    .replace(/\b\d{1,2}\s*[h:]\s*\d{2}\b/gi, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+function looksLikeStopLine(line) {
+  const hasWhen = /\b\d{1,2}[/.\-]\d{1,2}[/.\-]\d{2,4}\b/.test(line) || /\b\d{1,2}\s*[h:]\s*\d{2}\b/i.test(line);
+  if (!hasWhen) return false;
+  const name = stripDateAndTime(line);
+  return name.length >= 3 && /\p{L}{3,}/u.test(name);
+}
+
+/**
+ * Origin and destination of a transport booking.
+ *
+ * Only ever applied to transport: on a hotel confirmation, "Départ" means the
+ * check-out date, so the same labels would produce nonsense.
+ */
+function detectRoute(lines, type) {
+  if (type !== 'transport' && type !== 'flight') return { origin: '', destination: '' };
+
+  let origin = '';
+  let destination = '';
+
+  for (const line of lines) {
+    if (!origin) {
+      const match = line.match(ORIGIN_LABELS);
+      if (match?.[1]) {
+        const value = cleanExtractedValue(stripDateAndTime(match[1]));
+        if (value && /\p{L}{3,}/u.test(value)) origin = value;
+      }
+    }
+    if (!destination) {
+      const match = line.match(DESTINATION_LABELS);
+      if (match?.[1]) {
+        const value = cleanExtractedValue(stripDateAndTime(match[1]));
+        if (value && /\p{L}{3,}/u.test(value)) destination = value;
+      }
+    }
+  }
+  if (origin && destination) return { origin, destination };
+
+  // "Paris → Marseille" or "Paris - Marseille" on a single line.
+  for (const line of lines) {
+    const match = line.match(/^(.{2,45}?)\s*(?:→|->|—|–|>)\s*(.{2,45})$/u);
+    if (match) {
+      const left = cleanExtractedValue(stripDateAndTime(match[1]));
+      const right = cleanExtractedValue(stripDateAndTime(match[2]));
+      if (left && right && /\p{L}{3,}/u.test(left) && /\p{L}{3,}/u.test(right)) {
+        return { origin: left, destination: right };
+      }
+    }
+  }
+
+  // Otherwise the first two lines that name a place next to a date or time
+  // are the departure and the arrival, in that order.
+  const stops = lines.filter(looksLikeStopLine).map((line) => cleanExtractedValue(stripDateAndTime(line)));
+  if (stops.length >= 2) return { origin: stops[0], destination: stops[1] };
+
+  return { origin: origin || '', destination: destination || '' };
 }
 
 function detectLocation(lines, type, provider) {
