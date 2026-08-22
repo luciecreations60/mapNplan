@@ -5,6 +5,7 @@ import { useI18n } from '../../hooks/useI18n.js';
 import { formatLocalizedDateTime } from '../../utils/date.js';
 import { tripShareService } from '../../services/share/TripShareService.js';
 import { appendActivityEntry, createActivityEntry, getCurrentActorName } from '../../utils/collaboration.js';
+import { inviteMember, removeMember as removeRemoteMember } from '../../services/trips/TripCloudSyncService.js';
 import { createId } from '../../utils/id.js';
 import { Badge } from '../common/Badge.jsx';
 import { Button } from '../common/Button.jsx';
@@ -45,13 +46,30 @@ export function CollaborationPanel({ trip, onUpdate }) {
     setMemberForm((current) => ({ ...current, [name]: value }));
   }
 
-  function persistMember({ name, email = '', role = 'editor' }) {
+  /**
+   * Adding a member is two separate things: a name on the trip, and real
+   * access to it. Only an email address can grant access, so a member added
+   * without one stays a simple mention — and the notice says so instead of
+   * implying an invitation was sent.
+   */
+  async function persistMember({ name, email = '', role = 'editor' }) {
     if (!String(name || '').trim()) return;
     const member = { id: createId('member'), name: String(name).trim(), email: String(email || '').trim().toLowerCase(), role, addedAt: new Date().toISOString() };
     const entry = createActivityEntry({ action: 'memberAdded', actorName, entityType: 'member', entityId: member.id, targetTitle: member.name });
     onUpdate({ collaboration: appendActivityEntry({ ...collaboration, members: [...collaboration.members, member] }, entry) });
     setMemberForm(EMPTY_MEMBER);
-    setNotice({ tone: 'success', title: t('collaboration.memberAdded'), message: t('collaboration.memberAddedText', { name: member.name }) });
+
+    if (!member.email) {
+      setNotice({ tone: 'info', title: t('collaboration.memberAdded'), message: t('collaboration.memberAddedNoAccess', { name: member.name }) });
+      return;
+    }
+
+    try {
+      await inviteMember(trip.id, member.email, member.role === 'viewer' ? 'viewer' : 'editor');
+      setNotice({ tone: 'success', title: t('collaboration.memberAdded'), message: t('collaboration.memberInvited', { name: member.name, email: member.email }) });
+    } catch (error) {
+      setNotice({ tone: 'warning', title: t('collaboration.inviteFailedTitle'), message: t('collaboration.inviteFailedText', { name: member.name }) });
+    }
   }
 
   function addMember(event) { event.preventDefault(); persistMember(memberForm); }
@@ -74,6 +92,12 @@ export function CollaborationPanel({ trip, onUpdate }) {
         members: collaboration.members.map((item) => item.id === memberId ? { ...item, role } : item),
       }, entry),
     });
+
+    // Keep the granted access in step with the displayed role.
+    if (member.email) {
+      inviteMember(trip.id, member.email, role === 'viewer' ? 'viewer' : 'editor')
+        .catch(() => setNotice({ tone: 'warning', title: t('collaboration.inviteFailedTitle'), message: t('collaboration.inviteFailedText', { name: member.name }) }));
+    }
   }
 
   function removeMember(member) {
@@ -92,6 +116,13 @@ export function CollaborationPanel({ trip, onUpdate }) {
         members: collaboration.members.filter((item) => item.id !== member.id),
       }, entry),
     });
+
+    // Revoke the real access too, otherwise the person keeps seeing the trip
+    // after being removed from the list.
+    if (member.email) {
+      removeRemoteMember(trip.id, member.email)
+        .catch(() => setNotice({ tone: 'warning', title: t('collaboration.revokeFailedTitle'), message: t('collaboration.revokeFailedText', { name: member.name }) }));
+    }
   }
 
   function generateShare() {
