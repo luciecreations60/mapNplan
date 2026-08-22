@@ -44,6 +44,7 @@ export const WORKSPACE_VIEWS = Object.freeze({
     more: Object.freeze([
       { id: 'tools', labelKey: 'workspace.tools', icon: 'globe' },
       { id: 'collaboration', labelKey: 'workspace.collaboration', icon: 'users' },
+      { id: 'suggestions', labelKey: 'workspace.suggestions', icon: 'message' },
       { id: 'statistics', labelKey: 'workspace.statistics', icon: 'chart' },
     ]),
   }),

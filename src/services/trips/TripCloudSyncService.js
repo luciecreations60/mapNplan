@@ -131,3 +131,31 @@ export async function listMembers(tripId) {
   return data || [];
 }
 
+
+/**
+ * Whether the signed-in user may rewrite this trip. Owners always can;
+ * guests only when the owner made them a co-organizer. Defaults to true for a
+ * trip that is not shared at all, so solo use is never blocked by a failed
+ * lookup.
+ */
+export async function canEditTrip(tripId, userId) {
+  if (!tripId || !userId) return true;
+  if (!isSharedWithUser(tripId, userId)) return true;
+
+  const { data: sessionData } = await supabase.auth.getSession();
+  const email = String(sessionData?.session?.user?.email || '').toLowerCase();
+  if (!email) return false;
+
+  const { data, error } = await supabase
+    .from(MEMBERS_TABLE)
+    .select('role')
+    .eq('trip_id', tripId)
+    .eq('email', email)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Unable to read your role on this trip.', error);
+    return false;
+  }
+  return data?.role === 'coorganizer';
+}

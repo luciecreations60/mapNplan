@@ -18,6 +18,9 @@ import { TravelToolsPanel } from '../components/tripWorkspace/TravelToolsPanel.j
 import { TripHero } from '../components/tripWorkspace/TripHero.jsx';
 import { TodayPanel } from '../components/tripWorkspace/TodayPanel.jsx';
 import { AccommodationComparisonPanel } from '../components/tripWorkspace/AccommodationComparisonPanel.jsx';
+import { SuggestionsPanel } from '../components/tripWorkspace/SuggestionsPanel.jsx';
+import { canEditTrip } from '../services/trips/TripCloudSyncService.js';
+import { useAuth } from '../auth/AuthContext.jsx';
 import { EditTripDialog } from '../components/trips/EditTripDialog.jsx';
 import { InlineNotice } from '../components/feedback/InlineNotice.jsx';
 import {
@@ -51,7 +54,10 @@ export function TripWorkspacePage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useI18n();
+  const { user } = useAuth();
   const { getTripById, updateTrip } = useTrips();
+  // Guests may only suggest; the owner and co-organizers can apply changes.
+  const [canEditCurrentTrip, setCanEditCurrentTrip] = useState(true);
   const requestedTab = searchParams.get('tab');
   const requestedView = searchParams.get('view');
   const { activeGroup, activeView } = useMemo(
@@ -70,6 +76,14 @@ export function TripWorkspacePage() {
     window.scrollTo({ top: 0, behavior: 'auto' });
     setBookingContext(null);
   }, [tripId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    canEditTrip(tripId, user?.id)
+      .then((allowed) => { if (!cancelled) setCanEditCurrentTrip(allowed); })
+      .catch(() => { if (!cancelled) setCanEditCurrentTrip(false); });
+    return () => { cancelled = true; };
+  }, [tripId, user?.id]);
 
   useEffect(() => {
     if (!shouldFocusTabsRef.current) return;
@@ -223,6 +237,7 @@ export function TripWorkspacePage() {
         {activeGroup === 'trip' && activeView === 'documents' && <DocumentsPanel trip={trip} onUpdate={handleUpdate} focusedDocumentId={searchParams.get('document')} />}
         {activeGroup === 'trip' && activeView === 'notes' && <NotesPanel trip={trip} onUpdate={handleUpdate} />}
         {activeGroup === 'trip' && activeView === 'collaboration' && <CollaborationPanel trip={trip} onUpdate={handleUpdate} />}
+        {activeGroup === 'trip' && activeView === 'suggestions' && <SuggestionsPanel trip={trip} onUpdate={handleUpdate} canEdit={canEditCurrentTrip} />}
         {activeGroup === 'trip' && activeView === 'tools' && <TravelToolsPanel trip={trip} onOpenTab={handleTabChange} />}
       </div>
 
